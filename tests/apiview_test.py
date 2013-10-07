@@ -1,7 +1,7 @@
 from unittest import TestCase
 from werkzeug.wrappers import BaseResponse
 from werkzeug.test import Client
-from rest_api_framework.app import ApiApp
+from app import ApiApp
 import json
 import datetime
 

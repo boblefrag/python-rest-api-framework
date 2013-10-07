@@ -101,6 +101,7 @@ class PythonListDataStore(DataStore):
         """
         return an object matching the uri or None
         """
+        print "called", identifier
         for elem in self.data:
             if elem['id'] == identifier:
                 return elem

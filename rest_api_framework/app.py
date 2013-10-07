@@ -42,7 +42,7 @@ class ApiApp(Dispatcher, View):
     def __init__(self):
         urls = [
             ('/', 'index', ["GET", "POST"]),
-            ('/<int:identifier>', 'unique_uri', ["GET", "PUT", "DELETE"]),
+            ('/<int:identifier>/', 'unique_uri', ["GET", "PUT", "DELETE"]),
             ]
 
         options = {"paginate_by": 20,

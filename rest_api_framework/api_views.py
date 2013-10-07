@@ -77,6 +77,7 @@ class ApiView(WSGIWrapper):
         """
         Create a new object in the datastore
         """
+        print request.data
         try:
             data = json.loads(request.data)
         except:
@@ -95,5 +96,5 @@ class ApiView(WSGIWrapper):
             status=200)
 
     def delete(self, request, identifier):
-        obj = self.datastore.get(identifier=identifier)
-        return obj
+        obj = self.datastore.delete(identifier=identifier)
+        return JsonResponse("Hello", status=200)

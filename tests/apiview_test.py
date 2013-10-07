@@ -24,6 +24,8 @@ class TestApiView(TestCase):
         resp = client.post("/", data=json.dumps({'name': 'bob', 'age': 34}))
         self.assertEqual(resp.status_code, 201)
         self.assertEqual(resp.headers['Location'], "http://localhost/100")
+        resp = client.post("/", data=json.dumps({"hello": "world"}))
+        self.assertEqual(resp.status_code, 400)
 
     def test_updated(self):
         client = Client(ApiApp(), response_wrapper=BaseResponse)

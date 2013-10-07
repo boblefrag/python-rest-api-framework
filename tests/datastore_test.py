@@ -1,5 +1,5 @@
 from unittest import TestCase
-from rest_api_framework.datastore import PythonListDataStore
+from rest_api_framework.datastore import PythonListDataStore, DataStore
 from werkzeug.exceptions import BadRequest, NotFound
 
 
@@ -20,6 +20,12 @@ class PythonListDataStoreTest(TestCase):
         self.assertRaises(BadRequest,
                           store.validate,
                           {"name": "bob", "age": "34"})
+        self.assertRaises(BadRequest,
+                          store.validate_fields,
+                          {"age": "34"})
+        self.assertRaises(BadRequest,
+                          store.validate_fields,
+                          "age")
 
     def test_pagination(self):
         data_list = [

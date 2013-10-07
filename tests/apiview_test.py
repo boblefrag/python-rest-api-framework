@@ -4,6 +4,7 @@ from werkzeug.test import Client
 from rest_api_framework.app import ApiApp
 import json
 
+
 class TestApiView(TestCase):
 
     def test_get_list(self):

@@ -3,7 +3,7 @@ from werkzeug.wrappers import BaseResponse
 from werkzeug.test import Client
 from rest_api_framework.app import ApiApp
 import json
-
+import datetime
 
 class TestApiView(TestCase):
 
@@ -24,8 +24,7 @@ class TestApiView(TestCase):
         resp = client.post("/", data=json.dumps({'name': 'bob', 'age': 34}))
         self.assertEqual(resp.status_code, 201)
         self.assertEqual(resp.headers['Location'], "http://localhost/100")
-        resp = client.post("/", data=json.dumps(
-                json.dumps('{"hello": "world"}')))
+        resp = client.post("/", data={"test": datetime.datetime.now()})
         self.assertEqual(resp.status_code, 400)
 
     def test_updated(self):

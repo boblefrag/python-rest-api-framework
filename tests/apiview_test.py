@@ -16,6 +16,8 @@ class TestApiView(TestCase):
         client = Client(ApiApp(), response_wrapper=BaseResponse)
         resp = client.get("/1/")
         self.assertEqual(resp.status_code, 200)
+        resp = client.get("/400/")
+        self.assertEqual(resp.status_code, 404)
 
     def test_create(self):
         client = Client(ApiApp(), response_wrapper=BaseResponse)

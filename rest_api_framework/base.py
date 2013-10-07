@@ -52,15 +52,6 @@ class Dispatcher(object):
         except HTTPException, e:
             return e
 
-    def check_method(self, request, method):
-        if request.method != method:
-            return JsonResponse(
-                json.dumps({
-                    "error": "{0} not allowed with this URI".format(
-                        request.method)
-                    }),
-                status=403)
-
 
 class WSGIWrapper(object):
     """

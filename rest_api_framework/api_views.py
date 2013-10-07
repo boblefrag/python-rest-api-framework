@@ -2,6 +2,8 @@ import json
 from base import JsonResponse
 from werkzeug.exceptions import BadRequest
 from werkzeug.wrappers import Request
+from werkzeug.routing import Map, Rule
+from werkzeug.exceptions import HTTPException
 
 
 class WSGIWrapper(object):
@@ -20,7 +22,39 @@ class WSGIWrapper(object):
         return response(environ, start_response)
 
 
-class ApiView(WSGIWrapper):
+class Dispatcher(object):
+    """
+    Given a set of urls,
+    manage the urls mapping
+    """
+
+    def __init__(self, urls):
+        self.url_map = self.load_urls(urls)
+
+    def load_urls(self, urls):
+        """
+        return a Map object containing urls mapping
+        """
+        return Map(
+            [
+                Rule(pattern[0], endpoint=pattern[1], methods=pattern[2])
+                for pattern in urls
+                ]
+            )
+
+    def dispatch_request(self, request):
+        """
+        Bind a request to a method
+        """
+        adapter = self.url_map.bind_to_environ(request.environ)
+        try:
+            endpoint, values = adapter.match()
+            return getattr(self, endpoint)(request, **values)
+        except HTTPException, e:
+            return e
+
+
+class ApiView(WSGIWrapper, Dispatcher):
     """
     Handle the basic functionality of a Restful API
     """
@@ -96,5 +130,5 @@ class ApiView(WSGIWrapper):
             status=200)
 
     def delete(self, request, identifier):
-        obj = self.datastore.delete(identifier=identifier)
-        return JsonResponse("Hello", status=200)
+        self.datastore.delete(identifier=identifier)
+        return JsonResponse(status=200)

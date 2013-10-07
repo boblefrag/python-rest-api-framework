@@ -18,7 +18,6 @@ How it should work:
 
 """
 
-from base import Dispatcher
 from datastore import PythonListDataStore
 from api_views import ApiView
 
@@ -37,7 +36,7 @@ class View(ApiView):
     pass
 
 
-class ApiApp(Dispatcher, View):
+class ApiApp(View):
 
     def __init__(self):
         urls = [

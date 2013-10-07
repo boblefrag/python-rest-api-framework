@@ -3,11 +3,7 @@ The minimum needed to take a response and render a response
 - url mapper utility
 - wsgiwrapper
 """
-
-from werkzeug.routing import Map, Rule
-from werkzeug.exceptions import HTTPException
 from werkzeug.wrappers import Request, Response
-import json
 
 
 class JsonResponse(Response):
@@ -19,38 +15,6 @@ class JsonResponse(Response):
                      self).__init__(*args,
                                     mimetype="application/json",
                                     **kwargs)
-
-
-class Dispatcher(object):
-    """
-    Given a set of urls,
-    manage the urls mapping
-    """
-
-    def __init__(self, urls):
-        self.url_map = self.load_urls(urls)
-
-    def load_urls(self, urls):
-        """
-        return a Map object containing urls mapping
-        """
-        return Map(
-            [
-                Rule(pattern[0], endpoint=pattern[1], methods=pattern[2])
-                for pattern in urls
-                ]
-            )
-
-    def dispatch_request(self, request):
-        """
-        Bind a request to a method
-        """
-        adapter = self.url_map.bind_to_environ(request.environ)
-        try:
-            endpoint, values = adapter.match()
-            return getattr(self, endpoint)(request, **values)
-        except HTTPException, e:
-            return e
 
 
 class WSGIWrapper(object):

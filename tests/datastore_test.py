@@ -2,6 +2,17 @@ from unittest import TestCase
 from rest_api_framework.datastore import PythonListDataStore, DataStore
 from werkzeug.exceptions import BadRequest, NotFound
 
+options = {
+    "description": {
+        "name": {
+            "type": basestring, "required": True},
+        "age": {
+            "type": int, "required": True},
+        "id": {
+            "type": "autoincrement", "required": False}
+        }
+    }
+
 
 class PythonListDataStoreTest(TestCase):
 
@@ -14,7 +25,7 @@ class PythonListDataStoreTest(TestCase):
              } for a in range(100)
             ]
 
-        store = PythonListDataStore(data_list)
+        store = PythonListDataStore(data_list, **options)
         self.assertEqual(store.validate({"name": "bob", "age": 34}), None)
         self.assertRaises(BadRequest, store.validate, "a test")
         self.assertRaises(BadRequest,
@@ -35,7 +46,7 @@ class PythonListDataStoreTest(TestCase):
              } for a in range(100)
             ]
 
-        store = PythonListDataStore(data_list, paginate_by=10)
+        store = PythonListDataStore(data_list, paginate_by=10, **options)
         self.assertEqual(len(store.paginate(data_list)), 10)
         self.assertEqual(store.paginate(data_list, start=10)[0]["id"], 10)
         self.assertEqual(store.paginate(data_list, end=15)[-1]["id"], 14)
@@ -47,7 +58,7 @@ class PythonListDataStoreTest(TestCase):
              "id": a
              } for a in range(100)
             ]
-        store = PythonListDataStore(data_list)
+        store = PythonListDataStore(data_list, **options)
         self.assertEqual(store.get(10)["id"], 10)
         self.assertRaises(NotFound,
                           store.get,
@@ -61,7 +72,7 @@ class PythonListDataStoreTest(TestCase):
              } for a in range(100)
             ]
 
-        store = PythonListDataStore(data_list)
+        store = PythonListDataStore(data_list, **options)
         # The object does not exists
         self.assertRaises(NotFound,
                           store.get,
@@ -82,7 +93,7 @@ class PythonListDataStoreTest(TestCase):
              } for a in range(100)
             ]
 
-        store = PythonListDataStore(data_list)
+        store = PythonListDataStore(data_list, **options)
         self.assertEqual(
             store.update(
                 {"name": "bob", "age": "34", "id": 34},
@@ -110,7 +121,7 @@ class PythonListDataStoreTest(TestCase):
              } for a in range(100)
             ]
 
-        store = PythonListDataStore(data_list)
+        store = PythonListDataStore(data_list, **options)
         # the object exists
         self.assertEqual(store.get(10)["id"], 10)
         # is delete
@@ -128,7 +139,7 @@ class PythonListDataStoreTest(TestCase):
              } for a in range(100)
             ]
 
-        store = PythonListDataStore(data_list)
+        store = PythonListDataStore(data_list, **options)
         self.assertEqual(len(store.filter(age=24)), 1)
         self.assertEqual(len(store.filter(name="bob")), 100)
         self.assertEqual(len(store.filter(name="john")), 0)

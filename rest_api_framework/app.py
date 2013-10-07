@@ -47,6 +47,15 @@ class ApiApp(Dispatcher, View):
 
         options = {"paginate_by": 20,
                    }
+        options["description"] = {
+            "name": {
+                "type": basestring, "required": True},
+            "age": {
+                "type": int, "required": True},
+            "id": {
+                "type": "autoincrement", "required": False}
+            }
+
         self.datastore = PythonListDataStore(ressources, **options)
         super(ApiApp, self).__init__(urls)
 

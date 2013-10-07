@@ -79,23 +79,14 @@ class PythonListDataStore(DataStore):
     a datastore made of list of dicts
     """
 
-    def get_description(self):
-        return {
-            "name": {
-                "type": basestring, "required": True},
-            "age": {
-                "type": int, "required": True},
-            "id": {
-                "type": "autoincrement", "required": False}
-            }
-
     def __init__(self, data, **options):
         """
         Set the ressource datastore
         """
         self.data = data
         self.options = options
-        self.description = self.get_description()
+        print options
+        self.description = options["description"]
 
     def get(self, identifier):
         """

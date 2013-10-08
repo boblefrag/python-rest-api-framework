@@ -63,6 +63,12 @@ class ApiController(WSGIWrapper, Dispatcher):
             self.auth = kwargs['authentication']
         return super(ApiController, self).__init__(*args, **kwargs)
 
+    def render_list(self, objs):
+        for obj in objs:
+            obj['ressource_uri'] = "/{0}/{1}/".format(self.ressource_name,
+                                                  obj['id'])
+        return objs
+
     def index(self, request):
         """
         The root url of your ressources. Should present a list of
@@ -86,7 +92,8 @@ class ApiController(WSGIWrapper, Dispatcher):
         filters = request.values.to_dict()
         filters.pop("first_id", None)
         return self.response_class(
-            self.datastore.get_list(start=first_id, **filters),
+            self.render_list(
+                self.datastore.get_list(start=first_id, **filters)),
             status=200)
 
     def get_list(self, request):

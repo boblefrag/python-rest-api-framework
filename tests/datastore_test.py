@@ -2,7 +2,7 @@ from unittest import TestCase
 from rest_api_framework.datastore import (PythonListDataStore,
                                           SQLiteDataStore)
 from werkzeug.exceptions import BadRequest, NotFound
-
+import os
 
 options = {
     "description": {
@@ -152,7 +152,7 @@ class SQLiteDataStoreTest(TestCase):
 
     def test_validation(self):
         store = SQLiteDataStore(
-            {"name": "test_db", "table": "address"},
+            {"name": "test.db", "table": "address"},
             **options)
         self.assertEqual(store.validate({"name": "bob", "age": 34}), None)
         self.assertRaises(BadRequest, store.validate, "a test")
@@ -165,6 +165,7 @@ class SQLiteDataStoreTest(TestCase):
         self.assertRaises(BadRequest,
                           store.validate_fields,
                           "age")
+        os.remove("test.db")
 
     def test_pagination(self):
         store = SQLiteDataStore(
@@ -176,6 +177,7 @@ class SQLiteDataStoreTest(TestCase):
         self.assertEqual(len(store.get_list()), 10)
         self.assertEqual(store.get_list(start=10)[0]["id"], 10)
         self.assertEqual(store.get_list(end=15)[-1]["id"], 14)
+        os.remove("test.db")
 
     def test_get(self):
 
@@ -190,6 +192,7 @@ class SQLiteDataStoreTest(TestCase):
         self.assertRaises(NotFound,
                           store.get,
                           101)
+        os.remove("test.db")
 
     def test_create(self):
 
@@ -205,6 +208,7 @@ class SQLiteDataStoreTest(TestCase):
         self.assertEqual(store.create({"name": "bob", "age": 34}), 3)
         print store.get(3)
         self.assertEqual(store.get(3)["id"], 3)
+        os.remove("test.db")
 
     def test_update(self):
         store = SQLiteDataStore(
@@ -232,6 +236,7 @@ class SQLiteDataStoreTest(TestCase):
                           {"name": "bob", "age": "100", "id": 400},
                           {"name": "boby mc gee"}
                           )
+        os.remove("test.db")
 
     def test_delete(self):
         store = SQLiteDataStore(
@@ -248,3 +253,4 @@ class SQLiteDataStoreTest(TestCase):
         self.assertRaises(NotFound,
                           store.get,
                           10)
+        os.remove("test.db")

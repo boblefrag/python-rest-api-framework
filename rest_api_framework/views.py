@@ -12,6 +12,7 @@ class JsonResponse(Response):
     Just like a classic Response but render json everytime
     """
     def __init__(self, *args, **kwargs):
+
         if args:
             return super(JsonResponse,
                          self).__init__(json.dumps(*args),

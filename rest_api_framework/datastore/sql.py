@@ -12,6 +12,7 @@ class SQLiteDataStore(DataStore):
                }
 
     def __init__(self, data, **options):
+        self.table = data["name"]
         conn = sqlite3.connect(data["name"])
         c = conn.cursor()
         table = data["table"]
@@ -24,6 +25,11 @@ class SQLiteDataStore(DataStore):
         sql = 'create table if not exists {0} ({1})'.format(table, fields)
         c.execute(sql)
         conn.commit()
+        conn.close()
+
+    def get_connector(self):
+        conn = sqlite3.connect(self.table)
+        return conn
 
     def filter(self, **kwargs):
         kwargs['query'] += ' FROM {0}'
@@ -41,7 +47,7 @@ class SQLiteDataStore(DataStore):
         if limit:
             data["query"] += " LIMIT {0}".format(limit)
 
-        c = self.data['conn'].cursor()
+        c = self.get_connector().cursor()
         c.execute(data["query"].format(self.data['table']), tuple(args))
         objs = []
         for elem in c.fetchall():
@@ -63,13 +69,11 @@ class SQLiteDataStore(DataStore):
         return self.paginate(data, start=start, end=end)
 
     def get(self, identifier):
-
-        c = self.data['conn'].cursor()
         fields = ", ".join([k for k in self.description.iterkeys()])
         query = "select {0} from {1} where id=?".format(
             fields,
             self.data["table"])
-        c = self.data['conn'].cursor()
+        c = self.get_connector().cursor()
         c.execute(query, (identifier,))
         obj = c.fetchone()
         if obj:
@@ -77,6 +81,7 @@ class SQLiteDataStore(DataStore):
             return dict(zip(fields, obj))
         else:
             raise NotFound
+        self.data['conn'].commit()
 
     def create(self, data):
         self.validate(data)
@@ -84,14 +89,20 @@ class SQLiteDataStore(DataStore):
         values = []
         for k, v in data.iteritems():
             if k in self.description.iterkeys():
-                fields.append(k)
-                values.append(v)
-        c = self.data['conn'].cursor()
-        query = "insert into {0} {1} values {2}".format(
+                fields.append(str(k))
+                values.append(unicode(v))
+
+        conn = self.get_connector()
+        c = conn.cursor()
+
+        query = "insert into {0} {1} values ({2})".format(
             self.data["table"],
             tuple(fields),
-            tuple(values))
-        c.execute(query)
+            ",".join(["?" for i in range(len(fields))])
+            )
+        c.execute(query, tuple(values))
+        conn.commit()
+        conn.close()
         return c.lastrowid
 
     def update(self, obj, data):
@@ -103,7 +114,8 @@ class SQLiteDataStore(DataStore):
             if k in self.description.iterkeys():
                 fields.append(k)
                 values.append(v)
-        c = self.data['conn'].cursor()
+        conn = self.get_connector()
+        c = conn.cursor()
         update = " ".join(["{0}='{1}'".format(f, v) for f, v in zip(fields,
                                                                     values)])
         query = "update {0} set {1}".format(
@@ -111,11 +123,17 @@ class SQLiteDataStore(DataStore):
             update
             )
         c.execute(query)
+        conn.commit()
+        conn.close()
         return self.get(obj['id'])
 
     def delete(self, identifier):
         self.get(identifier)
-        c = self.data['conn'].cursor()
+        conn = self.get_connector()
+        c = conn.cursor()
+
         query = "delete from {0} where id={1}".format(self.data["table"],
                                                       identifier)
         c.execute(query)
+        conn.commit()
+        conn.close()

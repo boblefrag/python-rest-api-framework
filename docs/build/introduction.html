@@ -24,6 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Python Rest Api Framework 0.1 documentation" href="index.html" />
+    <link rel="next" title="Datastore" href="datastore.html" />
     <link rel="prev" title="Welcome to Python Rest Api Framework’s documentation!" href="index.html" /> 
   </head>
   <body>
@@ -33,6 +34,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="datastore.html" title="Datastore"
+             accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="index.html" title="Welcome to Python Rest Api Framework’s documentation!"
              accesskey="P">previous</a> |</li>
@@ -52,16 +56,15 @@ easily build Restful API. It keep a clean codebase and is easy to
 configure and extends.</p>
 <p>It does not decide how you want to render your data, or where they
 lives.</p>
-</div>
 <div class="section" id="how-to-use-it">
-<h1>How To use it<a class="headerlink" href="#how-to-use-it" title="Permalink to this headline">¶</a></h1>
+<h2>How To use it<a class="headerlink" href="#how-to-use-it" title="Permalink to this headline">¶</a></h2>
 <p>Python REST API framework is based on the MVC pattern. You define
 Controllers, DataStore and Views. Each of them are based on backends
 easily extendable and reusable.</p>
 <p>Each of those part are totaly unrelated. You can use any controllers
 with any datastore and any View</p>
 <div class="section" id="datastore">
-<h2>Datastore<a class="headerlink" href="#datastore" title="Permalink to this headline">¶</a></h2>
+<h3>Datastore<a class="headerlink" href="#datastore" title="Permalink to this headline">¶</a></h3>
 <p>First of all you have to decide where the data you want to expose
 lies. It can be anything from a database, another API, even a list of
 dictonary living in memory.</p>
@@ -70,7 +73,7 @@ new one to fit your needs. The datastore hanle the communication
 between your API and the data</p>
 </div>
 <div class="section" id="controllers">
-<h2>Controllers<a class="headerlink" href="#controllers" title="Permalink to this headline">¶</a></h2>
+<h3>Controllers<a class="headerlink" href="#controllers" title="Permalink to this headline">¶</a></h3>
 <p>The controller define your API. authorized verbs, pagination and
 authentication. You will also need to describe your ressource to allow
 validation on data.</p>
@@ -79,7 +82,7 @@ done, your application is up and running.</p>
 </div>
 </div>
 <div class="section" id="quickstart">
-<h1>QuickStart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h1>
+<h2>QuickStart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h2>
 <p>For this example, we will use a python list containing dicts. This is
 our data:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">ressources</span> <span class="o">=</span> <span class="p">[</span>
@@ -135,6 +138,8 @@ authorize read, deletion and modification.</li>
 ressource. Used for data creation, filtering and update.</li>
 <li>options: here you can add optional configuration options like
 authentication, pagination etc...</li>
+<li>response_class: the class used to render your ressources. Here we
+use JsonResponse a naïve implementation of a json formater</li>
 </ul>
 <p>To test you application locally, you can add:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
@@ -145,6 +150,7 @@ authentication, pagination etc...</li>
 </div>
 <p>then type &#8220;python app.py&#8221; and your API is up and running</p>
 </div>
+</div>
 
 
           </div>
@@ -154,7 +160,7 @@ authentication, pagination etc...</li>
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">What is Python REST API Framework</a></li>
+<li><a class="reference internal" href="#">What is Python REST API Framework</a><ul>
 <li><a class="reference internal" href="#how-to-use-it">How To use it</a><ul>
 <li><a class="reference internal" href="#datastore">Datastore</a></li>
 <li><a class="reference internal" href="#controllers">Controllers</a></li>
@@ -162,10 +168,15 @@ authentication, pagination etc...</li>
 </li>
 <li><a class="reference internal" href="#quickstart">QuickStart</a></li>
 </ul>
+</li>
+</ul>
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="index.html"
                         title="previous chapter">Welcome to Python Rest Api Framework&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="datastore.html"
+                        title="next chapter">Datastore</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/introduction.txt"
@@ -194,6 +205,9 @@ authentication, pagination etc...</li>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="datastore.html" title="Datastore"
+             >next</a> |</li>
         <li class="right" >
           <a href="index.html" title="Welcome to Python Rest Api Framework’s documentation!"
              >previous</a> |</li>

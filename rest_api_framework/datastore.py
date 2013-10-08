@@ -7,9 +7,6 @@ class DataStore(object):
     api, files and so one
     """
 
-    def get_description(self):
-        raise NotImplemented
-
     def paginate(self, data, **kwargs):
         """
         Naive implementation of pagination. Ressource_list must implement

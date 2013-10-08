@@ -10,7 +10,7 @@ lives.
 
 
 How To use it
-=============
+-------------
 
 Python REST API framework is based on the MVC pattern. You define
 Controllers, DataStore and Views. Each of them are based on backends
@@ -20,7 +20,7 @@ Each of those part are totaly unrelated. You can use any controllers
 with any datastore and any View
 
 Datastore
----------
+~~~~~~~~~
 
 First of all you have to decide where the data you want to expose
 lies. It can be anything from a database, another API, even a list of
@@ -31,7 +31,7 @@ new one to fit your needs. The datastore hanle the communication
 between your API and the data
 
 Controllers
------
+~~~~~~~~~~~
 
 The controller define your API. authorized verbs, pagination and
 authentication. You will also need to describe your ressource to allow
@@ -42,7 +42,7 @@ done, your application is up and running.
 
 
 QuickStart
-==========
+----------
 
 For this example, we will use a python list containing dicts. This is
 our data:
@@ -93,6 +93,7 @@ and a view to render our data
            }
         options = {"paginated_by": 20}
         response_class = JsonResponse
+
 * ressource : where the data lies. Each datastore implement his own
   way to gather data. For a PythonListDataStore, the actual python
   list is all we need.
@@ -112,6 +113,9 @@ and a view to render our data
 
 * options: here you can add optional configuration options like
   authentication, pagination etc...
+
+* response_class: the class used to render your ressources. Here we
+  use JsonResponse a naïve implementation of a json formater
 
 To test you application locally, you can add:
 

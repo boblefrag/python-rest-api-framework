@@ -73,3 +73,19 @@ class TestAuthentication(TestCase):
         self.assertEqual(resp.status_code, 200)
         resp = client.get("/?apikey=querty")
         self.assertEqual(resp.status_code, 401)
+
+    def test_auth_unique_uri(self):
+        ressources = [{"id": "azerty"}]
+        description = {"id": {"type": basestring, "required": True}}
+        client = Client(
+            ApiApp(
+                authentication=ApiKeyAuth(
+                    PythonListDataStore(ressources,
+                                        description=description)
+                    )
+                ),
+            response_wrapper=BaseResponse)
+        resp = client.get("/1/?apikey=azerty")
+        self.assertEqual(resp.status_code, 200)
+        resp = client.get("/1/?apikey=querty")
+        self.assertEqual(resp.status_code, 401)

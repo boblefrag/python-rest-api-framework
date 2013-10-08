@@ -9,7 +9,7 @@ class ApiKeyAuth(object):
     This authentication backend use an api key to authenticate and
     authorize users
     """
-    def __init__(self, datastore):
+    def __init__(self, datastore, **options):
         self.datastore = datastore
 
     def check_auth(self, request):

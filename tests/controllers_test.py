@@ -89,3 +89,25 @@ class TestAuthentication(TestCase):
         self.assertEqual(resp.status_code, 200)
         resp = client.get("/1/?apikey=querty")
         self.assertEqual(resp.status_code, 401)
+
+    def test_post_auth(self):
+        """
+        Test a read only api.
+        GET should be ok, POST and PUT should not
+        """
+        ressources = [{"id": "azerty"}]
+        description = {"id": {"type": basestring, "required": True}}
+        client = Client(
+            ApiApp(
+                authentication=ApiKeyAuth(
+                    PythonListDataStore(ressources,
+                                        description=description),
+                    authorized_method=["GET"]
+                    )
+                ),
+            response_wrapper=BaseResponse)
+        resp = client.get("/1/?apikey=azerty")
+        self.assertEqual(resp.status_code, 200)
+        resp = client.post("/?apikey=azerty",
+                           data=json.dumps({'name': 'bob', 'age': 34}))
+        self.assertEqual(resp.status_code, 401)

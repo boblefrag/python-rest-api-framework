@@ -85,14 +85,12 @@ class PythonListDataStore(DataStore):
         """
         self.data = data
         self.options = options
-        print options
         self.description = options["description"]
 
     def get(self, identifier):
         """
         return an object matching the uri or None
         """
-        print "called", identifier
         for elem in self.data:
             if elem['id'] == identifier:
                 return elem
@@ -104,7 +102,7 @@ class PythonListDataStore(DataStore):
             try:
                 data = [elem for elem in data if elem[k] == v]
             except KeyError:
-                raise BadRequest()
+                pass
         return data
 
     def get_list(self, **kwargs):

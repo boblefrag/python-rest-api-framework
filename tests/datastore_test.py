@@ -144,7 +144,3 @@ class PythonListDataStoreTest(TestCase):
         self.assertEqual(len(store.filter(name="bob")), 100)
         self.assertEqual(len(store.filter(name="john")), 0)
         self.assertEqual(len(store.filter(name="bob", age=12)), 1)
-        self.assertRaises(BadRequest,
-                          store.filter,
-                          **{"test": "something"}
-                          )

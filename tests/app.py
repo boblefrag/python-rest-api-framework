@@ -19,13 +19,19 @@ How it should work:
 """
 
 from rest_api_framework.datastore import PythonListDataStore
-from rest_api_framework.api_views import ApiView
+from rest_api_framework.controllers import ApiView
+
 
 ressources = [
     {"name": "bob",
      "age": a,
      "id": a
      } for a in range(100)
+    ]
+
+api_keys = [
+    {"id": "azerty"},
+    {"id": "querty"}
     ]
 
 
@@ -38,7 +44,7 @@ class View(ApiView):
 
 class ApiApp(View):
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         urls = [
             ('/', 'index', ["GET", "POST"]),
             ('/<int:identifier>/', 'unique_uri', ["GET", "PUT", "DELETE"]),
@@ -56,10 +62,4 @@ class ApiApp(View):
             }
 
         self.datastore = PythonListDataStore(ressources, **options)
-        super(ApiApp, self).__init__(urls)
-
-
-if __name__ == '__main__':
-    from werkzeug.serving import run_simple
-    app = ApiApp()
-    run_simple('127.0.0.1', 5000, app, use_debugger=True, use_reloader=True)
+        super(ApiApp, self).__init__(urls, *args, **kwargs)

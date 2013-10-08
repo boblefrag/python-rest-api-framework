@@ -4,6 +4,9 @@ from werkzeug.test import Client
 from app import ApiApp
 import json
 import datetime
+from rest_api_framework.authentication import ApiKeyAuth
+from rest_api_framework.datastore import PythonListDataStore
+
 
 class TestApiView(TestCase):
 
@@ -11,6 +14,7 @@ class TestApiView(TestCase):
         client = Client(ApiApp(), response_wrapper=BaseResponse)
         resp = client.get("/")
         self.assertEqual(resp.status_code, 200)
+        self.assertIsInstance(json.loads(resp.data), list)
 
     def test_get(self):
         client = Client(ApiApp(), response_wrapper=BaseResponse)
@@ -36,3 +40,36 @@ class TestApiView(TestCase):
         client = Client(ApiApp(), response_wrapper=BaseResponse)
         resp = client.delete("/4/")
         self.assertEqual(resp.status_code, 200)
+
+
+class TestAuthentication(TestCase):
+
+    def test_unauth_get_list(self):
+        ressources = [{"id": "azerty"}]
+        description = {"id": {"type": basestring, "required": True}}
+        client = Client(
+            ApiApp(
+                authentication=ApiKeyAuth(
+                    PythonListDataStore(ressources,
+                                        description=description)
+                    )
+                ),
+            response_wrapper=BaseResponse)
+        resp = client.get("/")
+        self.assertEqual(resp.status_code, 401)
+
+    def test_auth_get_list(self):
+        ressources = [{"id": "azerty"}]
+        description = {"id": {"type": basestring, "required": True}}
+        client = Client(
+            ApiApp(
+                authentication=ApiKeyAuth(
+                    PythonListDataStore(ressources,
+                                        description=description)
+                    )
+                ),
+            response_wrapper=BaseResponse)
+        resp = client.get("/?apikey=azerty")
+        self.assertEqual(resp.status_code, 200)
+        resp = client.get("/?apikey=querty")
+        self.assertEqual(resp.status_code, 401)

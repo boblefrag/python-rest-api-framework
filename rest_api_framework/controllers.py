@@ -1,5 +1,5 @@
 import json
-from base import JsonResponse
+from views import JsonResponse
 from werkzeug.exceptions import BadRequest
 from werkzeug.wrappers import Request
 from werkzeug.routing import Map, Rule
@@ -28,7 +28,7 @@ class Dispatcher(object):
     manage the urls mapping
     """
 
-    def __init__(self, urls):
+    def __init__(self, urls, *args, **kwargs):
         self.url_map = self.load_urls(urls)
 
     def load_urls(self, urls):
@@ -58,12 +58,21 @@ class ApiView(WSGIWrapper, Dispatcher):
     """
     Handle the basic functionality of a Restful API
     """
+    def __init__(self, *args, **kwargs):
+        self.auth = None
+        if kwargs.get('authentication'):
+            self.auth = kwargs['authentication']
+        return super(ApiView, self).__init__(*args, **kwargs)
+
     def index(self, request):
         """
         The root url of your ressources. Should present a list of
         ressources if method is GET.
         Should create a ressource if method is POST
         """
+        if self.auth:
+            self.auth.check_auth(request)
+
         if request.method == "GET":
             return self.get_list(request)
 
@@ -78,8 +87,7 @@ class ApiView(WSGIWrapper, Dispatcher):
         filters = request.values.to_dict()
         filters.pop("first_id", None)
         return JsonResponse(
-            json.dumps(
-                self.datastore.get_list(start=first_id, **filters)),
+            self.datastore.get_list(start=first_id, **filters),
             status=200)
 
     def get_list(self, request):
@@ -90,6 +98,9 @@ class ApiView(WSGIWrapper, Dispatcher):
         Retreive a unique object with his URI.
         Act on it accordingly to the Http verb used.
         """
+        if self.auth:
+            self.auth.check_auth(request)
+
         if request.method == "GET":
             return self.get(request, identifier)
         if request.method == "PUT":
@@ -104,14 +115,13 @@ class ApiView(WSGIWrapper, Dispatcher):
         obj = self.datastore.get(identifier=identifier)
 
         return JsonResponse(
-            json.dumps(obj),
+            obj,
             status=200)
 
     def create(self, request):
         """
         Create a new object in the datastore
         """
-        print request.data
         try:
             data = json.loads(request.data)
         except:
@@ -126,7 +136,7 @@ class ApiView(WSGIWrapper, Dispatcher):
         obj = self.datastore.get(identifier=identifier)
         obj = self.datastore.update(obj, json.loads(request.data))
         return JsonResponse(
-            json.dumps(obj),
+            obj,
             status=200)
 
     def delete(self, request, identifier):

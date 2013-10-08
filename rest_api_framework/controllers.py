@@ -1,5 +1,4 @@
 import json
-from views import JsonResponse
 from werkzeug.exceptions import BadRequest
 from werkzeug.wrappers import Request
 from werkzeug.routing import Map, Rule
@@ -54,7 +53,7 @@ class Dispatcher(object):
             return e
 
 
-class ApiView(WSGIWrapper, Dispatcher):
+class ApiController(WSGIWrapper, Dispatcher):
     """
     Handle the basic functionality of a Restful API
     """
@@ -62,7 +61,7 @@ class ApiView(WSGIWrapper, Dispatcher):
         self.auth = None
         if kwargs.get('authentication'):
             self.auth = kwargs['authentication']
-        return super(ApiView, self).__init__(*args, **kwargs)
+        return super(ApiController, self).__init__(*args, **kwargs)
 
     def index(self, request):
         """
@@ -86,7 +85,7 @@ class ApiView(WSGIWrapper, Dispatcher):
         first_id = request.values.to_dict().get("first_id", 0)
         filters = request.values.to_dict()
         filters.pop("first_id", None)
-        return JsonResponse(
+        return self.response_class(
             self.datastore.get_list(start=first_id, **filters),
             status=200)
 
@@ -114,7 +113,7 @@ class ApiView(WSGIWrapper, Dispatcher):
         """
         obj = self.datastore.get(identifier=identifier)
 
-        return JsonResponse(
+        return self.response_class(
             obj,
             status=200)
 
@@ -127,7 +126,8 @@ class ApiView(WSGIWrapper, Dispatcher):
         except:
             raise BadRequest()
         response = self.datastore.create(data)
-        return JsonResponse(headers={"location": str(response)}, status=201)
+        return self.response_class(
+            headers={"location": str(response)}, status=201)
 
     def update(self, request, identifier):
         """
@@ -135,10 +135,26 @@ class ApiView(WSGIWrapper, Dispatcher):
         """
         obj = self.datastore.get(identifier=identifier)
         obj = self.datastore.update(obj, json.loads(request.data))
-        return JsonResponse(
+        return self.response_class(
             obj,
             status=200)
 
     def delete(self, request, identifier):
         self.datastore.delete(identifier=identifier)
-        return JsonResponse(status=200)
+        return self.response_class(status=200)
+
+
+class Controller(ApiController):
+    """
+    The main views of the application
+    """
+    def __init__(self, *args, **kwargs):
+        urls = [
+            ('/{0}/'.format(self.ressource_name), 'index', self.list_verbs),
+            ('/{0}/<int:identifier>/'.format(self.ressource_name),
+             'unique_uri',
+             self.unique_verbs),
+            ]
+        self.options["description"] = self.description
+        self.datastore = self.datastore(self.ressource, **self.options)
+        super(Controller, self).__init__(urls, *args, **kwargs)

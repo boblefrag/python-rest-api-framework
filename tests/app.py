@@ -17,10 +17,11 @@ How it should work:
   - etc..
 
 """
-
+import sys
+sys.path.append("..")
 from rest_api_framework.datastore import PythonListDataStore
-from rest_api_framework.controllers import ApiView
-
+from rest_api_framework.controllers import Controller
+from rest_api_framework.views import JsonResponse
 
 ressources = [
     {"name": "bob",
@@ -35,31 +36,27 @@ api_keys = [
     ]
 
 
-class View(ApiView):
-    """
-    The main views of the application
-    """
-    pass
+class ApiApp(Controller):
 
+    ressource_name = "address"
+    list_verbs = ["GET", "POST"]
+    unique_verbs = ["GET", "PUT", "DElETE"]
+    options = {
+        "paginate_by": 20}
 
-class ApiApp(View):
+    description = {
+        "name": {
+            "type": basestring, "required": True},
+        "age": {
+            "type": int, "required": True},
+        "id": {
+            "type": "autoincrement", "required": False}
+        }
+    datastore = PythonListDataStore
+    ressource = ressources
+    response_class = JsonResponse
 
-    def __init__(self, *args, **kwargs):
-        urls = [
-            ('/', 'index', ["GET", "POST"]),
-            ('/<int:identifier>/', 'unique_uri', ["GET", "PUT", "DELETE"]),
-            ]
-
-        options = {"paginate_by": 20,
-                   }
-        options["description"] = {
-            "name": {
-                "type": basestring, "required": True},
-            "age": {
-                "type": int, "required": True},
-            "id": {
-                "type": "autoincrement", "required": False}
-            }
-
-        self.datastore = PythonListDataStore(ressources, **options)
-        super(ApiApp, self).__init__(urls, *args, **kwargs)
+if __name__ == '__main__':
+    from werkzeug.serving import run_simple
+    app = ApiApp()
+    run_simple('127.0.0.1', 5000, app, use_debugger=True, use_reloader=True)

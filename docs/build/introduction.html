@@ -1,0 +1,208 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>What is Python REST API Framework &mdash; Python Rest Api Framework 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Python Rest Api Framework 0.1 documentation" href="index.html" />
+    <link rel="prev" title="Welcome to Python Rest Api Framework’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Python Rest Api Framework’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="what-is-python-rest-api-framework">
+<h1>What is Python REST API Framework<a class="headerlink" href="#what-is-python-rest-api-framework" title="Permalink to this headline">¶</a></h1>
+<p>Python REST API framework is a set of utilities based on werkzeug to
+easily build Restful API. It keep a clean codebase and is easy to
+configure and extends.</p>
+<p>It does not decide how you want to render your data, or where they
+lives.</p>
+</div>
+<div class="section" id="how-to-use-it">
+<h1>How To use it<a class="headerlink" href="#how-to-use-it" title="Permalink to this headline">¶</a></h1>
+<p>Python REST API framework is based on the MVC pattern. You define
+Controllers, DataStore and Views. Each of them are based on backends
+easily extendable and reusable.</p>
+<p>Each of those part are totaly unrelated. You can use any controllers
+with any datastore and any View</p>
+<div class="section" id="datastore">
+<h2>Datastore<a class="headerlink" href="#datastore" title="Permalink to this headline">¶</a></h2>
+<p>First of all you have to decide where the data you want to expose
+lies. It can be anything from a database, another API, even a list of
+dictonary living in memory.</p>
+<p>Depending on your data, you can reuse à datastore class or create a
+new one to fit your needs. The datastore hanle the communication
+between your API and the data</p>
+</div>
+<div class="section" id="controllers">
+<h2>Controllers<a class="headerlink" href="#controllers" title="Permalink to this headline">¶</a></h2>
+<p>The controller define your API. authorized verbs, pagination and
+authentication. You will also need to describe your ressource to allow
+validation on data.</p>
+<p>Finaly you will need to hook your Controller to a Datastore. Once this is
+done, your application is up and running.</p>
+</div>
+</div>
+<div class="section" id="quickstart">
+<h1>QuickStart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h1>
+<p>For this example, we will use a python list containing dicts. This is
+our data:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">ressources</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="s">&quot;bob&quot;</span><span class="p">,</span>
+    <span class="s">&quot;age&quot;</span><span class="p">:</span> <span class="n">a</span><span class="p">,</span>
+    <span class="s">&quot;id&quot;</span><span class="p">:</span> <span class="n">a</span>
+    <span class="p">}</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+    <span class="p">]</span>
+</pre></div>
+</div>
+<p>There is already a datastore to handle this type of data. We can reuse
+this store:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">rest_api_framework.datastore</span> <span class="kn">import</span> <span class="n">PythonListDataStore</span>
+</pre></div>
+</div>
+<p>then we need a Controller class to hanlde our API:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">rest_api_framework.controllers</span> <span class="kn">import</span> <span class="n">Controller</span>
+</pre></div>
+</div>
+<p>and a view to render our data</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">rest_api_framework.views</span> <span class="kn">import</span> <span class="n">JsonResponse</span>
+
+
+<span class="k">class</span> <span class="nc">ApiApp</span><span class="p">(</span><span class="n">Controller</span><span class="p">):</span>
+    <span class="n">ressource</span> <span class="o">=</span> <span class="n">ressources</span>
+    <span class="n">ressource_name</span> <span class="o">=</span> <span class="s">&quot;address&quot;</span>
+    <span class="n">list_verbs</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;POST&quot;</span><span class="p">]</span>
+    <span class="n">unique_verbs</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;PUT&quot;</span><span class="p">,</span> <span class="s">&quot;DElETE&quot;</span><span class="p">]</span>
+    <span class="n">datastore</span> <span class="o">=</span> <span class="n">PythonListDataStore</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="p">{</span>
+       <span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="nb">basestring</span><span class="p">,</span> <span class="s">&quot;required&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">},</span>
+       <span class="s">&quot;age&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="s">&quot;required&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">},</span>
+       <span class="s">&quot;id&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="s">&quot;autoincrement&quot;</span><span class="p">,</span> <span class="s">&quot;required&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">}</span>
+       <span class="p">}</span>
+    <span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;paginated_by&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">}</span>
+    <span class="n">response_class</span> <span class="o">=</span> <span class="n">JsonResponse</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>ressource : where the data lies. Each datastore implement his own
+way to gather data. For a PythonListDataStore, the actual python
+list is all we need.</li>
+<li>ressource_name: will be used to construct your urls</li>
+<li>list_verbs: the authorized verbs on the listing of your ressource. Here
+we authorize read and write</li>
+<li>unique_verbs: the authorized verbs on a ressource URI. Here we
+authorize read, deletion and modification.</li>
+<li>datastore: the datastore to be used</li>
+<li>description : a dict containing the definition of each fields of the
+ressource. Used for data creation, filtering and update.</li>
+<li>options: here you can add optional configuration options like
+authentication, pagination etc...</li>
+</ul>
+<p>To test you application locally, you can add:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">werkzeug.serving</span> <span class="kn">import</span> <span class="n">run_simple</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">ApiApp</span><span class="p">()</span>
+    <span class="n">run_simple</span><span class="p">(</span><span class="s">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="mi">5000</span><span class="p">,</span> <span class="n">app</span><span class="p">,</span> <span class="n">use_debugger</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">use_reloader</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>then type &#8220;python app.py&#8221; and your API is up and running</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">What is Python REST API Framework</a></li>
+<li><a class="reference internal" href="#how-to-use-it">How To use it</a><ul>
+<li><a class="reference internal" href="#datastore">Datastore</a></li>
+<li><a class="reference internal" href="#controllers">Controllers</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#quickstart">QuickStart</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to Python Rest Api Framework&#8217;s documentation!</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/introduction.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Python Rest Api Framework’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Yohann Gabory.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

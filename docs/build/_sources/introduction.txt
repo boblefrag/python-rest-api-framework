@@ -1,0 +1,125 @@
+What is Python REST API Framework
+=================================
+
+Python REST API framework is a set of utilities based on werkzeug to
+easily build Restful API. It keep a clean codebase and is easy to
+configure and extends.
+
+It does not decide how you want to render your data, or where they
+lives.
+
+
+How To use it
+=============
+
+Python REST API framework is based on the MVC pattern. You define
+Controllers, DataStore and Views. Each of them are based on backends
+easily extendable and reusable.
+
+Each of those part are totaly unrelated. You can use any controllers
+with any datastore and any View
+
+Datastore
+---------
+
+First of all you have to decide where the data you want to expose
+lies. It can be anything from a database, another API, even a list of
+dictonary living in memory.
+
+Depending on your data, you can reuse à datastore class or create a
+new one to fit your needs. The datastore hanle the communication
+between your API and the data
+
+Controllers
+-----
+
+The controller define your API. authorized verbs, pagination and
+authentication. You will also need to describe your ressource to allow
+validation on data.
+
+Finaly you will need to hook your Controller to a Datastore. Once this is
+done, your application is up and running.
+
+
+QuickStart
+==========
+
+For this example, we will use a python list containing dicts. This is
+our data:
+
+.. code-block:: python
+
+    ressources = [
+        {"name": "bob",
+        "age": a,
+        "id": a
+        } for a in range(100)
+        ]
+
+
+There is already a datastore to handle this type of data. We can reuse
+this store:
+
+.. code-block:: python
+
+    from rest_api_framework.datastore import PythonListDataStore
+
+then we need a Controller class to hanlde our API:
+
+.. code-block:: python
+
+    from rest_api_framework.controllers import Controller
+
+and a view to render our data
+
+.. code-block:: python
+
+    from rest_api_framework.views import JsonResponse
+
+
+    class ApiApp(Controller):
+        ressource = ressources
+        ressource_name = "address"
+        list_verbs = ["GET", "POST"]
+        unique_verbs = ["GET", "PUT", "DElETE"]
+        datastore = PythonListDataStore
+        description = {
+           "name": {
+              "type": basestring, "required": True},
+           "age": {
+              "type": int, "required": True},
+           "id": {
+              "type": "autoincrement", "required": False}
+           }
+        options = {"paginated_by": 20}
+        response_class = JsonResponse
+* ressource : where the data lies. Each datastore implement his own
+  way to gather data. For a PythonListDataStore, the actual python
+  list is all we need.
+
+* ressource_name: will be used to construct your urls
+
+* list_verbs: the authorized verbs on the listing of your ressource. Here
+  we authorize read and write
+
+* unique_verbs: the authorized verbs on a ressource URI. Here we
+  authorize read, deletion and modification.
+
+* datastore: the datastore to be used
+
+* description : a dict containing the definition of each fields of the
+  ressource. Used for data creation, filtering and update.
+
+* options: here you can add optional configuration options like
+  authentication, pagination etc...
+
+To test you application locally, you can add:
+
+.. code-block:: python
+
+    if __name__ == '__main__':
+        from werkzeug.serving import run_simple
+        app = ApiApp()
+        run_simple('127.0.0.1', 5000, app, use_debugger=True, use_reloader=True)
+
+then type "python app.py" and your API is up and running

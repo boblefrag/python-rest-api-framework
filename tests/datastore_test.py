@@ -1,6 +1,6 @@
 from unittest import TestCase
 from rest_api_framework.datastore import (PythonListDataStore,
-                                          SQLDataStore)
+                                          SQLiteDataStore)
 from werkzeug.exceptions import BadRequest, NotFound
 
 
@@ -148,10 +148,10 @@ class PythonListDataStoreTest(TestCase):
         self.assertEqual(len(store.filter(name="bob", age=12)), 1)
 
 
-class SQLDataStoreTest(TestCase):
+class SQLiteDataStoreTest(TestCase):
 
     def test_validation(self):
-        store = SQLDataStore(
+        store = SQLiteDataStore(
             {"name": "test_db", "table": "address"},
             **options)
         self.assertEqual(store.validate({"name": "bob", "age": 34}), None)
@@ -167,7 +167,7 @@ class SQLDataStoreTest(TestCase):
                           "age")
 
     def test_pagination(self):
-        store = SQLDataStore(
+        store = SQLiteDataStore(
             {"name": "test.db", "table": "address"},
             paginate_by=10,
             **options)
@@ -179,7 +179,7 @@ class SQLDataStoreTest(TestCase):
 
     def test_get(self):
 
-        store = SQLDataStore(
+        store = SQLiteDataStore(
             {"name": "test.db", "table": "address"},
             **options)
 
@@ -193,7 +193,7 @@ class SQLDataStoreTest(TestCase):
 
     def test_create(self):
 
-        store = SQLDataStore(
+        store = SQLiteDataStore(
             {"name": "test.db", "table": "address"},
             **options)
 
@@ -207,7 +207,7 @@ class SQLDataStoreTest(TestCase):
         self.assertEqual(store.get(3)["id"], 3)
 
     def test_update(self):
-        store = SQLDataStore(
+        store = SQLiteDataStore(
             {"name": "test.db", "table": "address"},
             **options)
 
@@ -234,7 +234,7 @@ class SQLDataStoreTest(TestCase):
                           )
 
     def test_delete(self):
-        store = SQLDataStore(
+        store = SQLiteDataStore(
             {"name": "test.db", "table": "address"},
             **options)
 

@@ -55,7 +55,87 @@
 easily build Restful API. It keep a clean codebase and is easy to
 configure and extends.</p>
 <p>It does not decide how you want to render your data, or where they
-lives.</p>
+lives, or other decisions.</p>
+<p>Instead it give you a good start with an extensible architecture to
+build your own API.</p>
+<p>Python REST API Framework has not been create for the usual
+case. Instead it give you some hook to your very special ressource
+provider, your very special view management and your very special way
+of displaying data.</p>
+<p>Python REST API Framework is fully REST compilant; It implement the
+common verbs:</p>
+<ul class="simple">
+<li>GET</li>
+<li>POST</li>
+<li>UPDATE</li>
+<li>DELETE</li>
+</ul>
+<p>It also implement:</p>
+<ul class="simple">
+<li>PAGINATION</li>
+<li>AUTHENTICATION</li>
+<li>TROOTLING (comming soon)</li>
+<li>DATA VALIDATION</li>
+<li>...</li>
+</ul>
+<div class="section" id="architecture">
+<h2>Architecture<a class="headerlink" href="#architecture" title="Permalink to this headline">¶</a></h2>
+<p>Python REST API Framework is base on the MVC pattern.</p>
+<p>To create an API, you will need to create or reuse existing class:</p>
+<div class="section" id="controller">
+<h3>Controller<a class="headerlink" href="#controller" title="Permalink to this headline">¶</a></h3>
+<p>manage the routing of the urls. For a ressource, 2 urls are
+created:</p>
+<blockquote>
+<div><ul>
+<li><dl class="first docutils">
+<dt>/ressource_name/ <span class="classifier-delimiter">:</span> <span class="classifier">this url will show a list of ressources</span></dt>
+<dd><p class="first last">(GET) or create new one (POST)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>/ressource_name/identifier/ <span class="classifier-delimiter">:</span> <span class="classifier">this url will show a particular</span></dt>
+<dd><p class="first last">object (GET), update an existion object (PUT) or delete an
+existing object (DELETE)</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<p>Controller also check the authorized verbs. You can disable POST, PUT
+and DELETE to make a read-only API for exemple.</p>
+<p>If authentication is enabled, Controller call the
+Authorisation/Authentication backend to manage user management</p>
+</div>
+<div class="section" id="datastore">
+<h3>DataStore<a class="headerlink" href="#datastore" title="Permalink to this headline">¶</a></h3>
+<p>each method of a Controller call the DataStore to interact with
+data. The DataStore must be able to retreive data from a
+ressource. Each datastore act on a particular type of ressource
+(database backend, api backend, csv backend etc...). It must be
+able to validate data, create new ressources, update existing
+ressources, manage filters and pagination.</p>
+<p>Optional configuration option, that can be unique for a particular
+datastore make it very easy to configure, inherit and extend</p>
+</div>
+<div class="section" id="view">
+<h3>View<a class="headerlink" href="#view" title="Permalink to this headline">¶</a></h3>
+<p>Views defines how the data must be send to the client. It send a
+Response object and set the needed headers, mime-type and other
+presentation options</p>
+</div>
+<div class="section" id="authentication">
+<h3>Authentication<a class="headerlink" href="#authentication" title="Permalink to this headline">¶</a></h3>
+<p>Authentication are class too. This mean that you can easily create
+your own Authentication flow with REST API Framework.</p>
+<p>Authentication Backend can use DataStore to get authentication and
+authorization informations. As Backend can be anything from database
+to other API, you do not need to store user informations on the same
+machine or instance than your API.</p>
+<p>It is moer secure, more scallable, easy to extend to suit your needs</p>
+</div>
+</div>
 <div class="section" id="how-to-use-it">
 <h2>How To use it<a class="headerlink" href="#how-to-use-it" title="Permalink to this headline">¶</a></h2>
 <p>Python REST API framework is based on the MVC pattern. You define
@@ -63,8 +143,8 @@ Controllers, DataStore and Views. Each of them are based on backends
 easily extendable and reusable.</p>
 <p>Each of those part are totaly unrelated. You can use any controllers
 with any datastore and any View</p>
-<div class="section" id="datastore">
-<h3>Datastore<a class="headerlink" href="#datastore" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id1">
+<h3>Datastore<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <p>First of all you have to decide where the data you want to expose
 lies. It can be anything from a database, another API, even a list of
 dictonary living in memory.</p>
@@ -149,6 +229,51 @@ use JsonResponse a naïve implementation of a json formater</li>
 </pre></div>
 </div>
 <p>then type &#8220;python app.py&#8221; and your API is up and running</p>
+<div class="section" id="using-a-database">
+<h3>Using a database<a class="headerlink" href="#using-a-database" title="Permalink to this headline">¶</a></h3>
+<p>Instead of using a python dict, you may want to actualy save your data
+in a database. To do so, you just have to change your datastore and
+define your ressources in a way SQL datastore can understand.</p>
+<p>SQLiteDataStore use sqlite3 as database backend. ressources will be a
+dict with database name and table name. The rest of the configuration
+is the same as with the PythonListDataStore.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">if the database does not exist, REST API Framework create it for you</p>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">rest_api_framework.datastore</span> <span class="kn">import</span> <span class="n">SQLiteDataStore</span>
+<span class="kn">from</span> <span class="nn">rest_api_framework.controllers</span> <span class="kn">import</span> <span class="n">Controller</span>
+<span class="kn">from</span> <span class="nn">rest_api_framework.views</span> <span class="kn">import</span> <span class="n">JsonResponse</span>
+
+
+<span class="k">class</span> <span class="nc">ApiApp</span><span class="p">(</span><span class="n">Controller</span><span class="p">):</span>
+
+    <span class="n">ressource_name</span> <span class="o">=</span> <span class="s">&quot;tweets&quot;</span>
+    <span class="n">list_verbs</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;POST&quot;</span><span class="p">]</span>
+    <span class="n">unique_verbs</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;PUT&quot;</span><span class="p">,</span> <span class="s">&quot;DElETE&quot;</span><span class="p">]</span>
+    <span class="n">options</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&quot;paginate_by&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">}</span>
+
+    <span class="n">datastore</span> <span class="o">=</span> <span class="n">SQLiteDataStore</span>
+    <span class="n">ressource</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="s">&quot;twitter.db&quot;</span><span class="p">,</span> <span class="s">&quot;table&quot;</span><span class="p">:</span> <span class="s">&quot;tweets&quot;</span><span class="p">}</span>
+    <span class="n">response_class</span> <span class="o">=</span> <span class="n">JsonResponse</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&quot;user&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="nb">basestring</span><span class="p">,</span> <span class="s">&quot;required&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">},</span>
+        <span class="s">&quot;message&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="nb">basestring</span><span class="p">,</span> <span class="s">&quot;required&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">},</span>
+        <span class="s">&quot;id&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="s">&quot;autoincrement&quot;</span><span class="p">,</span> <span class="s">&quot;required&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">}</span>
+        <span class="p">}</span>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">werkzeug.serving</span> <span class="kn">import</span> <span class="n">run_simple</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">ApiApp</span><span class="p">()</span>
+    <span class="n">run_simple</span><span class="p">(</span><span class="s">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="mi">5000</span><span class="p">,</span> <span class="n">app</span><span class="p">,</span> <span class="n">use_debugger</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">use_reloader</span><span class="o">=</span><span class="bp">True</span>
+</pre></div>
+</div>
+</div>
 </div>
 </div>
 
@@ -161,12 +286,22 @@ use JsonResponse a naïve implementation of a json formater</li>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">What is Python REST API Framework</a><ul>
+<li><a class="reference internal" href="#architecture">Architecture</a><ul>
+<li><a class="reference internal" href="#controller">Controller</a></li>
+<li><a class="reference internal" href="#datastore">DataStore</a></li>
+<li><a class="reference internal" href="#view">View</a></li>
+<li><a class="reference internal" href="#authentication">Authentication</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#how-to-use-it">How To use it</a><ul>
-<li><a class="reference internal" href="#datastore">Datastore</a></li>
+<li><a class="reference internal" href="#id1">Datastore</a></li>
 <li><a class="reference internal" href="#controllers">Controllers</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#quickstart">QuickStart</a></li>
+<li><a class="reference internal" href="#quickstart">QuickStart</a><ul>
+<li><a class="reference internal" href="#using-a-database">Using a database</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

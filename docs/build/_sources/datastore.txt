@@ -1,0 +1,90 @@
+Datastore
+=========
+
+Datastores are the link between your API and a content provider. The
+content provider can be a database, relational or not, a CSV file,
+another API, well anything you can think of.
+
+Using a Datastore
+-----------------
+
+The data your are using must be compatible with the datastore you want
+to use. You cannot use a SQLDataStore with data coming from an api for
+example.
+
+Once the type of data and the datastore are compatible, you must:
+
+* describe your ressource
+* give the data to the datastore
+* define optional options
+
+Describe your ressource
+~~~~~~~~~~~~~~~~~~~~~~~
+
+A data description is a dict where each key is a field and each value
+another dict containing a type and some optionals arguments. The
+optional arguments depend on the datastore. See the documentation for
+the datastore you need to implement.
+
+a simple description can be something like:
+
+.. code-block:: python
+
+    description = {
+        "name": {
+            "type": basestring, "required": True},
+        "age": {
+            "type": int, "required": True},
+        "id": {
+            "type": "autoincrement", "required": False}
+        }
+
+Then you need the actual ressources. The format of the ressource
+parameter depend on the datastore you use. For example, if you use the
+SQLiteDataStore, ressource must be a dict containing the database name
+and the database table used to store data:
+
+.. code-block:: python
+
+    ressource = {"name": "twitter.db", "table": "tweets"}
+
+Finally you can give extra parameters to your DataStore like
+pagination, authentication and so on. This will be done using the
+options parameter.
+
+The option parameter must contain the description you set earlier:
+
+.. code-block:: python
+
+    options = {"description": description}
+
+You can then use your datastore :
+
+.. code-block:: python
+
+    datastore(ressource, **options)
+
+To use datastore with your API you can just set parameters in the
+Controller you use. The base controller take care of instanciate a
+datastore for you. See the Controller documentation for more
+informations about this.
+
+Available DataStore
+-------------------
+
+Those datastore can be used immediately or beeing inherited to suit
+your needs. They implements a complete datastore.
+
+.. autoclass:: rest_api_framework.datastore.sql.SQLiteDataStore
+  :members:
+
+Create a DataStore
+------------------
+
+Creating a custom datastore is easy. You can override an existing
+datastore or create on of you own .
+
+A DataStore inherit from DataStore base class
+
+.. autoclass:: rest_api_framework.datastore.base.DataStore
+  :members:

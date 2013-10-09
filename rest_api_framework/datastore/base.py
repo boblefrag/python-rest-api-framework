@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from abc import ABCMeta, abstractmethod
 from werkzeug.exceptions import BadRequest
 
 
@@ -8,6 +8,7 @@ class DataStore(object):
     define a source of data. Can be anything fron database to other
     api, files and so one
     """
+    __metaclass__ = ABCMeta
 
     def __init__(self, data, model, **options):
         """
@@ -17,6 +18,7 @@ class DataStore(object):
         self.options = options
         self.model = model()
 
+    @abstractmethod
     def get(self, identifier):
         """
         Should return a dictionnary representing the ressource matching the
@@ -28,6 +30,7 @@ class DataStore(object):
         """
         raise NotImplemented
 
+    @abstractmethod
     def create(self, data):
         """
         data is a dict containing the representation of the
@@ -42,6 +45,7 @@ class DataStore(object):
         """
         raise NotImplemented
 
+    @abstractmethod
     def update(self, obj, data):
         """
         should be able to call :meth:`~.DataStore.get` to retreive the
@@ -54,6 +58,7 @@ class DataStore(object):
         """
         raise NotImplemented
 
+    @abstractmethod
     def delete(self, identifier):
         """
         should be able to validate the existence of the object in the
@@ -65,6 +70,7 @@ class DataStore(object):
         """
         raise NotImplemented
 
+    @abstractmethod
     def get_list(self, **kwargs):
         """
         This method is called each time you want a set of data.
@@ -78,6 +84,7 @@ class DataStore(object):
         """
         raise NotImplemented
 
+    @abstractmethod
     def filter(self, **kwargs):
         """
         should return a way to filter the ressource according to

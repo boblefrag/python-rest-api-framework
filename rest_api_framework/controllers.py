@@ -162,6 +162,8 @@ class Controller(ApiController):
              'unique_uri',
              self.unique_verbs),
             ]
-        self.options["description"] = self.description
-        self.datastore = self.datastore(self.ressource, **self.options)
+        self.datastore = self.datastore(self.ressource,
+                                        self.model,
+                                        **self.options)
+
         super(Controller, self).__init__(urls, *args, **kwargs)

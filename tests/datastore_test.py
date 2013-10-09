@@ -1,19 +1,18 @@
 from unittest import TestCase
 from rest_api_framework.datastore import (PythonListDataStore,
                                           SQLiteDataStore)
+from rest_api_framework import models
+
 from werkzeug.exceptions import BadRequest, NotFound
 import os
 
-options = {
-    "description": {
-        "name": {
-            "type": basestring, "required": True},
-        "age": {
-            "type": int, "required": True},
-        "id": {
-            "type": "autoincrement", "required": False}
-        }
-    }
+
+class ApiModel(models.Model):
+
+    fields = [models.IntegerField(name="age", required=True),
+              models.StringField(name="name", required=True),
+              models.PkField(name="id")
+              ]
 
 
 class PythonListDataStoreTest(TestCase):
@@ -27,7 +26,7 @@ class PythonListDataStoreTest(TestCase):
              } for a in range(100)
             ]
 
-        store = PythonListDataStore(data_list, **options)
+        store = PythonListDataStore(data_list, ApiModel)
         self.assertEqual(store.validate({"name": "bob", "age": 34}), None)
         self.assertRaises(BadRequest, store.validate, "a test")
         self.assertRaises(BadRequest,
@@ -48,7 +47,7 @@ class PythonListDataStoreTest(TestCase):
              } for a in range(100)
             ]
 
-        store = PythonListDataStore(data_list, paginate_by=10, **options)
+        store = PythonListDataStore(data_list, ApiModel, paginate_by=10)
         self.assertEqual(len(store.paginate(data_list)), 10)
         self.assertEqual(store.paginate(data_list, start=10)[0]["id"], 10)
         self.assertEqual(store.paginate(data_list, end=15)[-1]["id"], 14)
@@ -60,7 +59,7 @@ class PythonListDataStoreTest(TestCase):
              "id": a
              } for a in range(100)
             ]
-        store = PythonListDataStore(data_list, **options)
+        store = PythonListDataStore(data_list, ApiModel)
         self.assertEqual(store.get(10)["id"], 10)
         self.assertRaises(NotFound,
                           store.get,
@@ -74,7 +73,7 @@ class PythonListDataStoreTest(TestCase):
              } for a in range(100)
             ]
 
-        store = PythonListDataStore(data_list, **options)
+        store = PythonListDataStore(data_list, ApiModel)
         # The object does not exists
         self.assertRaises(NotFound,
                           store.get,
@@ -95,7 +94,7 @@ class PythonListDataStoreTest(TestCase):
              } for a in range(100)
             ]
 
-        store = PythonListDataStore(data_list, **options)
+        store = PythonListDataStore(data_list, ApiModel)
         self.assertEqual(
             store.update(
                 {"name": "bob", "age": "34", "id": 34},
@@ -123,7 +122,7 @@ class PythonListDataStoreTest(TestCase):
              } for a in range(100)
             ]
 
-        store = PythonListDataStore(data_list, **options)
+        store = PythonListDataStore(data_list, ApiModel)
         # the object exists
         self.assertEqual(store.get(10)["id"], 10)
         # is delete
@@ -141,7 +140,7 @@ class PythonListDataStoreTest(TestCase):
              } for a in range(100)
             ]
 
-        store = PythonListDataStore(data_list, **options)
+        store = PythonListDataStore(data_list, ApiModel)
         self.assertEqual(len(store.filter(age=24)), 1)
         self.assertEqual(len(store.filter(name="bob")), 100)
         self.assertEqual(len(store.filter(name="john")), 0)
@@ -153,7 +152,7 @@ class SQLiteDataStoreTest(TestCase):
     def test_validation(self):
         store = SQLiteDataStore(
             {"name": "test.db", "table": "address"},
-            **options)
+            ApiModel)
         self.assertEqual(store.validate({"name": "bob", "age": 34}), None)
         self.assertRaises(BadRequest, store.validate, "a test")
         self.assertRaises(BadRequest,
@@ -170,8 +169,8 @@ class SQLiteDataStoreTest(TestCase):
     def test_pagination(self):
         store = SQLiteDataStore(
             {"name": "test.db", "table": "address"},
-            paginate_by=10,
-            **options)
+            ApiModel,
+            paginate_by=10)
         for i in range(100):
             store.create({"name": "bob", "age": 34})
         self.assertEqual(len(store.get_list()), 10)
@@ -182,8 +181,7 @@ class SQLiteDataStoreTest(TestCase):
     def test_get(self):
 
         store = SQLiteDataStore(
-            {"name": "test.db", "table": "address"},
-            **options)
+            {"name": "test.db", "table": "address"}, ApiModel)
 
         for i in range(100):
             store.create({"name": "bob", "age": 34})
@@ -195,10 +193,10 @@ class SQLiteDataStoreTest(TestCase):
         os.remove("test.db")
 
     def test_create(self):
-
+        data = {"name": "test.db", "table": "address"}
         store = SQLiteDataStore(
-            {"name": "test.db", "table": "address"},
-            **options)
+            data,
+            ApiModel)
 
         self.assertRaises(NotFound,
                           store.get,
@@ -213,7 +211,7 @@ class SQLiteDataStoreTest(TestCase):
     def test_update(self):
         store = SQLiteDataStore(
             {"name": "test.db", "table": "address"},
-            **options)
+            ApiModel)
 
         for i in range(100):
             store.create({"name": "bob", "age": 34})
@@ -240,8 +238,7 @@ class SQLiteDataStoreTest(TestCase):
 
     def test_delete(self):
         store = SQLiteDataStore(
-            {"name": "test.db", "table": "address"},
-            **options)
+            {"name": "test.db", "table": "address"}, ApiModel)
 
         for i in range(100):
             store.create({"name": "bob", "age": 34})

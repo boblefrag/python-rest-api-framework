@@ -1,4 +1,5 @@
 from .base import DataStore
+from rest_api_framework import models
 from werkzeug.exceptions import NotFound
 
 
@@ -38,14 +39,14 @@ class PythonListDataStore(DataStore):
         self.validate(data)
         obj = {}
         for k, v in data.iteritems():
-            if k in self.description.iterkeys():
+            if k in self.model.get_fields():
                 obj[k] = v
 
-        for field in self.description.iterkeys():
-            if self.description[field]["type"] == "autoincrement":
-                self.data.sort(lambda a, b: a[field] > b[field])
-                last = self.data[-1][field]
-                obj[field] = last + 1
+        for field in self.model.get_fields():
+            if isinstance(field, models.PkField):
+                self.data.sort(lambda a, b: a[field.name] > b[field.name])
+                last = self.data[-1][field.name]
+                obj[field.name] = last + 1
 
         self.data.append(obj)
         return obj["id"]

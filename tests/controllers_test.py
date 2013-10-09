@@ -6,6 +6,14 @@ import json
 import datetime
 from rest_api_framework.authentication import ApiKeyAuth
 from rest_api_framework.datastore import PythonListDataStore
+from rest_api_framework import models
+
+
+class ApiModel(models.Model):
+
+    fields = [
+        models.StringField(name="id", required=True)
+        ]
 
 
 class TestApiView(TestCase):
@@ -54,7 +62,7 @@ class TestAuthentication(TestCase):
             ApiApp(
                 authentication=ApiKeyAuth(
                     PythonListDataStore(ressources,
-                                        description=description)
+                                        ApiModel)
                     )
                 ),
             response_wrapper=BaseResponse)
@@ -62,13 +70,14 @@ class TestAuthentication(TestCase):
         self.assertEqual(resp.status_code, 401)
 
     def test_auth_get_list(self):
+
         ressources = [{"id": "azerty"}]
-        description = {"id": {"type": basestring, "required": True}}
+        model = ApiModel
         client = Client(
             ApiApp(
                 authentication=ApiKeyAuth(
                     PythonListDataStore(ressources,
-                                        description=description)
+                                        model)
                     )
                 ),
             response_wrapper=BaseResponse)
@@ -79,12 +88,11 @@ class TestAuthentication(TestCase):
 
     def test_auth_unique_uri(self):
         ressources = [{"id": "azerty"}]
-        description = {"id": {"type": basestring, "required": True}}
         client = Client(
             ApiApp(
                 authentication=ApiKeyAuth(
                     PythonListDataStore(ressources,
-                                        description=description)
+                                        ApiModel)
                     )
                 ),
             response_wrapper=BaseResponse)
@@ -99,12 +107,11 @@ class TestAuthentication(TestCase):
         GET should be ok, POST and PUT should not
         """
         ressources = [{"id": "azerty"}]
-        description = {"id": {"type": basestring, "required": True}}
         client = Client(
             ApiApp(
                 authentication=ApiKeyAuth(
                     PythonListDataStore(ressources,
-                                        description=description),
+                                        ApiModel),
                     authorized_method=["GET"]
                     )
                 ),

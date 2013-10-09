@@ -9,13 +9,13 @@ class DataStore(object):
     api, files and so one
     """
 
-    def __init__(self, data, **options):
+    def __init__(self, data, model, **options):
         """
         Set the ressource datastore
         """
         self.data = data
         self.options = options
-        self.description = options["description"]
+        self.model = model()
 
     def get(self, identifier):
         """
@@ -38,7 +38,7 @@ class DataStore(object):
 
         .. note::
 
-           Not implemented by base DataStore class
+        Not implemented by base DataStore class
         """
         raise NotImplemented
 
@@ -121,12 +121,9 @@ class DataStore(object):
 
         if not isinstance(data, dict):
             raise BadRequest()
-        for k, v in self.description.iteritems():
-            if self.description[k]['required']:
-                if not k in data or \
-                        not isinstance(data[k],
-                                       self.description[k]['type']
-                                       ):
+        for field in self.model.fields:
+            for validator in field.validators:
+                if not validator.validate(data[field.name]):
                     raise BadRequest()
 
     def validate_fields(self, data):
@@ -137,7 +134,9 @@ class DataStore(object):
         if not isinstance(data, dict):
             raise BadRequest()
         for k, v in data.iteritems():
-            if k not in self.description.iterkeys():
+            if k not in self.model.get_fields_name():
                 raise BadRequest()
-            elif not isinstance(v, self.description[k]["type"]):
-                raise BadRequest()
+            field = self.model.get_field(k)
+            for validator in field.validators:
+                if not validator.validate(v):
+                    raise BadRequest()

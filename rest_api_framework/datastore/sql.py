@@ -1,4 +1,5 @@
 from base import DataStore
+from rest_api_framework.models import PkField
 from werkzeug.exceptions import NotFound
 import sqlite3
 
@@ -46,17 +47,22 @@ class SQLiteDataStore(DataStore):
                "autoincrement": "integer primary key autoincrement"
                }
 
-    def __init__(self, data, **options):
+    def __init__(self, data, model, **options):
         self.table = data["name"]
         conn = sqlite3.connect(data["name"])
         c = conn.cursor()
         table = data["table"]
         super(SQLiteDataStore, self).__init__({"conn": conn, "table": table},
+                                              model,
                                               **options)
-        fields = ", ".join(
-            ["{0} {1}".format(k,
-                              self.wrapper[v['type']]
-                              ) for k, v in self.description.iteritems()])
+        statement = []
+        for field in self.model.get_fields():
+            query = "{0} {1}".format(field.name, self.wrapper[field.base_type])
+            if isinstance(field, PkField):
+                query += " primary key autoincrement"
+            statement.append(query)
+        fields = ", ".join(statement)
+
         sql = 'create table if not exists {0} ({1})'.format(table, fields)
         c.execute(sql)
         conn.commit()
@@ -101,7 +107,7 @@ class SQLiteDataStore(DataStore):
         c.execute(data["query"].format(self.data['table']), tuple(args))
         objs = []
         for elem in c.fetchall():
-            fields = [k for k in self.description.iterkeys()]
+            fields = self.model.get_fields_name()
             objs.append(dict(zip(fields, elem)))
         if kwargs.get("end", None):
             objs.reverse()
@@ -112,7 +118,7 @@ class SQLiteDataStore(DataStore):
         return all the objects, paginated if needed, fitered if
         filters have been set.
         """
-        fields = ", ".join([k for k in self.description.iterkeys()])
+        fields = ", ".join(self.model.get_fields_name())
         kwargs["query"] = 'SELECT {0}'.format(fields)
         start = kwargs.pop("start", None)
         end = kwargs.pop("end", None)
@@ -123,7 +129,7 @@ class SQLiteDataStore(DataStore):
         """
         Return a single row or raise NotFound
         """
-        fields = ", ".join([k for k in self.description.iterkeys()])
+        fields = ",".join(self.model.get_fields_name())
         query = "select {0} from {1} where id=?".format(
             fields,
             self.data["table"])
@@ -131,7 +137,7 @@ class SQLiteDataStore(DataStore):
         c.execute(query, (identifier,))
         obj = c.fetchone()
         if obj:
-            fields = [k for k in self.description.iterkeys()]
+            fields = self.model.get_fields_name()
             return dict(zip(fields, obj))
         else:
             raise NotFound
@@ -146,7 +152,7 @@ class SQLiteDataStore(DataStore):
         fields = []
         values = []
         for k, v in data.iteritems():
-            if k in self.description.iterkeys():
+            if k in self.model.get_fields_name():
                 fields.append(str(k))
                 values.append(unicode(v))
 
@@ -176,7 +182,7 @@ class SQLiteDataStore(DataStore):
         fields = []
         values = []
         for k, v in data.iteritems():
-            if k in self.description.iterkeys():
+            if k in self.model.get_fields_name():
                 fields.append(k)
                 values.append(v)
         conn = self.get_connector()

@@ -20,6 +20,7 @@ How it should work:
 import sys
 sys.path.append("..")
 from rest_api_framework.datastore import PythonListDataStore
+from rest_api_framework import models
 from rest_api_framework.controllers import Controller
 from rest_api_framework.views import JsonResponse
 
@@ -36,6 +37,14 @@ api_keys = [
     ]
 
 
+class ApiModel(models.Model):
+
+    fields = [models.IntegerField(name="age", required=True),
+              models.StringField(name="name", required=True),
+              models.PkField(name="id")
+              ]
+
+
 class ApiApp(Controller):
 
     ressource_name = "address"
@@ -44,14 +53,7 @@ class ApiApp(Controller):
     options = {
         "paginate_by": 20}
 
-    description = {
-        "name": {
-            "type": basestring, "required": True},
-        "age": {
-            "type": int, "required": True},
-        "id": {
-            "type": "autoincrement", "required": False}
-        }
+    model = ApiModel
     datastore = PythonListDataStore
     ressource = ressources
     response_class = JsonResponse

@@ -21,7 +21,7 @@ import sys
 sys.path.append("..")
 from rest_api_framework.datastore import PythonListDataStore
 from rest_api_framework import models
-from rest_api_framework.controllers import Controller
+from rest_api_framework.controllers import Controller, WSGIDispatcher
 from rest_api_framework.views import JsonResponse
 
 ressources = [
@@ -58,7 +58,8 @@ class ApiApp(Controller):
     ressource = ressources
     response_class = JsonResponse
 
+
 if __name__ == '__main__':
     from werkzeug.serving import run_simple
-    app = ApiApp()
+    app = WSGIDispatcher([ApiApp])
     run_simple('127.0.0.1', 5000, app, use_debugger=True, use_reloader=True)

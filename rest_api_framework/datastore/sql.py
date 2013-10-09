@@ -16,20 +16,17 @@ class SQLiteDataStore(DataStore):
 
        data={"table": "tweets",
              "name": "test.db"}
-       options = {
-           'description': {
-               'message': {'type': str, 'required': True},
-               'id': {'type': 'autoincrement', 'required': True}
-       }
+       model = ApiModel
        datastore = SQLiteDataStore(data, **options)
 
-    SQLiteDataStore implement a naive wrapper to convert description
+    SQLiteDataStore implement a naive wrapper to convert Field
     types into database type.
 
     * int will be saved in the database as INTEGER
     * float will be saved in the database as REAL
     * basestring will be saved in the database as TEXT
-    * autoincrement will be saved as INTEGER PRIMARY KEY AUTOINCREMENT
+    * if the Field type is PKField, is a will be saved as
+      PRIMARY KEY AUTOINCREMENT
 
     As soon as the datastore is instanciated, the database is create
     if it does not exists and table is created too
@@ -43,8 +40,7 @@ class SQLiteDataStore(DataStore):
 
     wrapper = {int: "integer",
                float: "real",
-               basestring: "text",
-               "autoincrement": "integer primary key autoincrement"
+               basestring: "text"
                }
 
     def __init__(self, data, model, **options):
@@ -145,7 +141,7 @@ class SQLiteDataStore(DataStore):
 
     def create(self, data):
         """
-        Validate the data with :meth:`~.SQLiteDataStore.validate`
+        Validate the data with :meth:`.base.DataStore.validate`
         And, if data is valid, create the row in database and return it.
         """
         self.validate(data)

@@ -3,7 +3,9 @@ from werkzeug.exceptions import BadRequest
 from werkzeug.wrappers import Request
 from werkzeug.routing import Map, Rule
 from werkzeug.exceptions import HTTPException
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta
+from werkzeug.wsgi import DispatcherMiddleware
+from werkzeug.exceptions import NotFound
 
 
 class WSGIWrapper(object):
@@ -25,6 +27,19 @@ class WSGIWrapper(object):
         return response(environ, start_response)
 
 
+class WSGIDispatcher(DispatcherMiddleware):
+    """
+    Embed multiple endpoint in one
+    """
+    def __init__(self, apps):
+        endpoints = {}
+        for elem in apps:
+            endpoints["/{0}".format(elem.ressource_name)] = elem()
+        app = NotFound()
+        mounts = endpoints
+        super(WSGIDispatcher, self).__init__(app, mounts=mounts)
+
+
 class Dispatcher(object):
     """
     Given a set of urls,
@@ -35,6 +50,7 @@ class Dispatcher(object):
 
     def __init__(self, urls, *args, **kwargs):
         self.url_map = self.load_urls(urls)
+        print self.url_map
 
     def load_urls(self, urls):
         """
@@ -66,10 +82,9 @@ class ApiController(WSGIWrapper, Dispatcher):
 
     __metaclass__ = ABCMeta
 
+    auth = None
+
     def __init__(self, *args, **kwargs):
-        self.auth = None
-        if kwargs.get('authentication'):
-            self.auth = kwargs['authentication']
         return super(ApiController, self).__init__(*args, **kwargs)
 
     def render_list(self, objs):
@@ -169,8 +184,8 @@ class Controller(ApiController):
 
     def __init__(self, *args, **kwargs):
         urls = [
-            ('/{0}/'.format(self.ressource_name), 'index', self.list_verbs),
-            ('/{0}/<int:identifier>/'.format(self.ressource_name),
+            ('/', 'index', self.list_verbs),
+            ('/<int:identifier>/',
              'unique_uri',
              self.unique_verbs),
             ]

@@ -13,6 +13,8 @@ Contents:
 
    introduction
    datastore
+   authentication
+   multiple_endpoint
 
 Indices and tables
 ==================

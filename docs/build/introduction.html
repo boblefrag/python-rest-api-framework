@@ -110,14 +110,33 @@ Authorisation/Authentication backend to manage user management</p>
 </div>
 <div class="section" id="datastore">
 <h3>DataStore<a class="headerlink" href="#datastore" title="Permalink to this headline">¶</a></h3>
-<p>each method of a Controller call the DataStore to interact with
+<p>Each method of a Controller call the DataStore to interact with
 data. The DataStore must be able to retreive data from a
-ressource. Each datastore act on a particular type of ressource
+ressource.</p>
+<p>Each datastore act on a particular type of ressource
 (database backend, api backend, csv backend etc...). It must be
 able to validate data, create new ressources, update existing
 ressources, manage filters and pagination.</p>
 <p>Optional configuration option, that can be unique for a particular
 datastore make it very easy to configure, inherit and extend</p>
+</div>
+<div class="section" id="model">
+<h3>Model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h3>
+<p>When you create a DataStoreInstance, you must feed it with a Model.
+A Model is the python representation of a ressource object.</p>
+<p>A Model will contain a list of Fields describing the ressource.</p>
+</div>
+<div class="section" id="field">
+<h3>Field<a class="headerlink" href="#field" title="Permalink to this headline">¶</a></h3>
+<p>Each fields of a Model must have a name to identify it. This name
+correspond to the name of the field or property of the ressource.</p>
+<p>Each Field can take optionals parameters to control its behavior. It
+can also implment as many Validators than needed to control data integrity.</p>
+</div>
+<div class="section" id="validator">
+<h3>Validator<a class="headerlink" href="#validator" title="Permalink to this headline">¶</a></h3>
+<p>Each Validator implement the validate method. The validate method will
+check a value and return True if the value is valide, False otherwise.</p>
 </div>
 <div class="section" id="view">
 <h3>View<a class="headerlink" href="#view" title="Permalink to this headline">¶</a></h3>
@@ -173,8 +192,22 @@ our data:</p>
     <span class="p">]</span>
 </pre></div>
 </div>
-<p>There is already a datastore to handle this type of data. We can reuse
-this store:</p>
+<p>Then we have to describe this ressource. To describe a ressouce, you
+must create a Model class inheriting from base Model class:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">rest_api_framework</span> <span class="kn">import</span> <span class="n">models</span>
+
+<span class="k">class</span> <span class="nc">ApiModel</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+
+    <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;age&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+              <span class="n">models</span><span class="o">.</span><span class="n">StringField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;name&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+              <span class="n">models</span><span class="o">.</span><span class="n">PkField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;id&quot;</span><span class="p">)</span>
+              <span class="p">]</span>
+</pre></div>
+</div>
+<p>Each Field contain validators. When you reuse an existing Field class
+you get his validators for free.</p>
+<p>There is already a datastore to handle this type of data: PythonListDataStore.
+We can reuse this store:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">rest_api_framework.datastore</span> <span class="kn">import</span> <span class="n">PythonListDataStore</span>
 </pre></div>
 </div>
@@ -192,14 +225,7 @@ this store:</p>
     <span class="n">list_verbs</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;POST&quot;</span><span class="p">]</span>
     <span class="n">unique_verbs</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;PUT&quot;</span><span class="p">,</span> <span class="s">&quot;DElETE&quot;</span><span class="p">]</span>
     <span class="n">datastore</span> <span class="o">=</span> <span class="n">PythonListDataStore</span>
-    <span class="n">description</span> <span class="o">=</span> <span class="p">{</span>
-       <span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="p">{</span>
-          <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="nb">basestring</span><span class="p">,</span> <span class="s">&quot;required&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">},</span>
-       <span class="s">&quot;age&quot;</span><span class="p">:</span> <span class="p">{</span>
-          <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="s">&quot;required&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">},</span>
-       <span class="s">&quot;id&quot;</span><span class="p">:</span> <span class="p">{</span>
-          <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="s">&quot;autoincrement&quot;</span><span class="p">,</span> <span class="s">&quot;required&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">}</span>
-       <span class="p">}</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">ApiModel</span>
     <span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;paginated_by&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">}</span>
     <span class="n">response_class</span> <span class="o">=</span> <span class="n">JsonResponse</span>
 </pre></div>
@@ -214,8 +240,7 @@ we authorize read and write</li>
 <li>unique_verbs: the authorized verbs on a ressource URI. Here we
 authorize read, deletion and modification.</li>
 <li>datastore: the datastore to be used</li>
-<li>description : a dict containing the definition of each fields of the
-ressource. Used for data creation, filtering and update.</li>
+<li>model : The model defining your ressource schema</li>
 <li>options: here you can add optional configuration options like
 authentication, pagination etc...</li>
 <li>response_class: the class used to render your ressources. Here we
@@ -224,7 +249,8 @@ use JsonResponse a naïve implementation of a json formater</li>
 <p>To test you application locally, you can add:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">werkzeug.serving</span> <span class="kn">import</span> <span class="n">run_simple</span>
-    <span class="n">app</span> <span class="o">=</span> <span class="n">ApiApp</span><span class="p">()</span>
+    <span class="kn">from</span> <span class="nn">rest_api_framework.controllers</span> <span class="kn">import</span> <span class="n">WSGIDispatcher</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">WSGIDispatcher</span><span class="p">([</span><span class="n">ApiApp</span><span class="p">])</span>
     <span class="n">run_simple</span><span class="p">(</span><span class="s">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="mi">5000</span><span class="p">,</span> <span class="n">app</span><span class="p">,</span> <span class="n">use_debugger</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">use_reloader</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -244,10 +270,15 @@ is the same as with the PythonListDataStore.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">rest_api_framework.datastore</span> <span class="kn">import</span> <span class="n">SQLiteDataStore</span>
 <span class="kn">from</span> <span class="nn">rest_api_framework.controllers</span> <span class="kn">import</span> <span class="n">Controller</span>
 <span class="kn">from</span> <span class="nn">rest_api_framework.views</span> <span class="kn">import</span> <span class="n">JsonResponse</span>
+<span class="kn">from</span> <span class="nn">rest_api_framework</span> <span class="kn">import</span> <span class="n">models</span>
 
+<span class="k">class</span> <span class="nc">ApiModel</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="n">models</span><span class="o">.</span><span class="n">StringField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;message&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+              <span class="n">models</span><span class="o">.</span><span class="n">StringField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;user&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+              <span class="n">models</span><span class="o">.</span><span class="n">PkField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;id&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+              <span class="p">]</span>
 
 <span class="k">class</span> <span class="nc">ApiApp</span><span class="p">(</span><span class="n">Controller</span><span class="p">):</span>
-
     <span class="n">ressource_name</span> <span class="o">=</span> <span class="s">&quot;tweets&quot;</span>
     <span class="n">list_verbs</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;POST&quot;</span><span class="p">]</span>
     <span class="n">unique_verbs</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;PUT&quot;</span><span class="p">,</span> <span class="s">&quot;DElETE&quot;</span><span class="p">]</span>
@@ -257,23 +288,23 @@ is the same as with the PythonListDataStore.</p>
     <span class="n">datastore</span> <span class="o">=</span> <span class="n">SQLiteDataStore</span>
     <span class="n">ressource</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="s">&quot;twitter.db&quot;</span><span class="p">,</span> <span class="s">&quot;table&quot;</span><span class="p">:</span> <span class="s">&quot;tweets&quot;</span><span class="p">}</span>
     <span class="n">response_class</span> <span class="o">=</span> <span class="n">JsonResponse</span>
-    <span class="n">description</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s">&quot;user&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="nb">basestring</span><span class="p">,</span> <span class="s">&quot;required&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">},</span>
-        <span class="s">&quot;message&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="nb">basestring</span><span class="p">,</span> <span class="s">&quot;required&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">},</span>
-        <span class="s">&quot;id&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="s">&quot;autoincrement&quot;</span><span class="p">,</span> <span class="s">&quot;required&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">}</span>
-        <span class="p">}</span>
-
+    <span class="n">model</span> <span class="o">=</span> <span class="n">ApiModel</span>
 
 <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">werkzeug.serving</span> <span class="kn">import</span> <span class="n">run_simple</span>
-    <span class="n">app</span> <span class="o">=</span> <span class="n">ApiApp</span><span class="p">()</span>
+    <span class="kn">from</span> <span class="nn">rest_api_framework.controllers</span> <span class="kn">import</span> <span class="n">WSGIDispatcher</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">WSGIDispatcher</span><span class="p">([</span><span class="n">ApiApp</span><span class="p">])</span>
     <span class="n">run_simple</span><span class="p">(</span><span class="s">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="mi">5000</span><span class="p">,</span> <span class="n">app</span><span class="p">,</span> <span class="n">use_debugger</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">use_reloader</span><span class="o">=</span><span class="bp">True</span>
 </pre></div>
 </div>
 </div>
+</div>
+<div class="section" id="where-to-go-from-here">
+<h2>Where to go from here<a class="headerlink" href="#where-to-go-from-here" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="authentication.html"><em>Authentication and Authorization</em></a></li>
+<li><tt class="xref doc docutils literal"><span class="pre">multiple_endpoint</span></tt></li>
+</ul>
 </div>
 </div>
 
@@ -289,6 +320,9 @@ is the same as with the PythonListDataStore.</p>
 <li><a class="reference internal" href="#architecture">Architecture</a><ul>
 <li><a class="reference internal" href="#controller">Controller</a></li>
 <li><a class="reference internal" href="#datastore">DataStore</a></li>
+<li><a class="reference internal" href="#model">Model</a></li>
+<li><a class="reference internal" href="#field">Field</a></li>
+<li><a class="reference internal" href="#validator">Validator</a></li>
 <li><a class="reference internal" href="#view">View</a></li>
 <li><a class="reference internal" href="#authentication">Authentication</a></li>
 </ul>
@@ -302,6 +336,7 @@ is the same as with the PythonListDataStore.</p>
 <li><a class="reference internal" href="#using-a-database">Using a database</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#where-to-go-from-here">Where to go from here</a></li>
 </ul>
 </li>
 </ul>

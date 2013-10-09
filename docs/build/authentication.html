@@ -1,0 +1,255 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Authentication and Authorization &mdash; Python Rest Api Framework 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Python Rest Api Framework 0.1 documentation" href="index.html" />
+    <link rel="next" title="Using more than a single endpoint" href="multiple_endpoint.html" />
+    <link rel="prev" title="Datastore" href="datastore.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="multiple_endpoint.html" title="Using more than a single endpoint"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="datastore.html" title="Datastore"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="authentication-and-authorization">
+<h1>Authentication and Authorization<a class="headerlink" href="#authentication-and-authorization" title="Permalink to this headline">¶</a></h1>
+<p>Endpoint can be easily protected with a custom or existing
+backend. Authentication and Authorization are given as argument to the
+Controller. Authorization backend will be given the request
+object. You can then have a very fine grained control on
+Authorization.</p>
+<div class="section" id="authentication">
+<h2>Authentication<a class="headerlink" href="#authentication" title="Permalink to this headline">¶</a></h2>
+<p>Authentication implement the get_user(identifier) method. As
+Authentication need to read the list of users somewhere, it need a
+datastore to work with.</p>
+<p>As always, datastore can be anything from a simple python list, a
+database, another api and so on.</p>
+<p>Authentication return the user object the datastore provide</p>
+<div class="section" id="example">
+<h3>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">ApiKeyAuthentication</span><span class="p">(</span><span class="n">Authentication</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datastore</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">datastore</span> <span class="o">=</span> <span class="n">datastore</span>
+
+    <span class="k">def</span> <span class="nf">get_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">user</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datastore</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">identifier</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">user</span>
+        <span class="k">except</span> <span class="n">NotFound</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="authorization">
+<h2>Authorization<a class="headerlink" href="#authorization" title="Permalink to this headline">¶</a></h2>
+<p>Authorization need a way to indentify a user. An Authentication
+backend is used for this need.</p>
+<p>Authorization can contain a number of option to change they behaviour,
+like authorizing some verbs to some user.</p>
+<p>They implements the check_auth(request) method. This method should
+return None if authorization is granted or raise an Unauthorized error
+otherwise.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">this documentation use &#8220;user&#8221; as a placeholder. You do not need a
+user. Only something to identify the request. This could be
+anything from a hash, a password, public key and so on...</p>
+</div>
+<div class="section" id="id1">
+<h3>Example<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">ApiKeyAuthorization</span><span class="p">(</span><span class="n">Authorization</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This authentication backend use an api key to authenticate and</span>
+<span class="sd">    authorize users</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">authentication</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">authentication</span> <span class="o">=</span> <span class="n">authentication</span>
+        <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;authorized_method&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">authorized_method</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;authorized_method&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">authorized_method</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">check_auth</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if a user is authorized to perform a particular action.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">authorized_method</span> <span class="ow">and</span> \
+                <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">authorized_method</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">Unauthorized</span>
+        <span class="k">if</span> <span class="s">&quot;apikey&quot;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">authentication</span><span class="o">.</span><span class="n">get_user</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;apikey&#39;</span><span class="p">]):</span>
+                <span class="k">return</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">Unauthorized</span>
+
+        <span class="k">raise</span> <span class="n">Unauthorized</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="how-to-use-an-authentication-authorization-backend">
+<h2>How to use an Authentication/Authorization backend<a class="headerlink" href="#how-to-use-an-authentication-authorization-backend" title="Permalink to this headline">¶</a></h2>
+<p>For this example we will use a very simple datastore ressource for
+authentication purpose :</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">ressources</span> <span class="o">=</span> <span class="p">[{</span><span class="s">&quot;id&quot;</span><span class="p">:</span> <span class="s">&quot;azerty&quot;</span><span class="p">}]</span>
+</pre></div>
+</div>
+<p>The ressource is a python dict. Is ok to use the PythonListDataStore
+to connect to the ressource.</p>
+<p>The model will be simple too:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">AuthModel</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">models</span><span class="o">.</span><span class="n">StringField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;id&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="p">]</span>
+</pre></div>
+</div>
+<p>Then here is our datastore fully functional:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">datastore</span> <span class="o">=</span> <span class="n">PythonListDataStore</span><span class="p">(</span><span class="n">ressources</span><span class="p">,</span> <span class="n">AuthModel</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Then we can instanciate an ApiKeyAuthentication :</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">authentication</span> <span class="o">=</span> <span class="n">ApiKeyAuthentication</span><span class="p">(</span><span class="n">datastore</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Finnaly, ApiKeyAuthorization can be instanciated too:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">auth</span> <span class="o">=</span> <span class="n">ApiKeyAuthorization</span><span class="p">(</span><span class="n">authentication</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can now use any of your api and protect it with the
+ApiKeyAuthorization you just created:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">ApiAppAuth</span><span class="p">(</span><span class="n">Controller</span><span class="p">):</span>
+            <span class="n">auth</span> <span class="o">=</span> <span class="n">auth</span>
+            <span class="n">other_parameters</span>
+</pre></div>
+</div>
+<p>Each time a user access this api, he must use ?apikey=azerty to be
+granted access to the api.</p>
+<p>As ApiKeyAuthorization implement a filter based on method, you can add
+to your ApiKeyAuthorization options the authorized verbs on this
+ressource with this key:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">auth</span> <span class="o">=</span> <span class="n">ApiKeyAuthorization</span><span class="p">(</span><span class="n">authentication</span><span class="p">,</span>
+                           <span class="n">authorized_method</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>and use this configuration in any of your API:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">ApiAppAuth</span><span class="p">(</span><span class="n">Controller</span><span class="p">):</span>
+            <span class="n">auth</span> <span class="o">=</span> <span class="n">auth</span>
+            <span class="n">other_parameters</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Authentication and Authorization</a><ul>
+<li><a class="reference internal" href="#authentication">Authentication</a><ul>
+<li><a class="reference internal" href="#example">Example</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#authorization">Authorization</a><ul>
+<li><a class="reference internal" href="#id1">Example</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-use-an-authentication-authorization-backend">How to use an Authentication/Authorization backend</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="datastore.html"
+                        title="previous chapter">Datastore</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="multiple_endpoint.html"
+                        title="next chapter">Using more than a single endpoint</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/authentication.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="multiple_endpoint.html" title="Using more than a single endpoint"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="datastore.html" title="Datastore"
+             >previous</a> |</li>
+        <li><a href="index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Yohann Gabory.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

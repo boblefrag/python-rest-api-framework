@@ -30,7 +30,7 @@ class PythonListDataStore(DataStore):
         """
         return all the objects paginated if needed
         """
-        start = kwargs.pop("start", None)
+        start = kwargs.pop("start", 0)
         data = self.filter(**kwargs)
         return self.paginate(data, start=start)
 

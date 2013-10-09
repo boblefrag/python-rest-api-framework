@@ -24,6 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Python Rest Api Framework 0.1 documentation" href="index.html" />
+    <link rel="next" title="Authentication and Authorization" href="authentication.html" />
     <link rel="prev" title="What is Python REST API Framework" href="introduction.html" /> 
   </head>
   <body>
@@ -33,6 +34,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="authentication.html" title="Authentication and Authorization"
+             accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="introduction.html" title="What is Python REST API Framework"
              accesskey="P">previous</a> |</li>
@@ -61,21 +65,22 @@ example.</p>
 <li>give the data to the datastore</li>
 <li>define optional options</li>
 </ul>
-<div class="section" id="describe-your-ressource">
-<h3>Describe your ressource<a class="headerlink" href="#describe-your-ressource" title="Permalink to this headline">¶</a></h3>
-<p>A data description is a dict where each key is a field and each value
-another dict containing a type and some optionals arguments. The
-optional arguments depend on the datastore. See the documentation for
-the datastore you need to implement.</p>
-<p>a simple description can be something like:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">description</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="nb">basestring</span><span class="p">,</span> <span class="s">&quot;required&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">},</span>
-    <span class="s">&quot;age&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="s">&quot;required&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">},</span>
-    <span class="s">&quot;id&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="s">&quot;autoincrement&quot;</span><span class="p">,</span> <span class="s">&quot;required&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">}</span>
-    <span class="p">}</span>
+<div class="section" id="model-describe-your-ressource">
+<h3>Model: Describe your ressource<a class="headerlink" href="#model-describe-your-ressource" title="Permalink to this headline">¶</a></h3>
+<p>To describe your ressources, you must use a Model class. Model class
+contain a list of field for each attribut of your ressource.</p>
+<p>You can reuse existing fields or create new one based on existing
+Fields.</p>
+<p>Like each fields come with validators, you get validation for
+free. You are also able to create new Fields just to add more
+validators or change the one your Field class implement.</p>
+<p>a simple Model can be something like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">ApiModel</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+
+    <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;age&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+              <span class="n">models</span><span class="o">.</span><span class="n">StringField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;name&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+              <span class="n">models</span><span class="o">.</span><span class="n">PkField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;id&quot;</span><span class="p">)</span>
+              <span class="p">]</span>
 </pre></div>
 </div>
 <p>Then you need the actual ressources. The format of the ressource
@@ -88,12 +93,13 @@ and the database table used to store data:</p>
 <p>Finally you can give extra parameters to your DataStore like
 pagination, authentication and so on. This will be done using the
 options parameter.</p>
-<p>The option parameter must contain the description you set earlier:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;description&quot;</span><span class="p">:</span> <span class="n">description</span><span class="p">}</span>
+<p>The option parameter should contain pagination option, or whatever
+your datastore may need:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;paginated_by&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">}</span>
 </pre></div>
 </div>
 <p>You can then use your datastore :</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">datastore</span><span class="p">(</span><span class="n">ressource</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">datastore</span><span class="p">(</span><span class="n">ressource</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>To use datastore with your API you can just set parameters in the
@@ -108,28 +114,25 @@ informations about this.</p>
 your needs. They implements a complete datastore.</p>
 <dl class="class">
 <dt id="rest_api_framework.datastore.sql.SQLiteDataStore">
-<em class="property">class </em><tt class="descclassname">rest_api_framework.datastore.sql.</tt><tt class="descname">SQLiteDataStore</tt><big>(</big><em>data</em>, <em>**options</em><big>)</big><a class="reference internal" href="_modules/rest_api_framework/datastore/sql.html#SQLiteDataStore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rest_api_framework.datastore.sql.SQLiteDataStore" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">rest_api_framework.datastore.sql.</tt><tt class="descname">SQLiteDataStore</tt><big>(</big><em>data</em>, <em>model</em>, <em>**options</em><big>)</big><a class="reference internal" href="_modules/rest_api_framework/datastore/sql.html#SQLiteDataStore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rest_api_framework.datastore.sql.SQLiteDataStore" title="Permalink to this definition">¶</a></dt>
 <dd><p>Define a sqlite datastore for your ressource.  you have to give
 __init__ a data parameter containing the information to connect to
 the database and to the table.</p>
 <p>example:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s">&quot;table&quot;</span><span class="p">:</span> <span class="s">&quot;tweets&quot;</span><span class="p">,</span>
       <span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="s">&quot;test.db&quot;</span><span class="p">}</span>
-<span class="n">options</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s">&#39;description&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">&#39;message&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s">&#39;required&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">},</span>
-        <span class="s">&#39;id&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;autoincrement&#39;</span><span class="p">,</span> <span class="s">&#39;required&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">}</span>
-<span class="p">}</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">ApiModel</span>
 <span class="n">datastore</span> <span class="o">=</span> <span class="n">SQLiteDataStore</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>SQLiteDataStore implement a naive wrapper to convert description
+<p>SQLiteDataStore implement a naive wrapper to convert Field
 types into database type.</p>
 <ul class="simple">
 <li>int will be saved in the database as INTEGER</li>
 <li>float will be saved in the database as REAL</li>
 <li>basestring will be saved in the database as TEXT</li>
-<li>autoincrement will be saved as INTEGER PRIMARY KEY AUTOINCREMENT</li>
+<li>if the Field type is PKField, is a will be saved as
+PRIMARY KEY AUTOINCREMENT</li>
 </ul>
 <p>As soon as the datastore is instanciated, the database is create
 if it does not exists and table is created too</p>
@@ -144,7 +147,7 @@ The connection is closed after each operations</li>
 <dl class="method">
 <dt id="rest_api_framework.datastore.sql.SQLiteDataStore.create">
 <tt class="descname">create</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="_modules/rest_api_framework/datastore/sql.html#SQLiteDataStore.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rest_api_framework.datastore.sql.SQLiteDataStore.create" title="Permalink to this definition">¶</a></dt>
-<dd><p>Validate the data with <tt class="xref py py-meth docutils literal"><span class="pre">validate()</span></tt>
+<dd><p>Validate the data with <a class="reference internal" href="#rest_api_framework.datastore.base.DataStore.validate" title="rest_api_framework.datastore.base.DataStore.validate"><tt class="xref py py-meth docutils literal"><span class="pre">base.DataStore.validate()</span></tt></a>
 And, if data is valid, create the row in database and return it.</p>
 </dd></dl>
 
@@ -213,7 +216,7 @@ datastore or create on of you own .</p>
 <p>A DataStore inherit from DataStore base class</p>
 <dl class="class">
 <dt id="rest_api_framework.datastore.base.DataStore">
-<em class="property">class </em><tt class="descclassname">rest_api_framework.datastore.base.</tt><tt class="descname">DataStore</tt><big>(</big><em>data</em>, <em>**options</em><big>)</big><a class="reference internal" href="_modules/rest_api_framework/datastore/base.html#DataStore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rest_api_framework.datastore.base.DataStore" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">rest_api_framework.datastore.base.</tt><tt class="descname">DataStore</tt><big>(</big><em>data</em>, <em>model</em>, <em>**options</em><big>)</big><a class="reference internal" href="_modules/rest_api_framework/datastore/base.html#DataStore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rest_api_framework.datastore.base.DataStore" title="Permalink to this definition">¶</a></dt>
 <dd><p>define a source of data. Can be anything fron database to other
 api, files and so one</p>
 <dl class="method">
@@ -224,10 +227,7 @@ ressource. This method should call
 <a class="reference internal" href="#rest_api_framework.datastore.base.DataStore.validate" title="rest_api_framework.datastore.base.DataStore.validate"><tt class="xref py py-meth docutils literal"><span class="pre">validate()</span></tt></a>,
 create the data in the datastore and return the ressource
 identifier</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Not implemented by base DataStore class</p>
-</div>
+<p>Not implemented by base DataStore class</p>
 </dd></dl>
 
 <dl class="method">
@@ -303,7 +303,7 @@ return the updated object</p>
 <dl class="method">
 <dt id="rest_api_framework.datastore.base.DataStore.validate">
 <tt class="descname">validate</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="_modules/rest_api_framework/datastore/base.html#DataStore.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rest_api_framework.datastore.base.DataStore.validate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check if data send are valide for objec creation. Validate
+<dd><p>Check if data send are valid for object creation. Validate
 Chek that each required fields are in data and check for their
 type too.</p>
 <p>Used to create new ressources</p>
@@ -331,7 +331,7 @@ Used to update existing objects</p>
   <ul>
 <li><a class="reference internal" href="#">Datastore</a><ul>
 <li><a class="reference internal" href="#using-a-datastore">Using a Datastore</a><ul>
-<li><a class="reference internal" href="#describe-your-ressource">Describe your ressource</a></li>
+<li><a class="reference internal" href="#model-describe-your-ressource">Model: Describe your ressource</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#available-datastore">Available DataStore</a></li>
@@ -343,6 +343,9 @@ Used to update existing objects</p>
   <h4>Previous topic</h4>
   <p class="topless"><a href="introduction.html"
                         title="previous chapter">What is Python REST API Framework</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="authentication.html"
+                        title="next chapter">Authentication and Authorization</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/datastore.txt"
@@ -371,6 +374,9 @@ Used to update existing objects</p>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="authentication.html" title="Authentication and Authorization"
+             >next</a> |</li>
         <li class="right" >
           <a href="introduction.html" title="What is Python REST API Framework"
              >previous</a> |</li>

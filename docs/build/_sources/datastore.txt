@@ -1,3 +1,5 @@
+
+
 Datastore
 =========
 
@@ -18,26 +20,29 @@ Once the type of data and the datastore are compatible, you must:
 * give the data to the datastore
 * define optional options
 
-Describe your ressource
+Model: Describe your ressource
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-A data description is a dict where each key is a field and each value
-another dict containing a type and some optionals arguments. The
-optional arguments depend on the datastore. See the documentation for
-the datastore you need to implement.
+To describe your ressources, you must use a Model class. Model class
+contain a list of field for each attribut of your ressource.
 
-a simple description can be something like:
+You can reuse existing fields or create new one based on existing
+Fields.
+
+Like each fields come with validators, you get validation for
+free. You are also able to create new Fields just to add more
+validators or change the one your Field class implement.
+
+a simple Model can be something like:
 
 .. code-block:: python
 
-    description = {
-        "name": {
-            "type": basestring, "required": True},
-        "age": {
-            "type": int, "required": True},
-        "id": {
-            "type": "autoincrement", "required": False}
-        }
+    class ApiModel(models.Model):
+
+        fields = [models.IntegerField(name="age", required=True),
+                  models.StringField(name="name", required=True),
+                  models.PkField(name="id")
+                  ]
 
 Then you need the actual ressources. The format of the ressource
 parameter depend on the datastore you use. For example, if you use the
@@ -52,17 +57,18 @@ Finally you can give extra parameters to your DataStore like
 pagination, authentication and so on. This will be done using the
 options parameter.
 
-The option parameter must contain the description you set earlier:
+The option parameter should contain pagination option, or whatever
+your datastore may need:
 
 .. code-block:: python
 
-    options = {"description": description}
+    options = {"paginated_by": 20}
 
 You can then use your datastore :
 
 .. code-block:: python
 
-    datastore(ressource, **options)
+    datastore(ressource, model, **options)
 
 To use datastore with your API you can just set parameters in the
 Controller you use. The base controller take care of instanciate a

@@ -108,18 +108,19 @@ class DataStore(object):
         """
         start = 0
         end = self.options.get('paginate_by', None)
-        if "start" in kwargs:
-            start = int(kwargs['start'])
-            end = start + self.options['paginate_by']
-        elif "end" in kwargs:
-            end = int(kwargs['end'])
-            start = end - int(kwargs['end'])
+        if end:
+            if "start" in kwargs:
+                start = int(kwargs['start'])
+                end = start + self.options['paginate_by']
+            elif "end" in kwargs:
+                end = int(kwargs['end'])
+                start = end - int(kwargs['end'])
 
         return data[start:end]
 
     def validate(self, data):
         """
-        Check if data send are valide for objec creation. Validate
+        Check if data send are valid for object creation. Validate
         Chek that each required fields are in data and check for their
         type too.
 

@@ -61,9 +61,11 @@ Authorisation/Authentication backend to manage user management
 DataStore
 ~~~~~~~~~
 
-each method of a Controller call the DataStore to interact with
+Each method of a Controller call the DataStore to interact with
 data. The DataStore must be able to retreive data from a
-ressource. Each datastore act on a particular type of ressource
+ressource.
+
+Each datastore act on a particular type of ressource
 (database backend, api backend, csv backend etc...). It must be
 able to validate data, create new ressources, update existing
 ressources, manage filters and pagination.
@@ -71,7 +73,28 @@ ressources, manage filters and pagination.
 Optional configuration option, that can be unique for a particular
 datastore make it very easy to configure, inherit and extend
 
+Model
+~~~~~
 
+When you create a DataStoreInstance, you must feed it with a Model.
+A Model is the python representation of a ressource object.
+
+A Model will contain a list of Fields describing the ressource.
+
+Field
+~~~~~
+
+Each fields of a Model must have a name to identify it. This name
+correspond to the name of the field or property of the ressource.
+
+Each Field can take optionals parameters to control its behavior. It
+can also implment as many Validators than needed to control data integrity.
+
+Validator
+~~~~~~~~~
+
+Each Validator implement the validate method. The validate method will
+check a value and return True if the value is valide, False otherwise.
 
 View
 ~~~~
@@ -141,9 +164,26 @@ our data:
         } for a in range(100)
         ]
 
+Then we have to describe this ressource. To describe a ressouce, you
+must create a Model class inheriting from base Model class:
 
-There is already a datastore to handle this type of data. We can reuse
-this store:
+.. code-block:: python
+
+   from rest_api_framework import models
+
+   class ApiModel(models.Model):
+
+       fields = [models.IntegerField(name="age", required=True),
+                 models.StringField(name="name", required=True),
+                 models.PkField(name="id")
+                 ]
+
+
+Each Field contain validators. When you reuse an existing Field class
+you get his validators for free.
+
+There is already a datastore to handle this type of data: PythonListDataStore.
+We can reuse this store:
 
 .. code-block:: python
 
@@ -168,14 +208,7 @@ and a view to render our data
         list_verbs = ["GET", "POST"]
         unique_verbs = ["GET", "PUT", "DElETE"]
         datastore = PythonListDataStore
-        description = {
-           "name": {
-              "type": basestring, "required": True},
-           "age": {
-              "type": int, "required": True},
-           "id": {
-              "type": "autoincrement", "required": False}
-           }
+        model = ApiModel
         options = {"paginated_by": 20}
         response_class = JsonResponse
 
@@ -193,9 +226,7 @@ and a view to render our data
 
 * datastore: the datastore to be used
 
-* description : a dict containing the definition of each fields of the
-  ressource. Used for data creation, filtering and update.
-
+* model : The model defining your ressource schema
 * options: here you can add optional configuration options like
   authentication, pagination etc...
 
@@ -208,10 +239,12 @@ To test you application locally, you can add:
 
     if __name__ == '__main__':
         from werkzeug.serving import run_simple
-        app = ApiApp()
+        from rest_api_framework.controllers import WSGIDispatcher
+        app = WSGIDispatcher([ApiApp])
         run_simple('127.0.0.1', 5000, app, use_debugger=True, use_reloader=True)
 
 then type "python app.py" and your API is up and running
+
 
 Using a database
 ~~~~~~~~~~~~~~~~
@@ -233,10 +266,15 @@ is the same as with the PythonListDataStore.
     from rest_api_framework.datastore import SQLiteDataStore
     from rest_api_framework.controllers import Controller
     from rest_api_framework.views import JsonResponse
+    from rest_api_framework import models
 
+    class ApiModel(models.Model):
+        fields = [models.StringField(name="message", required=True),
+                  models.StringField(name="user", required=True),
+                  models.PkField(name="id", required=True),
+                  ]
 
     class ApiApp(Controller):
-
         ressource_name = "tweets"
         list_verbs = ["GET", "POST"]
         unique_verbs = ["GET", "PUT", "DElETE"]
@@ -246,18 +284,16 @@ is the same as with the PythonListDataStore.
         datastore = SQLiteDataStore
         ressource = {"name": "twitter.db", "table": "tweets"}
         response_class = JsonResponse
-        description = {
-            "user": {
-                "type": basestring, "required": True},
-            "message": {
-                "type": basestring, "required": True},
-            "id": {
-                "type": "autoincrement", "required": False}
-            }
-
+        model = ApiModel
 
     if __name__ == '__main__':
         from werkzeug.serving import run_simple
-        app = ApiApp()
+        from rest_api_framework.controllers import WSGIDispatcher
+        app = WSGIDispatcher([ApiApp])
         run_simple('127.0.0.1', 5000, app, use_debugger=True, use_reloader=True
 
+Where to go from here
+---------------------
+
+* :doc:`Authentication and Authorization </authentication>`
+* :doc:`multiple_endpoint`

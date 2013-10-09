@@ -3,12 +3,16 @@ from werkzeug.exceptions import BadRequest
 from werkzeug.wrappers import Request
 from werkzeug.routing import Map, Rule
 from werkzeug.exceptions import HTTPException
+from abc import ABCMeta, abstractmethod
 
 
 class WSGIWrapper(object):
     """
     accept a request, return a response
     """
+
+    __metaclass__ = ABCMeta
+
     def __call__(self, environ, start_response):
         """
         return the wsgi wrapper
@@ -26,6 +30,8 @@ class Dispatcher(object):
     Given a set of urls,
     manage the urls mapping
     """
+
+    __metaclass__ = ABCMeta
 
     def __init__(self, urls, *args, **kwargs):
         self.url_map = self.load_urls(urls)
@@ -57,6 +63,9 @@ class ApiController(WSGIWrapper, Dispatcher):
     """
     Handle the basic functionality of a Restful API
     """
+
+    __metaclass__ = ABCMeta
+
     def __init__(self, *args, **kwargs):
         self.auth = None
         if kwargs.get('authentication'):
@@ -155,6 +164,9 @@ class Controller(ApiController):
     """
     The main views of the application
     """
+
+    __metaclass__ = ABCMeta
+
     def __init__(self, *args, **kwargs):
         urls = [
             ('/{0}/'.format(self.ressource_name), 'index', self.list_verbs),

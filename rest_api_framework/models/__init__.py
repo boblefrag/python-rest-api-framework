@@ -2,6 +2,7 @@
 Model are the representation of your ressources.
 """
 from validators import IntegerValidator, StringValidator
+from abc import ABCMeta
 
 
 class Model(object):
@@ -9,6 +10,9 @@ class Model(object):
     The base model class.
     A model object represent a ressource to be plugged in a datastore
     """
+
+    __metaclass__ = ABCMeta
+
     def get_fields_name(self):
         return [field.name for field in self.fields]
 
@@ -26,6 +30,9 @@ class Field(object):
     The base field class. A Field is part of a Model class. It define
     an aspect of a ressource.
     """
+
+    __metaclass__ = ABCMeta
+
     def __init__(self, name, **options):
         self.name = name
         self.options = options

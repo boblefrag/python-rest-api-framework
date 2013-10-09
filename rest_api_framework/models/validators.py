@@ -1,8 +1,14 @@
+from abc import ABCMeta, abstractmethod
+
+
 class Validator(object):
     """
     Base Validator class
     Used to validate data format
     """
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
     def validate(self, field):
         raise NotImplemented
 

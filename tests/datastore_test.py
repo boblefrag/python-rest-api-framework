@@ -1,6 +1,7 @@
 from unittest import TestCase
 from rest_api_framework.datastore import (PythonListDataStore,
                                           SQLiteDataStore)
+#                                          ApiDataStore)
 from rest_api_framework import models
 
 from werkzeug.exceptions import BadRequest, NotFound
@@ -251,3 +252,32 @@ class SQLiteDataStoreTest(TestCase):
                           store.get,
                           10)
         os.remove("test.db")
+
+
+# class ApiStoreTest(TestCase):
+
+#     def test_validation(self):
+#         store = ApiDataStore(
+#             "https://www.googleapis.com/youtube/v3/videos",
+#             ApiModel,
+#             list_key="items",
+#             paginate_by=10,
+#             limit="maxResults")
+#         self.assertEqual(
+#             len(store.get_list(key="AIzaSyChqwezk7uWrdXfhx27Bdz_1dF_ZWukPZM",
+#                                part="snippet",
+#                                mine="true",
+#                                order="rating",
+#                                type="video",
+#                                chart="mostPopular"
+#                                )), 10)
+
+#     def test_get(self):
+#         store = ApiDataStore(
+#             "https://www.googleapis.com/youtube/v3/videos",
+#             ApiModel,
+#             list_key="items",
+#             paginate_by=10,
+#             limit="maxResults",
+#             chart="mostPopular")
+

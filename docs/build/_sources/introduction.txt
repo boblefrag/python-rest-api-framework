@@ -203,35 +203,70 @@ and a view to render our data
 
 
     class ApiApp(Controller):
-        ressource = ressources
-        ressource_name = "address"
-        list_verbs = ["GET", "POST"]
-        unique_verbs = ["GET", "PUT", "DElETE"]
-        datastore = PythonListDataStore
-        model = ApiModel
-        options = {"paginated_by": 20}
-        response_class = JsonResponse
+        ressource = {
+            "ressource_name": "address",
+            "ressource": ressources,
+            "model": ApiModel,
+            "datastore": PythonListDataStore
+            }
 
-* ressource : where the data lies. Each datastore implement his own
-  way to gather data. For a PythonListDataStore, the actual python
-  list is all we need.
+        controller = {
+            "list_verbs": ["GET", "POST"],
+            "unique_verbs": ["GET", "PUT", "DElETE"],
+            "options": {"paginate_by": 20}
+            }
 
-* ressource_name: will be used to construct your urls
+        view = {"response_class": JsonResponse}
 
-* list_verbs: the authorized verbs on the listing of your ressource. Here
-  we authorize read and write
+A controller is build with 3 dicts:
 
-* unique_verbs: the authorized verbs on a ressource URI. Here we
-  authorize read, deletion and modification.
+* ressource
 
-* datastore: the datastore to be used
+Ressource define your data. Where are your data ? How can they be
+accessed ? What they look likes?
 
-* model : The model defining your ressource schema
-* options: here you can add optional configuration options like
-  authentication, pagination etc...
+  * ressource_name: will be used to build the url endpoint to your
+     ressource.
 
-* response_class: the class used to render your ressources. Here we
-  use JsonResponse a naïve implementation of a json formater
+  * ressource: where your ressource lies.this argument tell the
+     datastore how they can be accessed. It can be the database name
+     and the database table for a SQL datastore or the url endpoint to
+     a distant API for exemple.
+
+  * model: describe how your data look like. Wich field it show, how
+     to validate data and so on.
+
+  * datastore: the type of your data. There is datastore for simple
+     Python list of dict and SQLite datastore. They are exemple on how
+     to build your own datastore depending on your needs.
+
+* controller
+
+The controller define the way your data should be accessed. Should the
+results be paginated ? Authenticated ? Rate-limited ? Wich it the
+verbs you can use on the resource ? and so on.
+
+  * list_verbs: define the verbs you can use on the main endpoint of
+     your ressource. If you dont' use "POST", a user cannot create new
+     ressources on your datastore.
+
+  * unique_verbs: define the verbs you can use on the unique
+     identifier of the ressource. actions depending on the verbs
+     follows the REST implementation: PUT to modify an existing
+     ressource, DELETE to delete a ressource.
+
+  * options : a list of options your api can handle. Pagination,
+     Rate-Limit, Authentication, Authorization and so on.
+
+
+* view
+
+view define How your ressoources should be rendered to the
+user. It can be a Json format, XML, or whatever. It can also
+render pagination token, first page, last page, number of objects
+and other usefull informations for your users.
+
+  * response_class: the response class you use to render your data.
 
 To test you application locally, you can add:
 
@@ -275,16 +310,19 @@ is the same as with the PythonListDataStore.
                   ]
 
     class ApiApp(Controller):
-        ressource_name = "tweets"
-        list_verbs = ["GET", "POST"]
-        unique_verbs = ["GET", "PUT", "DElETE"]
-        options = {
-            "paginate_by": 20}
+        ressource = {
+           "ressource_name": "tweets",
+           "ressource": {"name": "twitter.db", "table": "tweets"},
+           "datastore": SQLiteDataStore,
+           "model": ApiModel
+        }
+        controller = {
+           "list_verbs": ["GET", "POST"],
+           "unique_verbs": ["GET", "PUT", "DElETE"]
+           "options": {"paginate_by": 20}
+        }
+        view = {"response_class": JsonResponse}
 
-        datastore = SQLiteDataStore
-        ressource = {"name": "twitter.db", "table": "tweets"}
-        response_class = JsonResponse
-        model = ApiModel
 
     if __name__ == '__main__':
         from werkzeug.serving import run_simple

@@ -9,7 +9,16 @@ class Authorization(object):
 
 
 class Authentication(object):
-    pass
+
+    def check_auth(self, request):
+        """
+        Return None if the request user is authorized to perform this
+        action, raise Unauthorized otherwise
+
+        :param request:
+        :type request: :class:`werkzeug.wrappers.Request`
+        """
+        raise NotImplemented
 
 
 class ApiKeyAuthentication(Authentication):

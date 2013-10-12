@@ -35,6 +35,9 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
           <a href="datastore.html" title="Datastore"
              accesskey="N">next</a> |</li>
         <li class="right" >
@@ -220,32 +223,102 @@ We can reuse this store:</p>
 
 
 <span class="k">class</span> <span class="nc">ApiApp</span><span class="p">(</span><span class="n">Controller</span><span class="p">):</span>
-    <span class="n">ressource</span> <span class="o">=</span> <span class="n">ressources</span>
-    <span class="n">ressource_name</span> <span class="o">=</span> <span class="s">&quot;address&quot;</span>
-    <span class="n">list_verbs</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;POST&quot;</span><span class="p">]</span>
-    <span class="n">unique_verbs</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;PUT&quot;</span><span class="p">,</span> <span class="s">&quot;DElETE&quot;</span><span class="p">]</span>
-    <span class="n">datastore</span> <span class="o">=</span> <span class="n">PythonListDataStore</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">ApiModel</span>
-    <span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;paginated_by&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">}</span>
-    <span class="n">response_class</span> <span class="o">=</span> <span class="n">JsonResponse</span>
+    <span class="n">ressource</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&quot;ressource_name&quot;</span><span class="p">:</span> <span class="s">&quot;address&quot;</span><span class="p">,</span>
+        <span class="s">&quot;ressource&quot;</span><span class="p">:</span> <span class="n">ressources</span><span class="p">,</span>
+        <span class="s">&quot;model&quot;</span><span class="p">:</span> <span class="n">ApiModel</span><span class="p">,</span>
+        <span class="s">&quot;datastore&quot;</span><span class="p">:</span> <span class="n">PythonListDataStore</span>
+        <span class="p">}</span>
+
+    <span class="n">controller</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&quot;list_verbs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;POST&quot;</span><span class="p">],</span>
+        <span class="s">&quot;unique_verbs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;PUT&quot;</span><span class="p">,</span> <span class="s">&quot;DElETE&quot;</span><span class="p">],</span>
+        <span class="s">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;paginate_by&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">}</span>
+        <span class="p">}</span>
+
+    <span class="n">view</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;response_class&quot;</span><span class="p">:</span> <span class="n">JsonResponse</span><span class="p">}</span>
 </pre></div>
 </div>
+<p>A controller is build with 3 dicts:</p>
 <ul class="simple">
-<li>ressource : where the data lies. Each datastore implement his own
-way to gather data. For a PythonListDataStore, the actual python
-list is all we need.</li>
-<li>ressource_name: will be used to construct your urls</li>
-<li>list_verbs: the authorized verbs on the listing of your ressource. Here
-we authorize read and write</li>
-<li>unique_verbs: the authorized verbs on a ressource URI. Here we
-authorize read, deletion and modification.</li>
-<li>datastore: the datastore to be used</li>
-<li>model : The model defining your ressource schema</li>
-<li>options: here you can add optional configuration options like
-authentication, pagination etc...</li>
-<li>response_class: the class used to render your ressources. Here we
-use JsonResponse a naïve implementation of a json formater</li>
+<li>ressource</li>
 </ul>
+<p>Ressource define your data. Where are your data ? How can they be
+accessed ? What they look likes?</p>
+<blockquote>
+<div><ul>
+<li><dl class="first docutils">
+<dt>ressource_name: will be used to build the url endpoint to your</dt>
+<dd><p class="first last">ressource.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>ressource: where your ressource lies.this argument tell the</dt>
+<dd><p class="first last">datastore how they can be accessed. It can be the database name
+and the database table for a SQL datastore or the url endpoint to
+a distant API for exemple.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>model: describe how your data look like. Wich field it show, how</dt>
+<dd><p class="first last">to validate data and so on.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>datastore: the type of your data. There is datastore for simple</dt>
+<dd><p class="first last">Python list of dict and SQLite datastore. They are exemple on how
+to build your own datastore depending on your needs.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>controller</li>
+</ul>
+<p>The controller define the way your data should be accessed. Should the
+results be paginated ? Authenticated ? Rate-limited ? Wich it the
+verbs you can use on the resource ? and so on.</p>
+<blockquote>
+<div><ul>
+<li><dl class="first docutils">
+<dt>list_verbs: define the verbs you can use on the main endpoint of</dt>
+<dd><p class="first last">your ressource. If you dont&#8217; use &#8220;POST&#8221;, a user cannot create new
+ressources on your datastore.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>unique_verbs: define the verbs you can use on the unique</dt>
+<dd><p class="first last">identifier of the ressource. actions depending on the verbs
+follows the REST implementation: PUT to modify an existing
+ressource, DELETE to delete a ressource.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>options <span class="classifier-delimiter">:</span> <span class="classifier">a list of options your api can handle. Pagination,</span></dt>
+<dd><p class="first last">Rate-Limit, Authentication, Authorization and so on.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>view</li>
+</ul>
+<p>view define How your ressoources should be rendered to the
+user. It can be a Json format, XML, or whatever. It can also
+render pagination token, first page, last page, number of objects
+and other usefull informations for your users.</p>
+<blockquote>
+<div><ul class="simple">
+<li>response_class: the response class you use to render your data.</li>
+</ul>
+</div></blockquote>
 <p>To test you application locally, you can add:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">werkzeug.serving</span> <span class="kn">import</span> <span class="n">run_simple</span>
@@ -279,16 +352,19 @@ is the same as with the PythonListDataStore.</p>
               <span class="p">]</span>
 
 <span class="k">class</span> <span class="nc">ApiApp</span><span class="p">(</span><span class="n">Controller</span><span class="p">):</span>
-    <span class="n">ressource_name</span> <span class="o">=</span> <span class="s">&quot;tweets&quot;</span>
-    <span class="n">list_verbs</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;POST&quot;</span><span class="p">]</span>
-    <span class="n">unique_verbs</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;PUT&quot;</span><span class="p">,</span> <span class="s">&quot;DElETE&quot;</span><span class="p">]</span>
-    <span class="n">options</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s">&quot;paginate_by&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">}</span>
+    <span class="n">ressource</span> <span class="o">=</span> <span class="p">{</span>
+       <span class="s">&quot;ressource_name&quot;</span><span class="p">:</span> <span class="s">&quot;tweets&quot;</span><span class="p">,</span>
+       <span class="s">&quot;ressource&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="s">&quot;twitter.db&quot;</span><span class="p">,</span> <span class="s">&quot;table&quot;</span><span class="p">:</span> <span class="s">&quot;tweets&quot;</span><span class="p">},</span>
+       <span class="s">&quot;datastore&quot;</span><span class="p">:</span> <span class="n">SQLiteDataStore</span><span class="p">,</span>
+       <span class="s">&quot;model&quot;</span><span class="p">:</span> <span class="n">ApiModel</span>
+    <span class="p">}</span>
+    <span class="n">controller</span> <span class="o">=</span> <span class="p">{</span>
+       <span class="s">&quot;list_verbs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;POST&quot;</span><span class="p">],</span>
+       <span class="s">&quot;unique_verbs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;PUT&quot;</span><span class="p">,</span> <span class="s">&quot;DElETE&quot;</span><span class="p">]</span>
+       <span class="s">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;paginate_by&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">}</span>
+    <span class="p">}</span>
+    <span class="n">view</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;response_class&quot;</span><span class="p">:</span> <span class="n">JsonResponse</span><span class="p">}</span>
 
-    <span class="n">datastore</span> <span class="o">=</span> <span class="n">SQLiteDataStore</span>
-    <span class="n">ressource</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="s">&quot;twitter.db&quot;</span><span class="p">,</span> <span class="s">&quot;table&quot;</span><span class="p">:</span> <span class="s">&quot;tweets&quot;</span><span class="p">}</span>
-    <span class="n">response_class</span> <span class="o">=</span> <span class="n">JsonResponse</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">ApiModel</span>
 
 <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">werkzeug.serving</span> <span class="kn">import</span> <span class="n">run_simple</span>
@@ -303,7 +379,7 @@ is the same as with the PythonListDataStore.</p>
 <h2>Where to go from here<a class="headerlink" href="#where-to-go-from-here" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><a class="reference internal" href="authentication.html"><em>Authentication and Authorization</em></a></li>
-<li><tt class="xref doc docutils literal"><span class="pre">multiple_endpoint</span></tt></li>
+<li><a class="reference internal" href="multiple_endpoint.html"><em>Using more than a single endpoint</em></a></li>
 </ul>
 </div>
 </div>
@@ -375,6 +451,9 @@ is the same as with the PythonListDataStore.</p>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li class="right" >
           <a href="datastore.html" title="Datastore"
              >next</a> |</li>

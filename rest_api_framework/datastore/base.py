@@ -10,11 +10,11 @@ class DataStore(object):
     """
     __metaclass__ = ABCMeta
 
-    def __init__(self, data, model, **options):
+    def __init__(self, ressource_config, model, **options):
         """
         Set the ressource datastore
         """
-        self.data = data
+        self.ressource_config = ressource_config
         self.options = options
         self.model = model()
 

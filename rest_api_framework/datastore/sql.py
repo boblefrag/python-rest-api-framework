@@ -43,11 +43,11 @@ class SQLiteDataStore(DataStore):
                basestring: "text"
                }
 
-    def __init__(self, data, model, **options):
-        self.table = data["name"]
-        conn = sqlite3.connect(data["name"])
+    def __init__(self, ressource_config, model, **options):
+        self.table = ressource_config["name"]
+        conn = sqlite3.connect(ressource_config["name"])
         c = conn.cursor()
-        table = data["table"]
+        table = ressource_config["table"]
         super(SQLiteDataStore, self).__init__({"conn": conn, "table": table},
                                               model,
                                               **options)
@@ -100,7 +100,9 @@ class SQLiteDataStore(DataStore):
             data["query"] += " LIMIT {0}".format(limit)
 
         c = self.get_connector().cursor()
-        c.execute(data["query"].format(self.data['table']), tuple(args))
+        c.execute(data["query"].format(self.ressource_config['table']),
+                  tuple(args)
+                  )
         objs = []
         for elem in c.fetchall():
             fields = self.model.get_fields_name()
@@ -128,7 +130,7 @@ class SQLiteDataStore(DataStore):
         fields = ",".join(self.model.get_fields_name())
         query = "select {0} from {1} where id=?".format(
             fields,
-            self.data["table"])
+            self.ressource_config["table"])
         c = self.get_connector().cursor()
         c.execute(query, (identifier,))
         obj = c.fetchone()
@@ -156,7 +158,7 @@ class SQLiteDataStore(DataStore):
         c = conn.cursor()
 
         query = "insert into {0} {1} values ({2})".format(
-            self.data["table"],
+            self.ressource_config["table"],
             tuple(fields),
             ",".join(["?" for i in range(len(fields))])
             )
@@ -186,7 +188,7 @@ class SQLiteDataStore(DataStore):
         update = " ".join(["{0}='{1}'".format(f, v) for f, v in zip(fields,
                                                                     values)])
         query = "update {0} set {1}".format(
-            self.data["table"],
+            self.ressource_config["table"],
             update
             )
         c.execute(query)
@@ -206,8 +208,9 @@ class SQLiteDataStore(DataStore):
         conn = self.get_connector()
         c = conn.cursor()
 
-        query = "delete from {0} where id={1}".format(self.data["table"],
-                                                      identifier)
+        query = "delete from {0} where id={1}".format(
+            self.ressource_config["table"],
+            identifier)
         c.execute(query)
         conn.commit()
         conn.close()

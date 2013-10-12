@@ -10,7 +10,9 @@ from werkzeug.exceptions import NotFound
 
 class WSGIWrapper(object):
     """
-    accept a request, return a response
+    Base Wsgi application loader. WSGIWrapper is an abstract
+    class. Herited by :class:`.ApiController` it make the class
+    callable and implement the request/response process
     """
 
     __metaclass__ = ABCMeta
@@ -29,12 +31,18 @@ class WSGIWrapper(object):
 
 class WSGIDispatcher(DispatcherMiddleware):
     """
-    Embed multiple endpoint in one
+    WSGIDispatcher take a list of :class:`.Controller` and mount them
+    on their ressource mount point.
+    basic syntax is:
+
+    .. code-block:: python
+
+       app = WSGIDispatcher([FirstApp, SecondApp])
     """
     def __init__(self, apps):
         endpoints = {}
         for elem in apps:
-            endpoints["/{0}".format(elem.ressource_name)] = elem()
+            endpoints["/{0}".format(elem.ressource["ressource_name"])] = elem()
         app = NotFound()
         mounts = endpoints
         super(WSGIDispatcher, self).__init__(app, mounts=mounts)
@@ -42,8 +50,18 @@ class WSGIDispatcher(DispatcherMiddleware):
 
 class Dispatcher(object):
     """
-    Given a set of urls,
-    manage the urls mapping
+    Dispatcher auto map urls to views methods defined in :class:`.Controller`.
+
+    :example:
+
+    .. code-block:: python
+
+       Dispatcher(
+                  [
+                   ("/", "index", ["GET"]),
+                   ("/register/", "register", ["GET", "POST"],
+                  ]
+                 )
     """
 
     __metaclass__ = ABCMeta
@@ -54,7 +72,14 @@ class Dispatcher(object):
 
     def load_urls(self, urls):
         """
-        return a Map object containing urls mapping
+        :param urls: A list of tuple in the form (url(string),
+                     view(string), permitted Http verbs(list))
+        :type urls: list
+
+        return a :class:`werkzeug.routing.Map`
+
+        this method is automaticaly called by __init__ to build the
+        :class:`.Controller` urls mapping
         """
         return Map(
             [
@@ -65,7 +90,9 @@ class Dispatcher(object):
 
     def dispatch_request(self, request):
         """
-        Bind a request to a method
+        Using the :class:`werkzeug.routing.Map` constructed by
+        :meth:`.load_urls` call the view method with the request
+        object and return the response object.
         """
         adapter = self.url_map.bind_to_environ(request.environ)
         try:
@@ -77,7 +104,8 @@ class Dispatcher(object):
 
 class ApiController(WSGIWrapper, Dispatcher):
     """
-    Handle the basic functionality of a Restful API
+    Inherit from :class:`.WSGIWrapper` and :class:`.Dispatcher`
+    implement the base API method. Should be inherited to create your own API
     """
 
     __metaclass__ = ABCMeta
@@ -89,8 +117,9 @@ class ApiController(WSGIWrapper, Dispatcher):
 
     def render_list(self, objs):
         for obj in objs:
-            obj['ressource_uri'] = "/{0}/{1}/".format(self.ressource_name,
-                                                  obj['id'])
+            obj['ressource_uri'] = "/{0}/{1}/".format(
+                self.ressource['ressource_name'],
+                obj['id'])
         return objs
 
     def index(self, request):
@@ -98,6 +127,13 @@ class ApiController(WSGIWrapper, Dispatcher):
         The root url of your ressources. Should present a list of
         ressources if method is GET.
         Should create a ressource if method is POST
+        :param request:
+        :type request: :class:`werkzeug.wrappers.Request`
+        if self.auth is set call
+        :meth:`.authentication.Authentication.check_auth`
+
+        :return: :meth:`.get_list` if request.method is GET,
+                 :meth:`.create` if request.method is POST
         """
         if self.auth:
             self.auth.check_auth(request)
@@ -111,22 +147,32 @@ class ApiController(WSGIWrapper, Dispatcher):
     def paginate(self, request):
         """
         A pagination example. Feel free to implement your own
+
+        :param request:
+        :type request: :class:`werkzeug.wrappers.Request`
         """
         first_id = request.values.to_dict().get("first_id", 0)
         filters = request.values.to_dict()
         filters.pop("first_id", None)
-        return self.response_class(
+        return self.view['response_class'](
             self.render_list(
                 self.datastore.get_list(start=first_id, **filters)),
             status=200)
 
     def get_list(self, request):
+        """
+        :param request:
+        :type request: :class:`werkzeug.wrappers.Request`
+        """
         return self.paginate(request)
 
     def unique_uri(self, request, identifier):
         """
         Retreive a unique object with his URI.
         Act on it accordingly to the Http verb used.
+
+        :param request:
+        :type request: :class:`werkzeug.wrappers.Request`
         """
         if self.auth:
             self.auth.check_auth(request)
@@ -141,38 +187,52 @@ class ApiController(WSGIWrapper, Dispatcher):
     def get(self, request, identifier):
         """
         Return an object or 404
+
+        :param request:
+        :type request: :class:`werkzeug.wrappers.Request`
         """
         obj = self.datastore.get(identifier=identifier)
 
-        return self.response_class(
+        return self.view['response_class'](
             obj,
             status=200)
 
     def create(self, request):
         """
         Create a new object in the datastore
+
+        :param request:
+        :type request: :class:`werkzeug.wrappers.Request`
         """
         try:
             data = json.loads(request.data)
         except:
             raise BadRequest()
         response = self.datastore.create(data)
-        return self.response_class(
+        return self.view['response_class'](
             headers={"location": str(response)}, status=201)
 
     def update(self, request, identifier):
         """
         Update an object in the datastore
+
+        :param request:
+        :type request: :class:`werkzeug.wrappers.Request`
+
         """
         obj = self.datastore.get(identifier=identifier)
         obj = self.datastore.update(obj, json.loads(request.data))
-        return self.response_class(
+        return self.view['response_class'](
             obj,
             status=200)
 
     def delete(self, request, identifier):
+        """
+        :param request:
+        :type request: :class:`werkzeug.wrappers.Request`
+        """
         self.datastore.delete(identifier=identifier)
-        return self.response_class(status=200)
+        return self.view['response_class'](status=200)
 
 
 class Controller(ApiController):
@@ -184,13 +244,14 @@ class Controller(ApiController):
 
     def __init__(self, *args, **kwargs):
         urls = [
-            ('/', 'index', self.list_verbs),
+            ('/', 'index', self.controller['list_verbs']),
             ('/<int:identifier>/',
              'unique_uri',
-             self.unique_verbs),
+             self.controller['unique_verbs']),
             ]
-        self.datastore = self.datastore(self.ressource,
-                                        self.model,
-                                        **self.options)
-
+        self.datastore = self.ressource['datastore'](
+            self.ressource['ressource'],
+            self.ressource['model'],
+            **self.ressource.get('options', {})
+            )
         super(Controller, self).__init__(urls, *args, **kwargs)

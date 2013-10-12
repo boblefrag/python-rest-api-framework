@@ -8,6 +8,12 @@ class PythonListDataStore(DataStore):
     a datastore made of list of dicts
     """
 
+    def __init__(self, ressource_config, model, **options):
+        self.data = ressource_config
+        super(PythonListDataStore, self).__init__(ressource_config,
+                                                  model,
+                                                  **options)
+
     def get(self, identifier):
         """
         return an object matching the uri or None
@@ -18,7 +24,7 @@ class PythonListDataStore(DataStore):
         raise NotFound
 
     def filter(self, **kwargs):
-        data = self.data
+        data = self.ressource_config
         for k, v in kwargs.iteritems():
             try:
                 data = [elem for elem in data if elem[k] == v]

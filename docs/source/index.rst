@@ -15,6 +15,7 @@ Contents:
    datastore
    authentication
    multiple_endpoint
+   references
 
 Indices and tables
 ==================

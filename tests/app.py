@@ -46,17 +46,20 @@ class ApiModel(models.Model):
 
 
 class ApiApp(Controller):
+    ressource = {
+        "ressource_name": "address",
+        "ressource": ressources,
+        "model": ApiModel,
+        "datastore": PythonListDataStore
+        }
 
-    ressource_name = "address"
-    list_verbs = ["GET", "POST"]
-    unique_verbs = ["GET", "PUT", "DElETE"]
-    options = {
-        "paginate_by": 20}
+    controller = {
+        "list_verbs": ["GET", "POST"],
+        "unique_verbs": ["GET", "PUT", "DElETE"],
+        "options": {"paginate_by": 20}
+        }
 
-    model = ApiModel
-    datastore = PythonListDataStore
-    ressource = ressources
-    response_class = JsonResponse
+    view = {"response_class": JsonResponse}
 
 
 if __name__ == '__main__':

@@ -41,19 +41,12 @@ class ApiKeyAuthorization(Authorization):
     """
     def __init__(self, authentication, **options):
         self.authentication = authentication
-        if options.get("authorized_method"):
-            self.authorized_method = options.get("authorized_method")
-        else:
-            self.authorized_method = None
 
     def check_auth(self, request):
         """
         Check if a user is authorized to perform a particular action.
         """
         data = request.values.to_dict()
-        if self.authorized_method and \
-                request.method not in self.authorized_method:
-            raise Unauthorized
         if "apikey" in data:
             if self.authentication.get_user(data['apikey']):
                 return

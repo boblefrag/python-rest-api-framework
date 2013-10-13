@@ -135,8 +135,8 @@ class ApiController(WSGIWrapper, Dispatcher):
         :return: :meth:`.get_list` if request.method is GET,
                  :meth:`.create` if request.method is POST
         """
-        if self.auth:
-            self.auth.check_auth(request)
+        if hasattr(self, "authorization"):
+            self.authorization.check_auth(request)
 
         if request.method == "GET":
             return self.get_list(request)
@@ -180,8 +180,8 @@ class ApiController(WSGIWrapper, Dispatcher):
         :param request:
         :type request: :class:`werkzeug.wrappers.Request`
         """
-        if self.auth:
-            self.auth.check_auth(request)
+        if hasattr(self, "authorization"):
+            self.authorization.check_auth(request)
 
         if request.method == "GET":
             return self.get(request, identifier)
@@ -261,7 +261,18 @@ class Controller(ApiController):
             **self.ressource.get('options', {})
             )
 
-        if self.controller.get("options", None) and \
-                self.controller["options"].get("pagination", None):
-            self.pagination = self.controller["options"]["pagination"]
+        if self.controller.get("options", None):
+            self.make_options(self.controller["options"])
+
         super(Controller, self).__init__(urls, *args, **kwargs)
+
+    def make_options(self, options):
+        if options.get("pagination", None):
+            self.pagination = options["pagination"]
+        if options.get("authentication", None):
+            self.authentication = options["authentication"]
+        if options.get("authorization", None):
+            if not hasattr(self, "authentication"):
+                raise ValueError(
+                    "Authorization option need an Authentication backend")
+            self.authorization = options["authorization"](self.authentication)

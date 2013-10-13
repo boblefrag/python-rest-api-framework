@@ -64,15 +64,22 @@ class TestApiView(TestCase):
 class TestAuthentication(TestCase):
 
     def test_unauth_get_list(self):
+        from rest_api_framework.pagination import Pagination
         ressources = [{"id": "azerty"}]
+        authentication = ApiKeyAuthentication(
+            PythonListDataStore(ressources,
+                                ApiModel)
+            )
 
         class ApiAppAuth(ApiApp):
-            auth = ApiKeyAuthorization(
-                ApiKeyAuthentication(
-                    PythonListDataStore(ressources,
-                                        ApiModel)
-                    )
-                )
+            controller = {
+                "list_verbs": ["GET", "POST"],
+                "unique_verbs": ["GET", "PUT", "DElETE"],
+                "options": {"pagination": Pagination(20),
+                            "authentication": authentication,
+                            "authorization": ApiKeyAuthorization
+                            }
+                }
 
         client = Client(
             WSGIDispatcher([ApiAppAuth]),
@@ -81,16 +88,22 @@ class TestAuthentication(TestCase):
         self.assertEqual(resp.status_code, 401)
 
     def test_auth_get_list(self):
-
+        from rest_api_framework.pagination import Pagination
         ressources = [{"id": "azerty"}]
+        authentication = ApiKeyAuthentication(
+            PythonListDataStore(ressources,
+                                ApiModel)
+            )
 
         class ApiAppAuth(ApiApp):
-            auth = ApiKeyAuthorization(
-                ApiKeyAuthentication(
-                    PythonListDataStore(ressources,
-                                        ApiModel)
-                    )
-                )
+            controller = {
+                "list_verbs": ["GET", "POST"],
+                "unique_verbs": ["GET", "PUT", "DElETE"],
+                "options": {"pagination": Pagination(20),
+                            "authentication": authentication,
+                            "authorization": ApiKeyAuthorization
+                            }
+                }
 
         client = Client(
             WSGIDispatcher([ApiAppAuth]),
@@ -101,15 +114,22 @@ class TestAuthentication(TestCase):
         self.assertEqual(resp.status_code, 401)
 
     def test_auth_unique_uri(self):
+        from rest_api_framework.pagination import Pagination
         ressources = [{"id": "azerty"}]
+        authentication = ApiKeyAuthentication(
+            PythonListDataStore(ressources,
+                                ApiModel)
+            )
 
         class ApiAppAuth(ApiApp):
-            auth = ApiKeyAuthorization(
-                ApiKeyAuthentication(
-                    PythonListDataStore(ressources,
-                                        ApiModel)
-                    )
-                )
+            controller = {
+                "list_verbs": ["GET", "POST"],
+                "unique_verbs": ["GET", "PUT", "DElETE"],
+                "options": {"pagination": Pagination(20),
+                            "authentication": authentication,
+                            "authorization": ApiKeyAuthorization
+                            }
+                }
 
         client = Client(
             WSGIDispatcher([ApiAppAuth]),
@@ -125,17 +145,23 @@ class TestAuthentication(TestCase):
         Test a read only api.
         GET should be ok, POST and PUT should not
         """
+
+        from rest_api_framework.pagination import Pagination
         ressources = [{"id": "azerty"}]
+        authentication = ApiKeyAuthentication(
+            PythonListDataStore(ressources,
+                                ApiModel)
+            )
 
         class ApiAppAuth(ApiApp):
-            auth = ApiKeyAuthorization(
-                ApiKeyAuthentication(
-                    PythonListDataStore(ressources,
-                                        ApiModel)
-                    ),
-                authorized_method=["GET"]
-                )
-
+            controller = {
+                "list_verbs": ["GET"],
+                "unique_verbs": ["GET"],
+                "options": {"pagination": Pagination(20),
+                            "authentication": authentication,
+                            "authorization": ApiKeyAuthorization
+                            }
+                }
         client = Client(
             WSGIDispatcher([ApiAppAuth]),
             response_wrapper=BaseResponse)
@@ -144,7 +170,7 @@ class TestAuthentication(TestCase):
         self.assertEqual(resp.status_code, 200)
         resp = client.post("/address/?apikey=azerty",
                            data=json.dumps({'name': 'bob', 'age': 34}))
-        self.assertEqual(resp.status_code, 401)
+        self.assertEqual(resp.status_code, 405)
 
 
 class TestPagination(TestCase):
@@ -180,7 +206,7 @@ class TestSQlitePagination(TestCase):
         client = Client(WSGIDispatcher([SQLiteApp]),
                         response_wrapper=BaseResponse)
         for i in range(100):
-            a = client.post("/address/",
+            client.post("/address/",
                         data=json.dumps({"name": "bob", "age": 34}))
         resp = client.get("/address/")
         self.assertEqual(len(json.loads(resp.data)), 20)

@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <link rel="top" title="Python Rest Api Framework 0.1 documentation" href="../../../index.html" />
-    <link rel="up" title="Module code" href="../../index.html" /> 
+    <link rel="up" title="rest_api_framework.datastore" href="../datastore.html" /> 
   </head>
   <body>
     <div class="related">
@@ -37,7 +37,8 @@
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li><a href="../../../index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li>
-          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../datastore.html" accesskey="U">rest_api_framework.datastore</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -50,7 +51,7 @@
 <span class="kn">from</span> <span class="nn">werkzeug.exceptions</span> <span class="kn">import</span> <span class="n">BadRequest</span>
 
 
-<div class="viewcode-block" id="DataStore"><a class="viewcode-back" href="../../../datastore.html#rest_api_framework.datastore.base.DataStore">[docs]</a><span class="k">class</span> <span class="nc">DataStore</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="DataStore"><a class="viewcode-back" href="../../../references.html#rest_api_framework.datastore.base.DataStore">[docs]</a><span class="k">class</span> <span class="nc">DataStore</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    define a source of data. Can be anything fron database to other</span>
 <span class="sd">    api, files and so one</span>
@@ -64,7 +65,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">options</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">options</span><span class="p">[</span><span class="s">&quot;description&quot;</span><span class="p">]</span>
 
-<div class="viewcode-block" id="DataStore.paginate"><a class="viewcode-back" href="../../../datastore.html#rest_api_framework.datastore.base.DataStore.paginate">[docs]</a>    <span class="k">def</span> <span class="nf">paginate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="DataStore.paginate"><a class="viewcode-back" href="../../../references.html#rest_api_framework.datastore.base.DataStore.paginate">[docs]</a>    <span class="k">def</span> <span class="nf">paginate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Naive implementation of pagination. Ressource_list must implement</span>
 <span class="sd">        indexing in a clever way. This naive implementation does not check</span>
@@ -100,7 +101,7 @@
 
         <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
 </div>
-<div class="viewcode-block" id="DataStore.validate"><a class="viewcode-back" href="../../../datastore.html#rest_api_framework.datastore.base.DataStore.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<div class="viewcode-block" id="DataStore.validate"><a class="viewcode-back" href="../../../references.html#rest_api_framework.datastore.base.DataStore.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check if data send are valide for objec creation</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -115,7 +116,7 @@
                                        <span class="p">):</span>
                     <span class="k">raise</span> <span class="n">BadRequest</span><span class="p">()</span>
 </div>
-<div class="viewcode-block" id="DataStore.validate_fields"><a class="viewcode-back" href="../../../datastore.html#rest_api_framework.datastore.base.DataStore.validate_fields">[docs]</a>    <span class="k">def</span> <span class="nf">validate_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<div class="viewcode-block" id="DataStore.validate_fields"><a class="viewcode-back" href="../../../references.html#rest_api_framework.datastore.base.DataStore.validate_fields">[docs]</a>    <span class="k">def</span> <span class="nf">validate_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Validate some fields of the ressource</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -160,7 +161,8 @@
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li><a href="../../../index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li>
-          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../datastore.html" >rest_api_framework.datastore</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

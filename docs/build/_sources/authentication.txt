@@ -42,9 +42,6 @@ Authorization
 Authorization need a way to indentify a user. An Authentication
 backend is used for this need.
 
-Authorization can contain a number of option to change they behaviour,
-like authorizing some verbs to some user.
-
 They implements the check_auth(request) method. This method should
 return None if authorization is granted or raise an Unauthorized error
 otherwise.
@@ -60,33 +57,26 @@ Example
 
 .. code-block:: python
 
-   class ApiKeyAuthorization(Authorization):
-       """
-       This authentication backend use an api key to authenticate and
-       authorize users
-       """
-       def __init__(self, authentication, **options):
-           self.authentication = authentication
-           if options.get("authorized_method"):
-               self.authorized_method = options.get("authorized_method")
-           else:
-               self.authorized_method = None
+    class ApiKeyAuthorization(Authorization):
+        """
+        This authentication backend use an api key to authenticate and
+        authorize users
+        """
+        def __init__(self, authentication, **options):
+            self.authentication = authentication
 
-       def check_auth(self, request):
-           """
-           Check if a user is authorized to perform a particular action.
-           """
-           data = request.values.to_dict()
-           if self.authorized_method and \
-                   request.method not in self.authorized_method:
-               raise Unauthorized
-           if "apikey" in data:
-               if self.authentication.get_user(data['apikey']):
-                   return
-               else:
-                   raise Unauthorized
+        def check_auth(self, request):
+            """
+            Check if a user is authorized to perform a particular action.
+            """
+            data = request.values.to_dict()
+            if "apikey" in data:
+                if self.authentication.get_user(data['apikey']):
+                    return
+                else:
+                    raise Unauthorized
 
-           raise Unauthorized
+            raise Unauthorized
 
 How to use an Authentication/Authorization backend
 ---------------------------------------------------
@@ -127,35 +117,20 @@ Finnaly, ApiKeyAuthorization can be instanciated too:
 
 .. code-block:: python
 
-    auth = ApiKeyAuthorization(authentication)
+    auth = ApiKeyAuthorization
 
 You can now use any of your api and protect it with the
 ApiKeyAuthorization you just created:
 
 .. code-block:: python
 
-    class ApiAppAuth(Controller):
-                auth = auth
-                other_parameters
+       class ApiAppAuth(Controller):
+            controller = {
+                "options": {"authentication": auth,
+                            "authorization": ApiKeyAuthorization
+                            }
+                }
+            <other arguments>...
 
 Each time a user access this api, he must use ?apikey=azerty to be
 granted access to the api.
-
-As ApiKeyAuthorization implement a filter based on method, you can add
-to your ApiKeyAuthorization options the authorized verbs on this
-ressource with this key:
-
-.. code-block:: python
-
-    auth = ApiKeyAuthorization(authentication,
-                               authorized_method=["GET"])
-
-
-and use this configuration in any of your API:
-
-.. code-block:: python
-
-    class ApiAppAuth(Controller):
-                auth = auth
-                other_parameters
-

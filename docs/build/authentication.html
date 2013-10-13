@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Python Rest Api Framework 0.1 documentation" href="index.html" />
     <link rel="next" title="Using more than a single endpoint" href="multiple_endpoint.html" />
-    <link rel="prev" title="Datastore" href="datastore.html" /> 
+    <link rel="prev" title="Paginate a ressource" href="pagination.html" /> 
   </head>
   <body>
     <div class="related">
@@ -35,10 +35,13 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
           <a href="multiple_endpoint.html" title="Using more than a single endpoint"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="datastore.html" title="Datastore"
+          <a href="pagination.html" title="Paginate a ressource"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li> 
       </ul>
@@ -85,8 +88,6 @@ database, another api and so on.</p>
 <h2>Authorization<a class="headerlink" href="#authorization" title="Permalink to this headline">¶</a></h2>
 <p>Authorization need a way to indentify a user. An Authentication
 backend is used for this need.</p>
-<p>Authorization can contain a number of option to change they behaviour,
-like authorizing some verbs to some user.</p>
 <p>They implements the check_auth(request) method. This method should
 return None if authorization is granted or raise an Unauthorized error
 otherwise.</p>
@@ -105,19 +106,12 @@ anything from a hash, a password, public key and so on...</p>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">authentication</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">authentication</span> <span class="o">=</span> <span class="n">authentication</span>
-        <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;authorized_method&quot;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">authorized_method</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;authorized_method&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">authorized_method</span> <span class="o">=</span> <span class="bp">None</span>
 
     <span class="k">def</span> <span class="nf">check_auth</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check if a user is authorized to perform a particular action.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">authorized_method</span> <span class="ow">and</span> \
-                <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">authorized_method</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">Unauthorized</span>
         <span class="k">if</span> <span class="s">&quot;apikey&quot;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">authentication</span><span class="o">.</span><span class="n">get_user</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;apikey&#39;</span><span class="p">]):</span>
                 <span class="k">return</span>
@@ -154,31 +148,22 @@ to connect to the ressource.</p>
 </pre></div>
 </div>
 <p>Finnaly, ApiKeyAuthorization can be instanciated too:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">auth</span> <span class="o">=</span> <span class="n">ApiKeyAuthorization</span><span class="p">(</span><span class="n">authentication</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">auth</span> <span class="o">=</span> <span class="n">ApiKeyAuthorization</span>
 </pre></div>
 </div>
 <p>You can now use any of your api and protect it with the
 ApiKeyAuthorization you just created:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">ApiAppAuth</span><span class="p">(</span><span class="n">Controller</span><span class="p">):</span>
-            <span class="n">auth</span> <span class="o">=</span> <span class="n">auth</span>
-            <span class="n">other_parameters</span>
+     <span class="n">controller</span> <span class="o">=</span> <span class="p">{</span>
+         <span class="s">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;authentication&quot;</span><span class="p">:</span> <span class="n">auth</span><span class="p">,</span>
+                     <span class="s">&quot;authorization&quot;</span><span class="p">:</span> <span class="n">ApiKeyAuthorization</span>
+                     <span class="p">}</span>
+         <span class="p">}</span>
+     <span class="o">&lt;</span><span class="n">other</span> <span class="n">arguments</span><span class="o">&gt;...</span>
 </pre></div>
 </div>
 <p>Each time a user access this api, he must use ?apikey=azerty to be
 granted access to the api.</p>
-<p>As ApiKeyAuthorization implement a filter based on method, you can add
-to your ApiKeyAuthorization options the authorized verbs on this
-ressource with this key:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">auth</span> <span class="o">=</span> <span class="n">ApiKeyAuthorization</span><span class="p">(</span><span class="n">authentication</span><span class="p">,</span>
-                           <span class="n">authorized_method</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">])</span>
-</pre></div>
-</div>
-<p>and use this configuration in any of your API:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">ApiAppAuth</span><span class="p">(</span><span class="n">Controller</span><span class="p">):</span>
-            <span class="n">auth</span> <span class="o">=</span> <span class="n">auth</span>
-            <span class="n">other_parameters</span>
-</pre></div>
-</div>
 </div>
 </div>
 
@@ -205,8 +190,8 @@ ressource with this key:</p>
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="datastore.html"
-                        title="previous chapter">Datastore</a></p>
+  <p class="topless"><a href="pagination.html"
+                        title="previous chapter">Paginate a ressource</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="multiple_endpoint.html"
                         title="next chapter">Using more than a single endpoint</a></p>
@@ -239,10 +224,13 @@ ressource with this key:</p>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
           <a href="multiple_endpoint.html" title="Using more than a single endpoint"
              >next</a> |</li>
         <li class="right" >
-          <a href="datastore.html" title="Datastore"
+          <a href="pagination.html" title="Paginate a ressource"
              >previous</a> |</li>
         <li><a href="index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li> 
       </ul>

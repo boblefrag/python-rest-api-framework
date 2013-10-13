@@ -16,7 +16,6 @@ Contents:
    controller
    pagination
    authentication
-   authorization
    multiple_endpoint
    references
 

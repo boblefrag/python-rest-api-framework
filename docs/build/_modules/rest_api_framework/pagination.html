@@ -64,13 +64,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">offset_key</span> <span class="o">=</span> <span class="n">offset_key</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">count_key</span> <span class="o">=</span> <span class="n">count_key</span>
 
-    <span class="k">def</span> <span class="nf">paginate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+<div class="viewcode-block" id="Pagination.paginate"><a class="viewcode-back" href="../../references.html#rest_api_framework.pagination.Pagination.paginate">[docs]</a>    <span class="k">def</span> <span class="nf">paginate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
         <span class="n">request_kwargs</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
         <span class="n">offset</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offset_key</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
         <span class="n">count</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">count_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max</span><span class="p">:</span>
             <span class="n">count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max</span>
-        <span class="k">return</span> <span class="n">offset</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">request_kwargs</span></div>
+        <span class="k">return</span> <span class="n">offset</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">request_kwargs</span></div></div>
 </pre></div>
 
           </div>

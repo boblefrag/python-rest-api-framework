@@ -13,6 +13,7 @@ Contents:
 
    introduction
    datastore
+   controller
    authentication
    multiple_endpoint
    references

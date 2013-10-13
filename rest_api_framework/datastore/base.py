@@ -71,7 +71,7 @@ class DataStore(object):
         raise NotImplemented
 
     @abstractmethod
-    def get_list(self, **kwargs):
+    def get_list(self, offset=None, count=None, **kwargs):
         """
         This method is called each time you want a set of data.
         Data could be paginated and filtered.
@@ -100,14 +100,14 @@ class DataStore(object):
         """
         raise NotImplemented
 
-    def paginate(self, data, **kwargs):
+    def paginate(self, data, offset, count, **kwargs):
         """
         Paginate sould return all the object if no pagination options
         have been set or only a subset of the ressources if pagination
         options exists.
         """
-        start = 0
-        end = self.options.get('paginate_by', None)
+        start = offset
+        end = count
         if end:
             if "start" in kwargs:
                 start = int(kwargs['start'])

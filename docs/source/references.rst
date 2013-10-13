@@ -12,3 +12,10 @@ Authentication
 
 .. autoclass:: rest_api_framework.authentication.Authentication
    :members:
+
+
+Pagination
+----------
+
+.. autoclass:: rest_api_framework.pagination.Pagination
+   :members:

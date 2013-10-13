@@ -1,7 +1,7 @@
 from unittest import TestCase
 from werkzeug.wrappers import BaseResponse
 from werkzeug.test import Client
-from app import ApiApp
+from app import ApiApp, SQLiteApp
 import json
 import datetime
 from rest_api_framework.authentication import (ApiKeyAuthorization,
@@ -9,6 +9,7 @@ from rest_api_framework.authentication import (ApiKeyAuthorization,
 from rest_api_framework.datastore import PythonListDataStore
 from rest_api_framework import models
 from rest_api_framework.controllers import WSGIDispatcher
+import os
 
 
 class ApiModel(models.Model):
@@ -144,3 +145,43 @@ class TestAuthentication(TestCase):
         resp = client.post("/address/?apikey=azerty",
                            data=json.dumps({'name': 'bob', 'age': 34}))
         self.assertEqual(resp.status_code, 401)
+
+
+class TestPagination(TestCase):
+
+    def test_base_pagination(self):
+        client = Client(WSGIDispatcher([ApiApp]),
+                        response_wrapper=BaseResponse)
+        resp = client.get("/address/")
+        self.assertEqual(len(json.loads(resp.data)), 20)
+
+    def test_base_pagination_count(self):
+        client = Client(WSGIDispatcher([ApiApp]),
+                        response_wrapper=BaseResponse)
+        resp = client.get("/address/?count=2")
+        self.assertEqual(len(json.loads(resp.data)), 2)
+
+    def test_base_pagination_count_overflow(self):
+        client = Client(WSGIDispatcher([ApiApp]),
+                        response_wrapper=BaseResponse)
+        resp = client.get("/address/?count=200")
+        self.assertEqual(len(json.loads(resp.data)), 20)
+
+    def test_base_pagination_offset(self):
+        client = Client(WSGIDispatcher([ApiApp]),
+                        response_wrapper=BaseResponse)
+        resp = client.get("/address/?offset=2")
+        self.assertEqual(json.loads(resp.data)[0]['id'], 2)
+
+
+class TestSQlitePagination(TestCase):
+
+    def test_base_pagination(self):
+        client = Client(WSGIDispatcher([SQLiteApp]),
+                        response_wrapper=BaseResponse)
+        for i in range(100):
+            a = client.post("/address/",
+                        data=json.dumps({"name": "bob", "age": 34}))
+        resp = client.get("/address/")
+        self.assertEqual(len(json.loads(resp.data)), 20)
+        os.remove("test.db")

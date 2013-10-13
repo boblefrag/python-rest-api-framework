@@ -19,10 +19,12 @@ How it should work:
 """
 import sys
 sys.path.append("..")
-from rest_api_framework.datastore import PythonListDataStore
+from rest_api_framework.datastore import PythonListDataStore, SQLiteDataStore
 from rest_api_framework import models
+from rest_api_framework.pagination import Pagination
 from rest_api_framework.controllers import Controller, WSGIDispatcher
 from rest_api_framework.views import JsonResponse
+
 
 ressources = [
     {"name": "bob",
@@ -56,7 +58,24 @@ class ApiApp(Controller):
     controller = {
         "list_verbs": ["GET", "POST"],
         "unique_verbs": ["GET", "PUT", "DElETE"],
-        "options": {"paginate_by": 20}
+        "options": {"pagination": Pagination(20)}
+        }
+
+    view = {"response_class": JsonResponse}
+
+
+class SQLiteApp(Controller):
+    ressource = {
+        "ressource_name": "address",
+        "ressource": {"name": "test.db", "table": "address"},
+        "model": ApiModel,
+        "datastore": SQLiteDataStore
+        }
+
+    controller = {
+        "list_verbs": ["GET", "POST"],
+        "unique_verbs": ["GET", "PUT", "DElETE"],
+        "options": {"pagination": Pagination(20)}
         }
 
     view = {"response_class": JsonResponse}
@@ -64,5 +83,5 @@ class ApiApp(Controller):
 
 if __name__ == '__main__':
     from werkzeug.serving import run_simple
-    app = WSGIDispatcher([ApiApp])
+    app = WSGIDispatcher([SQLiteApp])
     run_simple('127.0.0.1', 5000, app, use_debugger=True, use_reloader=True)

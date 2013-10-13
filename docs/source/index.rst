@@ -13,6 +13,8 @@ Contents:
 
    introduction
    datastore
+   controller
+   pagination
    authentication
    multiple_endpoint
    references

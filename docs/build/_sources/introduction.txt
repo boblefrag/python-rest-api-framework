@@ -152,6 +152,9 @@ done, your application is up and running.
 QuickStart
 ----------
 
+A Simple API
+~~~~~~~~~~~~
+
 For this example, we will use a python list containing dicts. This is
 our data:
 
@@ -213,14 +216,14 @@ and a view to render our data
         controller = {
             "list_verbs": ["GET", "POST"],
             "unique_verbs": ["GET", "PUT", "DElETE"],
-            "options": {"paginate_by": 20}
             }
 
         view = {"response_class": JsonResponse}
 
 A controller is build with 3 dicts:
 
-* ressource
+Ressource
+_________
 
 Ressource define your data. Where are your data ? How can they be
 accessed ? What they look likes?
@@ -240,7 +243,8 @@ accessed ? What they look likes?
      Python list of dict and SQLite datastore. They are exemple on how
      to build your own datastore depending on your needs.
 
-* controller
+Controller
+__________
 
 The controller define the way your data should be accessed. Should the
 results be paginated ? Authenticated ? Rate-limited ? Wich it the
@@ -255,11 +259,8 @@ verbs you can use on the resource ? and so on.
      follows the REST implementation: PUT to modify an existing
      ressource, DELETE to delete a ressource.
 
-  * options : a list of options your api can handle. Pagination,
-     Rate-Limit, Authentication, Authorization and so on.
-
-
-* view
+View
+____
 
 view define How your ressoources should be rendered to the
 user. It can be a Json format, XML, or whatever. It can also
@@ -279,6 +280,16 @@ To test you application locally, you can add:
         run_simple('127.0.0.1', 5000, app, use_debugger=True, use_reloader=True)
 
 then type "python app.py" and your API is up and running
+
+Options
+_______
+
+Each of this dicts can take an optional parameter: "option". This
+parameter is a dict containing all the options you want to use with
+either the datastore, the view or the controller.
+
+You can learn more about optional parameters in the documentation of
+each topic : :doc:`datastore`, :doc:`view`, :doc:`controller`
 
 
 Using a database
@@ -302,6 +313,7 @@ is the same as with the PythonListDataStore.
     from rest_api_framework.controllers import Controller
     from rest_api_framework.views import JsonResponse
     from rest_api_framework import models
+    from rest_api_framework.pagination import Pagination
 
     class ApiModel(models.Model):
         fields = [models.StringField(name="message", required=True),
@@ -319,7 +331,7 @@ is the same as with the PythonListDataStore.
         controller = {
            "list_verbs": ["GET", "POST"],
            "unique_verbs": ["GET", "PUT", "DElETE"]
-           "options": {"paginate_by": 20}
+           "options": {"pagination": Pagination(20)}
         }
         view = {"response_class": JsonResponse}
 
@@ -329,6 +341,7 @@ is the same as with the PythonListDataStore.
         from rest_api_framework.controllers import WSGIDispatcher
         app = WSGIDispatcher([ApiApp])
         run_simple('127.0.0.1', 5000, app, use_debugger=True, use_reloader=True
+
 
 Where to go from here
 ---------------------

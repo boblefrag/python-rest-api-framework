@@ -89,16 +89,23 @@ class SQLiteDataStore(DataStore):
         row this method can give back depend on the paginate_by option.
         """
         args = []
-        limit = self.options.get('paginate_by', None)
+        where_query = []
+        print kwargs
+        limit = kwargs.get("end", None)
         if kwargs.get("start", None):
-            data["query"] += " WHERE id >=?"
+            where_query.append(" id >=?")
             args.append(kwargs['start'])
-        if kwargs.get("end", None):
-            data["query"] += " WHERE id < ? order by id DESC"
-            args.append(kwargs['end'])
+        if len(where_query) > 0:
+            data["query"] += " WHERE"
+        data["query"] += " AND".join(where_query)
+
+        # a hook for ordering
+        data["query"] += " ORDER BY id ASC"
+
         if limit:
             data["query"] += " LIMIT {0}".format(limit)
 
+        print data["query"], tuple(args)
         c = self.get_connector().cursor()
         c.execute(data["query"].format(self.ressource_config['table']),
                   tuple(args)
@@ -107,8 +114,6 @@ class SQLiteDataStore(DataStore):
         for elem in c.fetchall():
             fields = self.model.get_fields_name()
             objs.append(dict(zip(fields, elem)))
-        if kwargs.get("end", None):
-            objs.reverse()
         return objs
 
     def get_list(self, **kwargs):
@@ -118,8 +123,8 @@ class SQLiteDataStore(DataStore):
         """
         fields = ", ".join(self.model.get_fields_name())
         kwargs["query"] = 'SELECT {0}'.format(fields)
-        start = kwargs.pop("start", None)
-        end = kwargs.pop("end", None)
+        start = kwargs.pop("offset", None)
+        end = kwargs.pop("count", None)
         data = self.filter(**kwargs)
         return self.paginate(data, start=start, end=end)
 

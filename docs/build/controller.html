@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Controllers &mdash; Python Rest Api Framework 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Python Rest Api Framework 0.1 documentation" href="index.html" />
+    <link rel="next" title="Authentication and Authorization" href="authentication.html" />
+    <link rel="prev" title="Datastore" href="datastore.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="authentication.html" title="Authentication and Authorization"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="datastore.html" title="Datastore"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="controllers">
+<h1>Controllers<a class="headerlink" href="#controllers" title="Permalink to this headline">¶</a></h1>
+<p>Controller manage the dialogue between the request and the
+datastore. Controller handle all the request related stuff:</p>
+<ul class="simple">
+<li>Pagination</li>
+<li>Authentication</li>
+<li>Authorization</li>
+<li>Rate-Limit</li>
+<li>Authorized verbs</li>
+</ul>
+<div class="section" id="mandatory-arguments">
+<h2>Mandatory Arguments<a class="headerlink" href="#mandatory-arguments" title="Permalink to this headline">¶</a></h2>
+<p>When creating a controller, some arguments are mandatory. It define
+how your controller should handle requests.</p>
+<ul class="simple">
+<li>list_verbs: list_verbs will tell your controller wich verbs are
+allowed at the root of your ressource. [&#8220;GET&#8221;, &#8220;POST&#8221;] for a read
+and write API, and only [&#8220;GET&#8221;] for a read-only API</li>
+<li>unique_verbs: unique verbs tell your controller wich verbs are
+allowed at the unique identifier endpoint of your ressource
+(/ressource_name/&lt;unique_id&gt;). [&#8220;GET&#8221;, &#8220;PUT&#8221;, &#8220;DELETE&#8221;] fa read and
+write API, [&#8220;GET&#8221;] for a read-only API.</li>
+</ul>
+</div>
+<div class="section" id="optionals-parameters">
+<h2>Optionals parameters<a class="headerlink" href="#optionals-parameters" title="Permalink to this headline">¶</a></h2>
+<p>Optionals parameters make your api able to manage special features
+like Pagination, Authentication, Authorization and Rate-Limit. They
+each depend on your own implementation.</p>
+<p>Exemples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">controller</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&quot;list_verbs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;POST&quot;</span><span class="p">],</span>
+    <span class="s">&quot;unique_verbs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;PUT&quot;</span><span class="p">,</span> <span class="s">&quot;DElETE&quot;</span><span class="p">],</span>
+    <span class="s">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;pagination&quot;</span><span class="p">:</span> <span class="n">Pagination</span><span class="p">(</span><span class="mi">20</span><span class="p">)}</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+<p>This will create:</p>
+<ul class="simple">
+<li>a read and write API (GET and POST on the root URL, GET, PUT and
+DELETE on the detail URL)</li>
+<li>with a pagination of 20 results max because of the optional
+pagination parameter. Results will be paginated using the offset and
+count keyword (see <tt class="xref doc docutils literal"><span class="pre">pagination</span></tt>) to get more on this topic.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Controllers</a><ul>
+<li><a class="reference internal" href="#mandatory-arguments">Mandatory Arguments</a></li>
+<li><a class="reference internal" href="#optionals-parameters">Optionals parameters</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="datastore.html"
+                        title="previous chapter">Datastore</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="authentication.html"
+                        title="next chapter">Authentication and Authorization</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/controller.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="authentication.html" title="Authentication and Authorization"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="datastore.html" title="Datastore"
+             >previous</a> |</li>
+        <li><a href="index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Yohann Gabory.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

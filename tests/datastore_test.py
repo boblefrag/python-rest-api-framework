@@ -49,9 +49,9 @@ class PythonListDataStoreTest(TestCase):
             ]
 
         store = PythonListDataStore(data_list, ApiModel, paginate_by=10)
-        self.assertEqual(len(store.paginate(data_list)), 10)
-        self.assertEqual(store.paginate(data_list, start=10)[0]["id"], 10)
-        self.assertEqual(store.paginate(data_list, end=15)[-1]["id"], 14)
+        self.assertEqual(len(store.paginate(data_list, 0, 10)), 10)
+        self.assertEqual(store.paginate(data_list, 10, None)[0]["id"], 10)
+        self.assertEqual(store.paginate(data_list, 0, 15)[-1]["id"], 14)
 
     def test_get(self):
         data_list = [
@@ -170,13 +170,16 @@ class SQLiteDataStoreTest(TestCase):
     def test_pagination(self):
         store = SQLiteDataStore(
             {"name": "test.db", "table": "address"},
-            ApiModel,
-            paginate_by=10)
+            ApiModel)
         for i in range(100):
             store.create({"name": "bob", "age": 34})
-        self.assertEqual(len(store.get_list()), 10)
-        self.assertEqual(store.get_list(start=10)[0]["id"], 10)
-        self.assertEqual(store.get_list(end=15)[-1]["id"], 14)
+        print store.get_list(count=10)
+        self.assertEqual(len(store.get_list(count=10)), 10)
+        self.assertEqual(store.get_list(count=10)[-1]["id"], 10)
+        self.assertEqual(store.get_list(offset=15)[0]["id"], 15)
+        req = store.get_list(offset=15, count=2)
+        self.assertEqual(len(req), 2)
+        self.assertEqual(req[0]['id'], 15)
         os.remove("test.db")
 
     def test_get(self):

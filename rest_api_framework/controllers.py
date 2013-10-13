@@ -151,12 +151,18 @@ class ApiController(WSGIWrapper, Dispatcher):
         :param request:
         :type request: :class:`werkzeug.wrappers.Request`
         """
-        first_id = request.values.to_dict().get("first_id", 0)
-        filters = request.values.to_dict()
-        filters.pop("first_id", None)
+
+        if hasattr(self, "pagination"):
+            offset, count, request_kwargs = self.pagination.paginate(request)
+        else:
+            offset, count = None
+        filters = request_kwargs
         return self.view['response_class'](
             self.render_list(
-                self.datastore.get_list(start=first_id, **filters)),
+                self.datastore.get_list(offset=offset,
+                                        count=count,
+                                        **filters)
+                ),
             status=200)
 
     def get_list(self, request):
@@ -254,4 +260,8 @@ class Controller(ApiController):
             self.ressource['model'],
             **self.ressource.get('options', {})
             )
+
+        if self.controller.get("options", None) and \
+                self.controller["options"].get("pagination", None):
+            self.pagination = self.controller["options"]["pagination"]
         super(Controller, self).__init__(urls, *args, **kwargs)

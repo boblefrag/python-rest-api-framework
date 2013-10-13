@@ -185,6 +185,8 @@ done, your application is up and running.</p>
 </div>
 <div class="section" id="quickstart">
 <h2>QuickStart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="a-simple-api">
+<h3>A Simple API<a class="headerlink" href="#a-simple-api" title="Permalink to this headline">¶</a></h3>
 <p>For this example, we will use a python list containing dicts. This is
 our data:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">ressources</span> <span class="o">=</span> <span class="p">[</span>
@@ -233,16 +235,14 @@ We can reuse this store:</p>
     <span class="n">controller</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s">&quot;list_verbs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;POST&quot;</span><span class="p">],</span>
         <span class="s">&quot;unique_verbs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;PUT&quot;</span><span class="p">,</span> <span class="s">&quot;DElETE&quot;</span><span class="p">],</span>
-        <span class="s">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;paginate_by&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">}</span>
         <span class="p">}</span>
 
     <span class="n">view</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;response_class&quot;</span><span class="p">:</span> <span class="n">JsonResponse</span><span class="p">}</span>
 </pre></div>
 </div>
 <p>A controller is build with 3 dicts:</p>
-<ul class="simple">
-<li>ressource</li>
-</ul>
+<div class="section" id="ressource">
+<h4>Ressource<a class="headerlink" href="#ressource" title="Permalink to this headline">¶</a></h4>
 <p>Ressource define your data. Where are your data ? How can they be
 accessed ? What they look likes?</p>
 <blockquote>
@@ -276,9 +276,9 @@ to build your own datastore depending on your needs.</p>
 </li>
 </ul>
 </div></blockquote>
-<ul class="simple">
-<li>controller</li>
-</ul>
+</div>
+<div class="section" id="id2">
+<h4>Controller<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
 <p>The controller define the way your data should be accessed. Should the
 results be paginated ? Authenticated ? Rate-limited ? Wich it the
 verbs you can use on the resource ? and so on.</p>
@@ -299,17 +299,11 @@ ressource, DELETE to delete a ressource.</p>
 </dd>
 </dl>
 </li>
-<li><dl class="first docutils">
-<dt>options <span class="classifier-delimiter">:</span> <span class="classifier">a list of options your api can handle. Pagination,</span></dt>
-<dd><p class="first last">Rate-Limit, Authentication, Authorization and so on.</p>
-</dd>
-</dl>
-</li>
 </ul>
 </div></blockquote>
-<ul class="simple">
-<li>view</li>
-</ul>
+</div>
+<div class="section" id="id3">
+<h4>View<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
 <p>view define How your ressoources should be rendered to the
 user. It can be a Json format, XML, or whatever. It can also
 render pagination token, first page, last page, number of objects
@@ -328,6 +322,16 @@ and other usefull informations for your users.</p>
 </pre></div>
 </div>
 <p>then type &#8220;python app.py&#8221; and your API is up and running</p>
+</div>
+<div class="section" id="options">
+<h4>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h4>
+<p>Each of this dicts can take an optional parameter: &#8220;option&#8221;. This
+parameter is a dict containing all the options you want to use with
+either the datastore, the view or the controller.</p>
+<p>You can learn more about optional parameters in the documentation of
+each topic : <a class="reference internal" href="datastore.html"><em>Datastore</em></a>, <tt class="xref doc docutils literal"><span class="pre">view</span></tt>, <a class="reference internal" href="controller.html"><em>Controllers</em></a></p>
+</div>
+</div>
 <div class="section" id="using-a-database">
 <h3>Using a database<a class="headerlink" href="#using-a-database" title="Permalink to this headline">¶</a></h3>
 <p>Instead of using a python dict, you may want to actualy save your data
@@ -344,6 +348,7 @@ is the same as with the PythonListDataStore.</p>
 <span class="kn">from</span> <span class="nn">rest_api_framework.controllers</span> <span class="kn">import</span> <span class="n">Controller</span>
 <span class="kn">from</span> <span class="nn">rest_api_framework.views</span> <span class="kn">import</span> <span class="n">JsonResponse</span>
 <span class="kn">from</span> <span class="nn">rest_api_framework</span> <span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span> <span class="nn">rest_api_framework.pagination</span> <span class="kn">import</span> <span class="n">Pagination</span>
 
 <span class="k">class</span> <span class="nc">ApiModel</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
     <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="n">models</span><span class="o">.</span><span class="n">StringField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;message&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
@@ -361,7 +366,7 @@ is the same as with the PythonListDataStore.</p>
     <span class="n">controller</span> <span class="o">=</span> <span class="p">{</span>
        <span class="s">&quot;list_verbs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;POST&quot;</span><span class="p">],</span>
        <span class="s">&quot;unique_verbs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;PUT&quot;</span><span class="p">,</span> <span class="s">&quot;DElETE&quot;</span><span class="p">]</span>
-       <span class="s">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;paginate_by&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">}</span>
+       <span class="s">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;pagination&quot;</span><span class="p">:</span> <span class="n">Pagination</span><span class="p">(</span><span class="mi">20</span><span class="p">)}</span>
     <span class="p">}</span>
     <span class="n">view</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;response_class&quot;</span><span class="p">:</span> <span class="n">JsonResponse</span><span class="p">}</span>
 
@@ -409,6 +414,13 @@ is the same as with the PythonListDataStore.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#quickstart">QuickStart</a><ul>
+<li><a class="reference internal" href="#a-simple-api">A Simple API</a><ul>
+<li><a class="reference internal" href="#ressource">Ressource</a></li>
+<li><a class="reference internal" href="#id2">Controller</a></li>
+<li><a class="reference internal" href="#id3">View</a></li>
+<li><a class="reference internal" href="#options">Options</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#using-a-database">Using a database</a></li>
 </ul>
 </li>

@@ -272,7 +272,7 @@ identifier or raise a NotFound exception.</p>
 
 <dl class="method">
 <dt id="rest_api_framework.datastore.base.DataStore.get_list">
-<tt class="descname">get_list</tt><big>(</big><em>**kwargs</em><big>)</big><a class="headerlink" href="#rest_api_framework.datastore.base.DataStore.get_list" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">get_list</tt><big>(</big><em>offset=None</em>, <em>count=None</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#rest_api_framework.datastore.base.DataStore.get_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method is called each time you want a set of data.
 Data could be paginated and filtered.
 Should call <a class="reference internal" href="#rest_api_framework.datastore.base.DataStore.filter" title="rest_api_framework.datastore.base.DataStore.filter"><tt class="xref py py-meth docutils literal"><span class="pre">filter()</span></tt></a>
@@ -285,7 +285,7 @@ and return <a class="reference internal" href="#rest_api_framework.datastore.bas
 
 <dl class="method">
 <dt id="rest_api_framework.datastore.base.DataStore.paginate">
-<tt class="descname">paginate</tt><big>(</big><em>data</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/rest_api_framework/datastore/base.html#DataStore.paginate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rest_api_framework.datastore.base.DataStore.paginate" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">paginate</tt><big>(</big><em>data</em>, <em>offset</em>, <em>count</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/rest_api_framework/datastore/base.html#DataStore.paginate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rest_api_framework.datastore.base.DataStore.paginate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Paginate sould return all the object if no pagination options
 have been set or only a subset of the ressources if pagination
 options exists.</p>

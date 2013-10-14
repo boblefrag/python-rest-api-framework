@@ -16,9 +16,12 @@ class Model(object):
     fields = None
 
     def __init__(self):
-        self.pk_field = [
+        pk_field = [
             field for field in self.fields if isinstance(
-                field, fields.PkField)][0]
+                field, fields.PkField)]
+        if len(pk_field) != 1:
+            raise ValueError
+        self.pk_field = pk_field[0]
 
     def get_fields_name(self):
         """

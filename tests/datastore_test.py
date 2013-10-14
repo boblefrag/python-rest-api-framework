@@ -16,6 +16,21 @@ class ApiModel(models.Model):
               ]
 
 
+class ModelTest(TestCase):
+
+    def test_badlyconfigured_model(self):
+        class BadModel(models.Model):
+
+            fields = [models.IntegerField(name="age", required=True),
+                      models.StringField(name="name", required=True),
+                      ]
+        self.assertRaises(ValueError, BadModel)
+
+    def test_unfound_field(self):
+        model = ApiModel()
+        self.assertEqual(model.get_field("something"), None)
+
+
 class PythonListDataStoreTest(TestCase):
 
     def test_validation(self):

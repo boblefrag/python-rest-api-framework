@@ -14,12 +14,12 @@ class JsonResponse(Response):
     def __init__(self, *args, **kwargs):
 
         if args:
-            return super(JsonResponse,
-                         self).__init__(json.dumps(*args),
-                                        mimetype="application/json",
-                                        **kwargs)
+            super(JsonResponse,
+                  self).__init__(json.dumps(*args),
+                                 mimetype="application/json",
+                                 **kwargs)
         else:
-            return super(JsonResponse,
-                         self).__init__(*args,
-                                        mimetype="application/json",
-                                        **kwargs)
+            super(JsonResponse,
+                  self).__init__(*args,
+                                  mimetype="application/json",
+                                  **kwargs)

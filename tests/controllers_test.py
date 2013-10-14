@@ -210,6 +210,16 @@ class TestAuthentication(TestCase):
                            data=json.dumps({'name': 'bob', 'age': 34}))
         self.assertEqual(resp.status_code, 405)
 
+    def test_badlyconfigured_api(self):
+
+        class ApiAppAuth(ApiApp):
+            controller = {
+                "list_verbs": ["GET"],
+                "unique_verbs": ["GET"],
+                "options": {"authorization": ApiKeyAuthorization}
+                }
+        self.assertRaises(ValueError, ApiAppAuth, "")
+
 
 class TestPagination(TestCase):
 

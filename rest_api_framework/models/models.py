@@ -13,6 +13,8 @@ class Model(object):
 
     __metaclass__ = ABCMeta
 
+    fields = None
+
     def __init__(self):
         self.pk_field = [
             field for field in self.fields if isinstance(

@@ -218,6 +218,8 @@ class Controller(ApiController):
     The main views of the application
     """
 
+    controller = None
+
     __metaclass__ = ABCMeta
 
     def __init__(self, *args, **kwargs):

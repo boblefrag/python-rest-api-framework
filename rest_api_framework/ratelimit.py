@@ -9,6 +9,10 @@ HTTP_STATUS_CODES[429] = "Too Many Requests"
 
 
 class TooManyRequest(HTTPException):
+    """
+    Implement the 429 status code (see
+    http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html for details)
+    """
     code = 429
     description = ("Rate Limit")
 
@@ -18,6 +22,8 @@ class RateLimit(object):
     Rate limit a user depending on the datetime of the request, the
     number of previous requests and the rate-limit strategy
     """
+
+    authentication = None
 
     def __init__(self, datastore, interval=6000, quota=100):
         self.datastore = datastore

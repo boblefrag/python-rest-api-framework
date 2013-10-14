@@ -1,3 +1,6 @@
+"""
+Define a sample datastore based on a list of python dict: PythonListDataStore
+"""
 from .base import DataStore
 from rest_api_framework import models
 from werkzeug.exceptions import NotFound, BadRequest

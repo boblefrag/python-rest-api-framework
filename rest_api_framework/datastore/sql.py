@@ -1,4 +1,8 @@
-from base import DataStore
+"""
+Implement some datastore based on SQL databases
+"""
+
+from .base import DataStore
 from rest_api_framework.models import PkField
 from werkzeug.exceptions import NotFound, BadRequest
 import sqlite3
@@ -155,7 +159,6 @@ class SQLiteDataStore(DataStore):
             return dict(zip(fields, obj))
         else:
             raise NotFound
-        self.data['conn'].commit()
 
     def create(self, data):
         """
@@ -176,7 +179,7 @@ class SQLiteDataStore(DataStore):
         query = "insert into {0} {1} values ({2})".format(
             self.ressource_config["table"],
             tuple(fields),
-            ",".join(["?" for i in range(len(fields))])
+            ",".join(["?" for step in range(len(fields))])
             )
         cursor.execute(query, tuple(values))
         conn.commit()

@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+"""
+The base datastore implementation. Define the DataStore class from
+wich each DataStore inherit
+"""
 from abc import ABCMeta, abstractmethod
 from werkzeug.exceptions import BadRequest
 
@@ -100,7 +104,7 @@ class DataStore(object):
         """
         raise NotImplementedError
 
-    def paginate(self, data, offset, count, **kwargs):
+    def paginate(self, data, offset, count):
         """
         Paginate sould return all the object if no pagination options
         have been set or only a subset of the ressources if pagination

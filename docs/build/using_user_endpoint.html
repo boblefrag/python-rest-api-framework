@@ -1,0 +1,159 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Playing with the newly created endpoint &mdash; Python Rest Api Framework 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Python Rest Api Framework 0.1 documentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="playing-with-the-newly-created-endpoint">
+<h1>Playing with the newly created endpoint<a class="headerlink" href="#playing-with-the-newly-created-endpoint" title="Permalink to this headline">¶</a></h1>
+<p>First you can check that your endpoint is up</p>
+<div class="highlight-bash"><div class="highlight"><pre>curl -i <span class="s2">&quot;http://localhost:5000/users/&quot;</span>
+
+HTTP/1.0 200 OK
+Content-Type: application/json
+Content-Length: 2
+Server: Werkzeug/0.8.3 Python/2.7.2
+Date: Mon, 14 Oct 2013 12:52:22 GMT
+</pre></div>
+</div>
+<p>Your endpoint is responding but does not have any data. Let&#8217;s add
+some:</p>
+<div class="section" id="create-a-user">
+<h2>Create a user<a class="headerlink" href="#create-a-user" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash"><div class="highlight"><pre>curl -i -H <span class="s2">&quot;Content-type: application/json&quot;</span> -X POST -d <span class="s1">&#39;{&quot;first_name&quot;:&quot;John&quot;, &quot;last_name&quot;: &quot;Doe&quot;}&#39;</span>  http://localhost:5000/users/
+
+HTTP/1.0 201 CREATED
+Location: http://localhost:5000/users/1
+Content-Type: application/json
+Content-Length: 0
+Server: Werkzeug/0.8.3 Python/2.7.2
+Date: Mon, 14 Oct 2013 13:00:13 GMT
+</pre></div>
+</div>
+<div class="section" id="error-handling">
+<h3>Error handling<a class="headerlink" href="#error-handling" title="Permalink to this headline">¶</a></h3>
+<p>If you don&#8217;t provide a last_name, the API will raise a BAD REQUEST
+explaining your error:</p>
+<div class="highlight-bash"><div class="highlight"><pre>curl -i -H <span class="s2">&quot;Content-type: application/json&quot;</span> -X POST -d <span class="s1">&#39;{&quot;first_name&quot;:&quot;John&quot;}&#39;</span>  http://localhost:5000/users/
+
+HTTP/1.0 400 BAD REQUEST
+Content-Type: application/json
+Content-Length: 62
+Server: Werkzeug/0.8.3 Python/2.7.2
+Date: Mon, 14 Oct 2013 13:21:10 GMT
+
+<span class="o">{</span><span class="s2">&quot;error&quot;</span>: <span class="s2">&quot;last_name is missing. Cannot create the ressource&quot;</span><span class="o">}</span>
+</pre></div>
+</div>
+<p>The same apply if you dont give coherent data:</p>
+<div class="highlight-bash"><div class="highlight"><pre>curl -i -H <span class="s2">&quot;Content-type: application/json&quot;</span> -X POST -d <span class="s1">&#39;{&quot;first_name&quot;:45, &quot;last_name&quot;: &quot;Doe&quot;}&#39;</span>  http://localhost:5000/users/
+
+HTTP/1.0 400 BAD REQUEST
+Content-Type: application/json
+Content-Length: 41
+Server: Werkzeug/0.8.3 Python/2.7.2
+Date: Mon, 14 Oct 2013 13:24:53 GMT
+<span class="o">{</span><span class="s2">&quot;error&quot;</span>: <span class="s2">&quot;first_name does not validate&quot;</span><span class="o">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Playing with the newly created endpoint</a><ul>
+<li><a class="reference internal" href="#create-a-user">Create a user</a><ul>
+<li><a class="reference internal" href="#error-handling">Error handling</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/using_user_endpoint.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Yohann Gabory.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,62 @@
+Playing with the newly created endpoint
+=======================================
+
+First you can check that your endpoint is up
+
+.. code-block:: bash
+
+    curl -i "http://localhost:5000/users/"
+
+    HTTP/1.0 200 OK
+    Content-Type: application/json
+    Content-Length: 2
+    Server: Werkzeug/0.8.3 Python/2.7.2
+    Date: Mon, 14 Oct 2013 12:52:22 GMT
+
+Your endpoint is responding but does not have any data. Let's add
+some:
+
+Create a user
+-------------
+
+.. code-block:: bash
+
+    curl -i -H "Content-type: application/json" -X POST -d '{"first_name":"John", "last_name": "Doe"}'  http://localhost:5000/users/
+
+    HTTP/1.0 201 CREATED
+    Location: http://localhost:5000/users/1
+    Content-Type: application/json
+    Content-Length: 0
+    Server: Werkzeug/0.8.3 Python/2.7.2
+    Date: Mon, 14 Oct 2013 13:00:13 GMT
+
+Error handling
+~~~~~~~~~~~~~~
+
+If you don't provide a last_name, the API will raise a BAD REQUEST
+explaining your error:
+
+.. code-block:: bash
+
+    curl -i -H "Content-type: application/json" -X POST -d '{"first_name":"John"}'  http://localhost:5000/users/
+
+    HTTP/1.0 400 BAD REQUEST
+    Content-Type: application/json
+    Content-Length: 62
+    Server: Werkzeug/0.8.3 Python/2.7.2
+    Date: Mon, 14 Oct 2013 13:21:10 GMT
+
+    {"error": "last_name is missing. Cannot create the ressource"}
+
+The same apply if you dont give coherent data:
+
+.. code-block:: bash
+
+    curl -i -H "Content-type: application/json" -X POST -d '{"first_name":45, "last_name": "Doe"}'  http://localhost:5000/users/
+
+    HTTP/1.0 400 BAD REQUEST
+    Content-Type: application/json
+    Content-Length: 41
+    Server: Werkzeug/0.8.3 Python/2.7.2
+    Date: Mon, 14 Oct 2013 13:24:53 GMT
+    {"error": "first_name does not validate"}

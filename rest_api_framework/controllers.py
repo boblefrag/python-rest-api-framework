@@ -47,7 +47,9 @@ class WSGIWrapper(object):
             endpoint, values = adapter.match()
             return getattr(self, endpoint)(request, **values)
         except HTTPException, e:
-            return e
+            return self.view['response_class'](
+                {"error": e.description},
+                status=e.code)
 
 
 class WSGIDispatcher(DispatcherMiddleware):

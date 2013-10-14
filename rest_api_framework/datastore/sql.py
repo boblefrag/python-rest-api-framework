@@ -93,15 +93,18 @@ class SQLiteDataStore(DataStore):
         receive from the last call on this method. The max number of
         row this method can give back depend on the paginate_by option.
         """
+        print kwargs
         args = []
-        where_query = []
-        limit = kwargs.get("end", None)
+        where_query = [
+            "{0}='{1}'".format(k, v) for k, v in data.iteritems() if k not in ["query", "fields"]]
+        limit = kwargs.pop("end", None)
         if kwargs.get("start", None):
             where_query.append(" id >=?")
-            args.append(kwargs['start'])
+            args.append(kwargs.pop('start'))
+
         if len(where_query) > 0:
-            data["query"] += " WHERE"
-        data["query"] += " AND".join(where_query)
+            data["query"] += " WHERE "
+        data["query"] += " AND ".join(where_query)
 
         # a hook for ordering
         data["query"] += " ORDER BY id ASC"
@@ -109,6 +112,7 @@ class SQLiteDataStore(DataStore):
         if limit:
             data["query"] += " LIMIT {0}".format(limit)
         cursor = self.get_connector().cursor()
+        print data["query"]
         cursor.execute(data["query"].format(self.ressource_config['table']),
                        tuple(args)
                        )
@@ -118,8 +122,8 @@ class SQLiteDataStore(DataStore):
         return objs
 
     def get_fields(self, **fields):
-        if self.options.get("partial"):
-            fields, kwargs = self.options["partial"].get_partials(**fields)
+        if self.partial:
+            fields, kwargs = self.partial.get_partials(**fields)
             for field in fields:
                 if not field in self.model.get_fields_name():
                     raise BadRequest()

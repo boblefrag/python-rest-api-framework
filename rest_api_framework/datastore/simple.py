@@ -40,8 +40,8 @@ class PythonListDataStore(DataStore):
         return all the objects. paginated if needed
         """
         data = self.filter(**kwargs)
-        if self.options.get("partial"):
-            fields, kwargs = self.options["partial"].get_partials(**kwargs)
+        if self.partial:
+            fields, kwargs = self.partial.get_partials(**kwargs)
             if not self.model.pk_field.name in fields:
                 fields.append(self.model.pk_field.name)
             try:

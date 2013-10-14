@@ -19,8 +19,18 @@ class DataStore(object):
         Set the ressource datastore
         """
         self.ressource_config = ressource_config
-        self.options = options
+        self.make_options(options)
         self.model = model()
+
+    def make_options(self, options):
+
+        if options.get("validators", None):
+            self.validators = []
+            for elem in options["validators"]:
+                self.validators.append(elem)
+        else:
+            self.validators = None
+        self.partial = options.get("partial", None)
 
     @abstractmethod
     def get(self, identifier):
@@ -127,8 +137,18 @@ class DataStore(object):
             raise BadRequest()
         for field in self.model.fields:
             for validator in field.validators:
+                if not field.name in data:
+                    raise BadRequest(
+                        "{0} is missing. Cannot create the ressource".format(
+                            field.name)
+                        )
                 if not validator.validate(data[field.name]):
-                    raise BadRequest()
+                    raise BadRequest("{0} does not validate".format(
+                            field.name)
+                                     )
+        if self.validators:
+            for elem in self.validators:
+                elem.validate(self, data)
 
     def validate_fields(self, data):
         """
@@ -144,3 +164,7 @@ class DataStore(object):
             for validator in field.validators:
                 if not validator.validate(v):
                     raise BadRequest()
+
+        if self.validators:
+            for elem in self.validators:
+                elem.validate(self, data)

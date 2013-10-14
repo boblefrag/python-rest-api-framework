@@ -33,6 +33,47 @@ class ModelTest(TestCase):
 
 class PythonListDataStoreTest(TestCase):
 
+    def test_validator(self):
+        from rest_api_framework.datastore.validators import UniqueTogether
+        data_list = [
+            {"name": "bob",
+             "age": a,
+             "id": a
+             } for a in range(100)
+            ]
+
+        store = PythonListDataStore(
+            data_list,
+            ApiModel,
+            validators=[UniqueTogether("age", "name")]
+            )
+
+        self.assertEqual(store.validate({"name": "bob", "age": 209}), None)
+        self.assertRaises(BadRequest,
+                          store.validate,
+                          {"name": "bob", "age": 20})
+
+        self.assertRaises(
+            BadRequest,
+            store.update,
+            {"name": "bob", "age": 34, "id": 34},
+            {"age": 20})
+
+        store = SQLiteDataStore(
+            {"name": "test.db", "table": "address"},
+            ApiModel,
+            validators=[UniqueTogether("age", "name")]
+            )
+
+        for i in range(100):
+            store.create({"name": "bob", "age": i+1})
+
+        self.assertEqual(store.validate({"name": "bob", "age": 209}), None)
+        self.assertRaises(BadRequest,
+                          store.validate,
+                          {"name": "bob", "age": 20})
+        os.remove("test.db")
+
     def test_validation(self):
 
         data_list = [

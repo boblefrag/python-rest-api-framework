@@ -83,6 +83,7 @@ class ApiController(WSGIWrapper):
     authorization = None
     pagination = None
     datastore = None
+    ratelimit = None
 
     def __init__(self, *args, **kwargs):
         super(ApiController, self).__init__(*args, **kwargs)
@@ -109,7 +110,8 @@ class ApiController(WSGIWrapper):
         """
         if self.authorization:
             self.authorization.check_auth(request)
-
+        if self.ratelimit:
+            self.ratelimit.check_limit(request)
         if request.method == "GET":
             return self.get_list(request)
 
@@ -154,7 +156,8 @@ class ApiController(WSGIWrapper):
         """
         if self.authorization:
             self.authorization.check_auth(request)
-
+        if self.ratelimit:
+            self.ratelimit.check_limit(request)
         if request.method == "GET":
             return self.get(request, identifier)
         if request.method == "PUT":
@@ -259,8 +262,14 @@ class Controller(ApiController):
             )
 
     def make_options(self, options):
+        """
+        Make options enable Pagination, Authentication, Authorization,
+        RateLimit and so on.
+        """
         if options.get("pagination", None):
             self.pagination = options["pagination"]
+        if options.get("ratelimit", None):
+            self.ratelimit = options["ratelimit"]
         if options.get("authentication", None):
             self.authentication = options["authentication"]
         if options.get("authorization", None):

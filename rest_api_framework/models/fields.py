@@ -3,7 +3,7 @@ Fields type used with models
 """
 
 from abc import ABCMeta
-from .validators import IntegerValidator, StringValidator
+from .validators import IntegerValidator, StringValidator, FloatValidator
 
 
 class Field(object):
@@ -52,4 +52,12 @@ class StringPkField(PkField):
     A string based PkField
     """
     base_type = str
-    validator = []
+    validators = []
+
+
+class TimestampField(Field):
+    """
+    A unix timestamp
+    """
+    base_type = float
+    validators = [FloatValidator()]

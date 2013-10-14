@@ -129,7 +129,8 @@ class ApiController(WSGIWrapper):
         if self.pagination:
             offset, count, request_kwargs = self.pagination.paginate(request)
         else:
-            offset, count = None
+            offset, count = None, None
+            request_kwargs = request.values.to_dict()
         filters = request_kwargs
         return self.view['response_class'](
             self.render_list(
@@ -268,10 +269,16 @@ class Controller(ApiController):
         """
         if options.get("pagination", None):
             self.pagination = options["pagination"]
-        if options.get("ratelimit", None):
-            self.ratelimit = options["ratelimit"]
+
         if options.get("authentication", None):
             self.authentication = options["authentication"]
+
+        if options.get("ratelimit", None):
+            if not hasattr(self, "authentication"):
+                raise ValueError(
+                    "RateLimit option need an Authentication backend")
+            self.ratelimit = options["ratelimit"](self.authentication)
+
         if options.get("authorization", None):
             if not hasattr(self, "authentication"):
                 raise ValueError(

@@ -1,7 +1,7 @@
 from unittest import TestCase
 from rest_api_framework.datastore import (PythonListDataStore,
                                           SQLiteDataStore)
-#                                          ApiDataStore)
+
 from rest_api_framework import models
 
 from werkzeug.exceptions import BadRequest, NotFound
@@ -54,6 +54,18 @@ class PythonListDataStoreTest(TestCase):
         self.assertRaises(BadRequest,
                           store.validate_fields,
                           "age")
+        data_list = []
+
+        class OtherModel(models.Model):
+
+            fields = [models.TimestampField(name="timestamp",
+                                                 required=True),
+                      models.PkField(name="id")
+                      ]
+        store = PythonListDataStore(data_list, OtherModel)
+        self.assertRaises(BadRequest,
+                          store.validate_fields,
+                          {"timestamp": 2345})
 
     def test_pagination(self):
         data_list = [

@@ -40,3 +40,14 @@ class StringValidator(Validator):
         if isinstance(field, basestring):
             return True
         return False
+
+
+class FloatValidator(Validator):
+    """
+    Validate that a value is of float type
+    """
+
+    def validate(self, field):
+        if isinstance(field, float):
+            return True
+        return False

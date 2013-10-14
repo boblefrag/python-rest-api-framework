@@ -79,8 +79,17 @@ class PythonListDataStore(DataStore):
         for k, v in data.iteritems():
             obj[k] = v
 
-        # save it in the datastore
-        self.data[obj[self.model.pk_field.name]] = obj
+        # save it in the datastore if the self.model.pk_field is an
+        # int, looking by index is enought
+        if self.model.pk_field.base_type == int:
+            self.data[obj[self.model.pk_field.name]] = obj
+        else:
+            index = [
+                self.data.index(elem) for elem in self.data \
+                    if elem[
+                    self.model.pk_field.name] == obj[
+                    self.model.pk_field.name]][0]
+            self.data[index] = obj
         # return the object
         return obj
 

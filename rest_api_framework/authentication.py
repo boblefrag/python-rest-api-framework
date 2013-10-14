@@ -42,15 +42,19 @@ class ApiKeyAuthentication(Authentication):
     def __init__(self, datastore):
         self.datastore = datastore
 
-    def get_user(self, identifier):
+    def get_user(self, request):
         """
         return a user or None.
         """
-        try:
-            user = self.datastore.get(identifier)
-            return user
-        except NotFound:
-            return None
+        data = request.values.to_dict()
+        identifier = "apikey"
+        if identifier in data:
+            try:
+                user = self.datastore.get(data[identifier])
+                return user
+            except NotFound:
+                return None
+        return None
 
 
 class ApiKeyAuthorization(Authorization):
@@ -63,11 +67,7 @@ class ApiKeyAuthorization(Authorization):
         """
         Check if a user is authorized to perform a particular action.
         """
-        data = request.values.to_dict()
-        if "apikey" in data:
-            if self.authentication.get_user(data['apikey']):
-                return
-            else:
-                raise Unauthorized
-
-        raise Unauthorized
+        if self.authentication.get_user(request):
+            return
+        else:
+            raise Unauthorized

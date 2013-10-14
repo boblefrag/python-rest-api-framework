@@ -1,6 +1,6 @@
 from base import DataStore
 from rest_api_framework.models import PkField
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound, BadRequest
 import sqlite3
 
 
@@ -63,6 +63,7 @@ class SQLiteDataStore(DataStore):
         c.execute(sql)
         conn.commit()
         conn.close()
+        self.fields = self.model.get_fields()
 
     def get_connector(self):
         """
@@ -90,7 +91,6 @@ class SQLiteDataStore(DataStore):
         """
         args = []
         where_query = []
-        print kwargs
         limit = kwargs.get("end", None)
         if kwargs.get("start", None):
             where_query.append(" id >=?")
@@ -104,24 +104,34 @@ class SQLiteDataStore(DataStore):
 
         if limit:
             data["query"] += " LIMIT {0}".format(limit)
-
-        print data["query"], tuple(args)
         c = self.get_connector().cursor()
         c.execute(data["query"].format(self.ressource_config['table']),
                   tuple(args)
                   )
         objs = []
         for elem in c.fetchall():
-            fields = self.model.get_fields_name()
-            objs.append(dict(zip(fields, elem)))
+            objs.append(dict(zip(self.fields, elem)))
         return objs
+
+    def get_fields(self, **fields):
+        if self.options.get("partial"):
+            fields, kwargs = self.options["partial"].get_partials(**fields)
+            for field in fields:
+                if not field in self.model.get_fields_name():
+                    raise BadRequest()
+                if not self.model.pk_field.name in fields:
+                    fields.append(self.model.pk_field.name)
+        else:
+            fields = self.model.get_fields_name()
+        return fields
 
     def get_list(self, **kwargs):
         """
         return all the objects, paginated if needed, fitered if
         filters have been set.
         """
-        fields = ", ".join(self.model.get_fields_name())
+        self.fields = self.get_fields(**kwargs)
+        fields = ", ".join(self.fields)
         kwargs["query"] = 'SELECT {0}'.format(fields)
         start = kwargs.pop("offset", None)
         end = kwargs.pop("count", None)
@@ -133,9 +143,10 @@ class SQLiteDataStore(DataStore):
         Return a single row or raise NotFound
         """
         fields = ",".join(self.model.get_fields_name())
-        query = "select {0} from {1} where id=?".format(
+        query = "select {0} from {1} where {2}=?".format(
             fields,
-            self.ressource_config["table"])
+            self.ressource_config["table"],
+            self.model.pk_field.name)
         c = self.get_connector().cursor()
         c.execute(query, (identifier,))
         obj = c.fetchone()
@@ -180,7 +191,7 @@ class SQLiteDataStore(DataStore):
 
         Validate the fields to be updated and return the updated row
         """
-        self.get(obj['id'])
+        self.get(obj[self.model.pk_field.name])
         self.validate_fields(data)
         fields = []
         values = []
@@ -199,7 +210,7 @@ class SQLiteDataStore(DataStore):
         c.execute(query)
         conn.commit()
         conn.close()
-        return self.get(obj['id'])
+        return self.get(obj[self.model.pk_field.name])
 
     def delete(self, identifier):
         """
@@ -213,9 +224,10 @@ class SQLiteDataStore(DataStore):
         conn = self.get_connector()
         c = conn.cursor()
 
-        query = "delete from {0} where id={1}".format(
+        query = "delete from {0} where {2}={1}".format(
             self.ressource_config["table"],
-            identifier)
+            identifier,
+            self.model.pk_field.name)
         c.execute(query)
         conn.commit()
         conn.close()

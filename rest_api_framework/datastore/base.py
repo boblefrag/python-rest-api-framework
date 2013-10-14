@@ -106,17 +106,9 @@ class DataStore(object):
         have been set or only a subset of the ressources if pagination
         options exists.
         """
-        start = offset
-        end = count
-        if end:
-            if "start" in kwargs:
-                start = int(kwargs['start'])
-                end = start + self.options['paginate_by']
-            elif "end" in kwargs:
-                end = int(kwargs['end'])
-                start = end - int(kwargs['end'])
-
-        return data[start:end]
+        if not count:
+            return data[offset:]
+        return data[offset:offset+count]
 
     def validate(self, data):
         """

@@ -6,16 +6,54 @@ import json
 import datetime
 from rest_api_framework.authentication import (ApiKeyAuthorization,
                                                ApiKeyAuthentication)
-from rest_api_framework.datastore import PythonListDataStore
+from rest_api_framework.datastore import PythonListDataStore, SQLiteDataStore
 from rest_api_framework import models
 from rest_api_framework.controllers import WSGIDispatcher
+from rest_api_framework.partials import Partial
 import os
 
 
 class ApiModel(models.Model):
     fields = [
-        models.StringField(name="id", required=True)
+        models.StringPkField(name="id", required=True)
         ]
+
+
+class SQLModel(models.Model):
+
+    fields = [models.IntegerField(name="age", required=True),
+              models.StringField(name="name", required=True),
+              models.PkField(name="id")
+              ]
+
+
+ressources = [
+    {"name": "bob",
+     "age": a,
+     "id": a
+     } for a in range(100)
+    ]
+
+
+class PartialApiApp(ApiApp):
+
+    ressource = {
+        "ressource_name": "address",
+        "ressource": ressources,
+        "model": ApiModel,
+        "datastore": PythonListDataStore,
+        "options": {"partial": Partial()}
+        }
+
+
+class PartialSQLApp(SQLiteApp):
+    ressource = {
+        "ressource_name": "address",
+        "ressource": {"name": "test.db", "table": "address"},
+        "model": SQLModel,
+        "datastore": SQLiteDataStore,
+        "options": {"partial": Partial()}
+        }
 
 
 class TestApiView(TestCase):
@@ -210,4 +248,76 @@ class TestSQlitePagination(TestCase):
                         data=json.dumps({"name": "bob", "age": 34}))
         resp = client.get("/address/")
         self.assertEqual(len(json.loads(resp.data)), 20)
+        os.remove("test.db")
+
+    def test_base_pagination_offset(self):
+        client = Client(WSGIDispatcher([SQLiteApp]),
+                        response_wrapper=BaseResponse)
+        for i in range(100):
+            client.post("/address/",
+                        data=json.dumps({"name": "bob", "age": 34}))
+        resp = client.get("/address/?offset=2")
+        self.assertEqual(json.loads(resp.data)[0]['id'], 2)
+        os.remove("test.db")
+
+    def test_base_pagination_count(self):
+        client = Client(WSGIDispatcher([SQLiteApp]),
+                        response_wrapper=BaseResponse)
+        for i in range(100):
+            client.post("/address/",
+                        data=json.dumps({"name": "bob", "age": 34}))
+        resp = client.get("/address/?count=2")
+        self.assertEqual(len(json.loads(resp.data)), 2)
+        os.remove("test.db")
+
+    def test_base_pagination_count_offset(self):
+        client = Client(WSGIDispatcher([SQLiteApp]),
+                        response_wrapper=BaseResponse)
+        for i in range(100):
+            client.post("/address/",
+                        data=json.dumps({"name": "bob", "age": 34}))
+        resp = client.get("/address/?count=2&offset=4")
+        self.assertEqual(len(json.loads(resp.data)), 2)
+        self.assertEqual(json.loads(resp.data)[0]['id'], 4)
+        os.remove("test.db")
+
+
+class TestPartialResponse(TestCase):
+
+    def test_get_partial_list(self):
+        client = Client(WSGIDispatcher([PartialApiApp]),
+                        response_wrapper=BaseResponse)
+        resp = client.get("/address/?fields=age")
+        # we only want "age". get_list add id, JsonResponse add ressource_uri
+        self.assertEqual(len(json.loads(resp.data)[0].keys()), 3)
+
+    def test_get_partial_raise(self):
+        client = Client(WSGIDispatcher([PartialApiApp]),
+                        response_wrapper=BaseResponse)
+        response = client.get("/address/?fields=wrongkey")
+        self.assertEqual(response.status_code, 400)
+
+
+class TestPartialSQLResponse(TestCase):
+    def test_get_partial_sql(self):
+        client = Client(WSGIDispatcher([PartialSQLApp]),
+                        response_wrapper=BaseResponse)
+        for i in range(100):
+            client.post("/address/",
+                        data=json.dumps({"name": "bob", "age": 34}))
+
+        resp = client.get("/address/?fields=age")
+        # we only want "age". get_list add id, JsonResponse add ressource_uri
+        print resp
+        self.assertEqual(len(json.loads(resp.data)[0].keys()), 3)
+        os.remove("test.db")
+
+    def test_get_partial_sql_raise(self):
+        client = Client(WSGIDispatcher([PartialSQLApp]),
+                        response_wrapper=BaseResponse)
+        for i in range(100):
+            client.post("/address/",
+                        data=json.dumps({"name": "bob", "age": 34}))
+        response = client.get("/address/?fields=wrongkey")
+        self.assertEqual(response.status_code, 400)
         os.remove("test.db")

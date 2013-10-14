@@ -19,6 +19,7 @@ class WSGIWrapper(object):
     """
 
     __metaclass__ = ABCMeta
+    url_map = None
 
     def __call__(self, environ, start_response):
         """
@@ -77,7 +78,11 @@ class ApiController(WSGIWrapper):
 
     __metaclass__ = ABCMeta
 
-    views = None
+    view = None
+    ressource = None
+    authorization = None
+    pagination = None
+    datastore = None
 
     def __init__(self, *args, **kwargs):
         super(ApiController, self).__init__(*args, **kwargs)
@@ -102,7 +107,7 @@ class ApiController(WSGIWrapper):
         :return: :meth:`.get_list` if request.method is GET,
                  :meth:`.create` if request.method is POST
         """
-        if hasattr(self, "authorization"):
+        if self.authorization:
             self.authorization.check_auth(request)
 
         if request.method == "GET":
@@ -119,7 +124,7 @@ class ApiController(WSGIWrapper):
         :type request: :class:`werkzeug.wrappers.Request`
         """
 
-        if hasattr(self, "pagination"):
+        if self.pagination:
             offset, count, request_kwargs = self.pagination.paginate(request)
         else:
             offset, count = None
@@ -147,7 +152,7 @@ class ApiController(WSGIWrapper):
         :param request:
         :type request: :class:`werkzeug.wrappers.Request`
         """
-        if hasattr(self, "authorization"):
+        if self.authorization:
             self.authorization.check_auth(request)
 
         if request.method == "GET":

@@ -28,7 +28,7 @@ class DataStore(object):
 
            Not implemented by base DataStore class
         """
-        raise NotImplemented
+        raise NotImplementedError
 
     @abstractmethod
     def create(self, data):
@@ -43,7 +43,7 @@ class DataStore(object):
 
         Not implemented by base DataStore class
         """
-        raise NotImplemented
+        raise NotImplementedError
 
     @abstractmethod
     def update(self, obj, data):
@@ -56,7 +56,7 @@ class DataStore(object):
 
            Not implemented by base DataStore class
         """
-        raise NotImplemented
+        raise NotImplementedError
 
     @abstractmethod
     def delete(self, identifier):
@@ -68,7 +68,7 @@ class DataStore(object):
 
            Not implemented by base DataStore class
         """
-        raise NotImplemented
+        raise NotImplementedError
 
     @abstractmethod
     def get_list(self, offset=None, count=None, **kwargs):
@@ -82,7 +82,7 @@ class DataStore(object):
 
            Not implemented by base DataStore class
         """
-        raise NotImplemented
+        raise NotImplementedError
 
     @abstractmethod
     def filter(self, **kwargs):
@@ -98,7 +98,7 @@ class DataStore(object):
 
            Not implemented by base DataStore class
         """
-        raise NotImplemented
+        raise NotImplementedError
 
     def paginate(self, data, offset, count, **kwargs):
         """

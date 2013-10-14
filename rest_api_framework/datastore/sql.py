@@ -46,7 +46,7 @@ class SQLiteDataStore(DataStore):
     def __init__(self, ressource_config, model, **options):
         self.table = ressource_config["name"]
         conn = sqlite3.connect(ressource_config["name"])
-        c = conn.cursor()
+        cursor = conn.cursor()
         table = ressource_config["table"]
         super(SQLiteDataStore, self).__init__({"conn": conn, "table": table},
                                               model,
@@ -60,7 +60,7 @@ class SQLiteDataStore(DataStore):
         fields = ", ".join(statement)
 
         sql = 'create table if not exists {0} ({1})'.format(table, fields)
-        c.execute(sql)
+        cursor.execute(sql)
         conn.commit()
         conn.close()
         self.fields = self.model.get_fields()
@@ -104,12 +104,12 @@ class SQLiteDataStore(DataStore):
 
         if limit:
             data["query"] += " LIMIT {0}".format(limit)
-        c = self.get_connector().cursor()
-        c.execute(data["query"].format(self.ressource_config['table']),
-                  tuple(args)
-                  )
+        cursor = self.get_connector().cursor()
+        cursor.execute(data["query"].format(self.ressource_config['table']),
+                       tuple(args)
+                       )
         objs = []
-        for elem in c.fetchall():
+        for elem in cursor.fetchall():
             objs.append(dict(zip(self.fields, elem)))
         return objs
 
@@ -147,9 +147,9 @@ class SQLiteDataStore(DataStore):
             fields,
             self.ressource_config["table"],
             self.model.pk_field.name)
-        c = self.get_connector().cursor()
-        c.execute(query, (identifier,))
-        obj = c.fetchone()
+        cursor = self.get_connector().cursor()
+        cursor.execute(query, (identifier,))
+        obj = cursor.fetchone()
         if obj:
             fields = self.model.get_fields_name()
             return dict(zip(fields, obj))
@@ -171,17 +171,17 @@ class SQLiteDataStore(DataStore):
                 values.append(unicode(v))
 
         conn = self.get_connector()
-        c = conn.cursor()
+        cursor = conn.cursor()
 
         query = "insert into {0} {1} values ({2})".format(
             self.ressource_config["table"],
             tuple(fields),
             ",".join(["?" for i in range(len(fields))])
             )
-        c.execute(query, tuple(values))
+        cursor.execute(query, tuple(values))
         conn.commit()
         conn.close()
-        return c.lastrowid
+        return cursor.lastrowid
 
     def update(self, obj, data):
         """
@@ -200,14 +200,14 @@ class SQLiteDataStore(DataStore):
                 fields.append(k)
                 values.append(v)
         conn = self.get_connector()
-        c = conn.cursor()
+        cursor = conn.cursor()
         update = " ".join(["{0}='{1}'".format(f, v) for f, v in zip(fields,
                                                                     values)])
         query = "update {0} set {1}".format(
             self.ressource_config["table"],
             update
             )
-        c.execute(query)
+        cursor.execute(query)
         conn.commit()
         conn.close()
         return self.get(obj[self.model.pk_field.name])
@@ -222,12 +222,12 @@ class SQLiteDataStore(DataStore):
         """
         self.get(identifier)
         conn = self.get_connector()
-        c = conn.cursor()
+        cursor = conn.cursor()
 
         query = "delete from {0} where {2}={1}".format(
             self.ressource_config["table"],
             identifier,
             self.model.pk_field.name)
-        c.execute(query)
+        cursor.execute(query)
         conn.commit()
         conn.close()

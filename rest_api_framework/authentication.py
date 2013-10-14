@@ -5,10 +5,12 @@ from werkzeug.exceptions import Unauthorized, NotFound
 
 
 class Authorization(object):
-    pass
+    """
+    Check if an authenticated request can perform the given action.
+    """
 
-
-class Authentication(object):
+    def __init__(self, authentication):
+        self.authentication = authentication
 
     def check_auth(self, request):
         """
@@ -18,15 +20,32 @@ class Authentication(object):
         :param request:
         :type request: :class:`werkzeug.wrappers.Request`
         """
-        raise NotImplemented
+
+        raise NotImplementedError
+
+
+class Authentication(object):
+    """
+    Manage the authentication of a request. Must implement the get_user method
+    """
+    def get_user(self, identifier):
+        """
+        Must return a user if authentication pass, None otherwise
+        """
+        raise NotImplementedError
 
 
 class ApiKeyAuthentication(Authentication):
-
-    def __init__(self, datastore, **options):
+    """
+    Authentication based on an apikey stored in a datastore.
+    """
+    def __init__(self, datastore):
         self.datastore = datastore
 
     def get_user(self, identifier):
+        """
+        return a user or None.
+        """
         try:
             user = self.datastore.get(identifier)
             return user
@@ -39,8 +58,6 @@ class ApiKeyAuthorization(Authorization):
     This authentication backend use an api key to authenticate and
     authorize users
     """
-    def __init__(self, authentication, **options):
-        self.authentication = authentication
 
     def check_auth(self, request):
         """

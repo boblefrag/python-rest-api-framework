@@ -1,3 +1,6 @@
+"""
+Validators to check the values of Fields instances
+"""
 from abc import ABCMeta, abstractmethod
 
 
@@ -10,10 +13,17 @@ class Validator(object):
 
     @abstractmethod
     def validate(self, field):
-        raise NotImplemented
+        """
+        Method to validate that a field is formated as expected or is
+        of correct type/class
+        """
+        raise NotImplementedError
 
 
 class IntegerValidator(Validator):
+    """
+    Validate that a value is of type int
+    """
 
     def validate(self, field):
         if isinstance(field, int):
@@ -22,6 +32,9 @@ class IntegerValidator(Validator):
 
 
 class StringValidator(Validator):
+    """
+    Validate that a value is of type basestring (either str or unicode)
+    """
 
     def validate(self, field):
         if isinstance(field, basestring):

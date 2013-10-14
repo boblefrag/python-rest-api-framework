@@ -1,3 +1,6 @@
+"""
+Define base controller for your API.
+"""
 import json
 from werkzeug.exceptions import BadRequest
 from werkzeug.wrappers import Request
@@ -17,6 +20,10 @@ class WSGIWrapper(object):
 
     __metaclass__ = ABCMeta
 
+    def __init__(self, *args, **kwargs):
+        self.url_map = self.load_urls()
+        print self.url_map
+
     def __call__(self, environ, start_response):
         """
         return the wsgi wrapper
@@ -27,6 +34,37 @@ class WSGIWrapper(object):
         request = Request(environ)
         response = self.dispatch_request(request)
         return response(environ, start_response)
+
+    def load_urls(self):
+        """
+        :param urls: A list of tuple in the form (url(string),
+                     view(string), permitted Http verbs(list))
+        :type urls: list
+
+        return a :class:`werkzeug.routing.Map`
+
+        this method is automaticaly called by __init__ to build the
+        :class:`.Controller` urls mapping
+        """
+        return Map(
+            [
+                Rule(pattern[0], endpoint=pattern[1], methods=pattern[2])
+                for pattern in self.urls
+                ]
+            )
+
+    def dispatch_request(self, request):
+        """
+        Using the :class:`werkzeug.routing.Map` constructed by
+        :meth:`.load_urls` call the view method with the request
+        object and return the response object.
+        """
+        adapter = self.url_map.bind_to_environ(request.environ)
+        try:
+            endpoint, values = adapter.match()
+            return getattr(self, endpoint)(request, **values)
+        except HTTPException, e:
+            return e
 
 
 class WSGIDispatcher(DispatcherMiddleware):
@@ -48,63 +86,9 @@ class WSGIDispatcher(DispatcherMiddleware):
         super(WSGIDispatcher, self).__init__(app, mounts=mounts)
 
 
-class Dispatcher(object):
+class ApiController(WSGIWrapper):
     """
-    Dispatcher auto map urls to views methods defined in :class:`.Controller`.
-
-    :example:
-
-    .. code-block:: python
-
-       Dispatcher(
-                  [
-                   ("/", "index", ["GET"]),
-                   ("/register/", "register", ["GET", "POST"],
-                  ]
-                 )
-    """
-
-    __metaclass__ = ABCMeta
-
-    def __init__(self, urls, *args, **kwargs):
-        self.url_map = self.load_urls(urls)
-        print self.url_map
-
-    def load_urls(self, urls):
-        """
-        :param urls: A list of tuple in the form (url(string),
-                     view(string), permitted Http verbs(list))
-        :type urls: list
-
-        return a :class:`werkzeug.routing.Map`
-
-        this method is automaticaly called by __init__ to build the
-        :class:`.Controller` urls mapping
-        """
-        return Map(
-            [
-                Rule(pattern[0], endpoint=pattern[1], methods=pattern[2])
-                for pattern in urls
-                ]
-            )
-
-    def dispatch_request(self, request):
-        """
-        Using the :class:`werkzeug.routing.Map` constructed by
-        :meth:`.load_urls` call the view method with the request
-        object and return the response object.
-        """
-        adapter = self.url_map.bind_to_environ(request.environ)
-        try:
-            endpoint, values = adapter.match()
-            return getattr(self, endpoint)(request, **values)
-        except HTTPException, e:
-            return e
-
-
-class ApiController(WSGIWrapper, Dispatcher):
-    """
-    Inherit from :class:`.WSGIWrapper` and :class:`.Dispatcher`
+    Inherit from :class:`.WSGIWrapper`
     implement the base API method. Should be inherited to create your own API
     """
 
@@ -113,7 +97,7 @@ class ApiController(WSGIWrapper, Dispatcher):
     auth = None
 
     def __init__(self, *args, **kwargs):
-        return super(ApiController, self).__init__(*args, **kwargs)
+        super(ApiController, self).__init__(*args, **kwargs)
 
     def render_list(self, objs):
         for obj in objs:
@@ -249,7 +233,7 @@ class Controller(ApiController):
     __metaclass__ = ABCMeta
 
     def __init__(self, *args, **kwargs):
-        urls = [
+        self.urls = [
             ('/', 'index', self.controller['list_verbs']),
             ('/<int:identifier>/',
              'unique_uri',
@@ -264,7 +248,7 @@ class Controller(ApiController):
         if self.controller.get("options", None):
             self.make_options(self.controller["options"])
 
-        super(Controller, self).__init__(urls, *args, **kwargs)
+        super(Controller, self).__init__(*args, **kwargs)
 
     def make_options(self, options):
         if options.get("pagination", None):

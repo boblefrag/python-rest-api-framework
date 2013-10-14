@@ -20,10 +20,6 @@ class WSGIWrapper(object):
 
     __metaclass__ = ABCMeta
 
-    def __init__(self, *args, **kwargs):
-        self.url_map = self.load_urls()
-        print self.url_map
-
     def __call__(self, environ, start_response):
         """
         return the wsgi wrapper
@@ -31,27 +27,13 @@ class WSGIWrapper(object):
         return self.wsgi_app(environ, start_response)
 
     def wsgi_app(self, environ, start_response):
+        """
+        instanciate a Request object, dispatch to the needed method,
+        return a response
+        """
         request = Request(environ)
         response = self.dispatch_request(request)
         return response(environ, start_response)
-
-    def load_urls(self):
-        """
-        :param urls: A list of tuple in the form (url(string),
-                     view(string), permitted Http verbs(list))
-        :type urls: list
-
-        return a :class:`werkzeug.routing.Map`
-
-        this method is automaticaly called by __init__ to build the
-        :class:`.Controller` urls mapping
-        """
-        return Map(
-            [
-                Rule(pattern[0], endpoint=pattern[1], methods=pattern[2])
-                for pattern in self.urls
-                ]
-            )
 
     def dispatch_request(self, request):
         """
@@ -77,6 +59,7 @@ class WSGIDispatcher(DispatcherMiddleware):
 
        app = WSGIDispatcher([FirstApp, SecondApp])
     """
+
     def __init__(self, apps):
         endpoints = {}
         for elem in apps:
@@ -94,7 +77,7 @@ class ApiController(WSGIWrapper):
 
     __metaclass__ = ABCMeta
 
-    auth = None
+    views = None
 
     def __init__(self, *args, **kwargs):
         super(ApiController, self).__init__(*args, **kwargs)
@@ -239,16 +222,34 @@ class Controller(ApiController):
              'unique_uri',
              self.controller['unique_verbs']),
             ]
+        self.url_map = self.load_urls()
         self.datastore = self.ressource['datastore'](
             self.ressource['ressource'],
             self.ressource['model'],
             **self.ressource.get('options', {})
             )
-
         if self.controller.get("options", None):
             self.make_options(self.controller["options"])
 
         super(Controller, self).__init__(*args, **kwargs)
+
+    def load_urls(self):
+        """
+        :param urls: A list of tuple in the form (url(string),
+                     view(string), permitted Http verbs(list))
+        :type urls: list
+
+        return a :class:`werkzeug.routing.Map`
+
+        this method is automaticaly called by __init__ to build the
+        :class:`.Controller` urls mapping
+        """
+        return Map(
+            [
+                Rule(pattern[0], endpoint=pattern[1], methods=pattern[2])
+                for pattern in self.urls
+                ]
+            )
 
     def make_options(self, options):
         if options.get("pagination", None):

@@ -86,6 +86,7 @@ class ApiController(WSGIWrapper):
     pagination = None
     datastore = None
     ratelimit = None
+    formaters = None
 
     def __init__(self, *args, **kwargs):
         super(ApiController, self).__init__(*args, **kwargs)
@@ -196,6 +197,10 @@ class ApiController(WSGIWrapper):
             data = json.loads(request.data)
         except:
             raise BadRequest()
+        if self.formaters:
+            for formater in self.formaters:
+                data[formater["field"]] = formater[
+                    "function"](data[formater["field"]])
         response = self.datastore.create(data)
 
         return self.view(
@@ -287,6 +292,10 @@ class Controller(ApiController):
         Make options enable Pagination, Authentication, Authorization,
         RateLimit and so on.
         """
+
+        if options.get("formaters", None):
+            self.formaters = options["formaters"]
+
         if options.get("pagination", None):
             self.pagination = options["pagination"]
 

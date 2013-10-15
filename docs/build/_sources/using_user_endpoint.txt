@@ -13,7 +13,13 @@ First you can check that your endpoint is up
     Server: Werkzeug/0.8.3 Python/2.7.2
     Date: Tue, 15 Oct 2013 11:13:44 GMT
 
-    {"meta": {"filters": {}}, "object_list": []}
+    {
+    "meta": {
+        "filters": {}
+    }, 
+    "object_list": []
+    }
+
 
 Your endpoint is responding but does not have any data. Let's add
 some:
@@ -49,7 +55,13 @@ List and Get
     Server: Werkzeug/0.8.3 Python/2.7.2
     Date: Mon, 14 Oct 2013 16:53:19 GMT
 
-    {"first_name": "John", "last_name": "Doe", "id": 1, "ressource_uri": "/users/1/"}
+    {
+    "first_name": "John", 
+    "id": 1, 
+    "last_name": "Doe", 
+    "ressource_uri": "/users/1/"
+    }
+
 
 You can see that ressource_uri was not part of the ressource. It have
 been added by the View itself. View can add multiple

@@ -27,15 +27,6 @@ Contents:
 ..   multiple_endpoint
 ..   references
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
-
-
 
 A Full working example
 ----------------------
@@ -93,3 +84,10 @@ A Full working example
         from rest_api_framework.controllers import WSGIDispatcher
         app = WSGIDispatcher([UserEndPoint])
         run_simple('127.0.0.1', 5000, app, use_debugger=True, use_reloader=True)
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`

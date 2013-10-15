@@ -23,7 +23,10 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Python Rest Api Framework 0.1 documentation" href="index.html" /> 
+    <link rel="top" title="Python Rest Api Framework 0.1 documentation" href="index.html" />
+    <link rel="up" title="Tutorial building an adressebook API" href="tutorial.html" />
+    <link rel="next" title="Playing with the newly created endpoint" href="using_user_endpoint.html" />
+    <link rel="prev" title="Tutorial building an adressebook API" href="tutorial.html" /> 
   </head>
   <body>
     <div class="related">
@@ -35,7 +38,14 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li> 
+        <li class="right" >
+          <a href="using_user_endpoint.html" title="Playing with the newly created endpoint"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="tutorial.html" title="Tutorial building an adressebook API"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li>
+          <li><a href="tutorial.html" accesskey="U">Tutorial building an adressebook API</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -50,6 +60,14 @@
 book and for our authentication process.</p>
 <p>Users will be define with at least a first name and a last name. We
 also need an unique identifier to retreive the user.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>For this tutorial the file yyou create will be named app.py
+To launch your application then just type in a terminal:</p>
+<div class="last highlight-bash"><div class="highlight"><pre>python app.py
+</pre></div>
+</div>
+</div>
 <div class="section" id="define-a-model">
 <h2>Define a model<a class="headerlink" href="#define-a-model" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">rest_api_framework</span> <span class="kn">import</span> <span class="n">models</span>
@@ -152,6 +170,13 @@ endpoint in a RESTFUL fashion.</p>
     <span class="n">run_simple</span><span class="p">(</span><span class="s">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="mi">5000</span><span class="p">,</span> <span class="n">app</span><span class="p">,</span> <span class="n">use_debugger</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">use_reloader</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 </pre></div>
 </div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>to launch your application, just type in a terminal:</p>
+<div class="last highlight-bash"><div class="highlight"><pre>python app.py
+</pre></div>
+</div>
+</div>
 <p>Next: <a class="reference internal" href="using_user_endpoint.html"><em>Playing with the newly created endpoint</em></a></p>
 </div>
 </div>
@@ -174,6 +199,12 @@ endpoint in a RESTFUL fashion.</p>
 </li>
 </ul>
 
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="tutorial.html"
+                        title="previous chapter">Tutorial building an adressebook API</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="using_user_endpoint.html"
+                        title="next chapter">Playing with the newly created endpoint</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/first_step.txt"
@@ -205,7 +236,14 @@ endpoint in a RESTFUL fashion.</p>
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li> 
+        <li class="right" >
+          <a href="using_user_endpoint.html" title="Playing with the newly created endpoint"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="tutorial.html" title="Tutorial building an adressebook API"
+             >previous</a> |</li>
+        <li><a href="index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li>
+          <li><a href="tutorial.html" >Tutorial building an adressebook API</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

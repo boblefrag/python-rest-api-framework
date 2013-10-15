@@ -23,7 +23,10 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Python Rest Api Framework 0.1 documentation" href="index.html" /> 
+    <link rel="top" title="Python Rest Api Framework 0.1 documentation" href="index.html" />
+    <link rel="up" title="Tutorial building an adressebook API" href="tutorial.html" />
+    <link rel="next" title="Linking ressource together" href="related_ressources.html" />
+    <link rel="prev" title="Show data to users" href="representing_data.html" /> 
   </head>
   <body>
     <div class="related">
@@ -35,7 +38,14 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li> 
+        <li class="right" >
+          <a href="related_ressources.html" title="Linking ressource together"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="representing_data.html" title="Show data to users"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li>
+          <li><a href="tutorial.html" accesskey="U">Tutorial building an adressebook API</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -129,37 +139,118 @@ Content-Length: 1811
 Server: Werkzeug/0.8.3 Python/2.7.2
 Date: Tue, 15 Oct 2013 11:32:55 GMT
 
-<span class="o">{</span><span class="s2">&quot;meta&quot;</span>: <span class="o">{</span><span class="s2">&quot;count&quot;</span>: 20, <span class="s2">&quot;total_count&quot;</span>: 802, <span class="s2">&quot;next&quot;</span>: <span class="s2">&quot;?offset=20&quot;</span>,
-<span class="s2">&quot;filters&quot;</span>: <span class="o">{}</span>, <span class="s2">&quot;offset&quot;</span>: 0, <span class="s2">&quot;previous&quot;</span>: <span class="s2">&quot;null&quot;</span><span class="o">}</span>, <span class="s2">&quot;object_list&quot;</span>:
-<span class="o">[{</span><span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;Captain&quot;</span>, <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;America&quot;</span>,
-<span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/1/&quot;</span><span class="o">}</span>, <span class="o">{</span><span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;Captain&quot;</span>,
-<span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;America&quot;</span>, <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/3/&quot;</span><span class="o">}</span>,
-<span class="o">{</span><span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;John&quot;</span>, <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;Doe&quot;</span>, <span class="s2">&quot;ressource_uri&quot;</span>:
-<span class="s2">&quot;/users/4/&quot;</span><span class="o">}</span>, <span class="o">{</span><span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;arRFOSYZT&quot;</span>, <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;&quot;</span>,
-<span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/5/&quot;</span><span class="o">}</span>, <span class="o">{</span><span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;iUJsYORMuYeMUDy&quot;</span>,
-<span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;TqFpmcBQD&quot;</span>, <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/6/&quot;</span><span class="o">}</span>,
-<span class="o">{</span><span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;EU&quot;</span>, <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;FMSAbcUJBSBDPaF&quot;</span>,
-<span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/7/&quot;</span><span class="o">}</span>, <span class="o">{</span><span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;mWAwamrMQARXW&quot;</span>,
-<span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;yMNpEnYOPzY&quot;</span>, <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/8/&quot;</span><span class="o">}</span>,
-<span class="o">{</span><span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;y&quot;</span>, <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;yNiKP&quot;</span>, <span class="s2">&quot;ressource_uri&quot;</span>:
-<span class="s2">&quot;/users/9/&quot;</span><span class="o">}</span>, <span class="o">{</span><span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;s&quot;</span>, <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;TRT&quot;</span>,
-<span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/10/&quot;</span><span class="o">}</span>, <span class="o">{</span><span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;&quot;</span>, <span class="s2">&quot;last_name&quot;</span>:
-<span class="s2">&quot;zFUaBd&quot;</span>, <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/11/&quot;</span><span class="o">}</span>, <span class="o">{</span><span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;WA&quot;</span>,
-<span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;priJ&quot;</span>, <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/12/&quot;</span><span class="o">}</span>,
-<span class="o">{</span><span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;XvpLttDqFmR&quot;</span>, <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;liU&quot;</span>, <span class="s2">&quot;ressource_uri&quot;</span>:
-<span class="s2">&quot;/users/13/&quot;</span><span class="o">}</span>, <span class="o">{</span><span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;ZhJqTgYoEUzmcN&quot;</span>, <span class="s2">&quot;last_name&quot;</span>:
-<span class="s2">&quot;KKDqHJwJMxPSaTX&quot;</span>, <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/14/&quot;</span><span class="o">}</span>, <span class="o">{</span><span class="s2">&quot;first_name&quot;</span>:
-<span class="s2">&quot;qvUxiKIATdKdkC&quot;</span>, <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;wIVzfDlKCkjkHIaC&quot;</span>,
-<span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/15/&quot;</span><span class="o">}</span>, <span class="o">{</span><span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;YSSMHxdDQQsW&quot;</span>,
-<span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;UaKCKgKsgEe&quot;</span>, <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/16/&quot;</span><span class="o">}</span>,
-<span class="o">{</span><span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;EKLFTPJLKDINZio&quot;</span>, <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;nuilPTzHqattX&quot;</span>,
-<span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/17/&quot;</span><span class="o">}</span>, <span class="o">{</span><span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;SPcDBtmDIi&quot;</span>,
-<span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;MrytYqElXiIxA&quot;</span>, <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/18/&quot;</span><span class="o">}</span>,
-<span class="o">{</span><span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;OHxNppXiYp&quot;</span>, <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;AUvUXFRPICsJIB&quot;</span>,
-<span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/19/&quot;</span><span class="o">}</span>, <span class="o">{</span><span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;WBFGxnoe&quot;</span>,
-<span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;KG&quot;</span>, <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/20/&quot;</span><span class="o">}</span>, <span class="o">{</span><span class="s2">&quot;first_name&quot;</span>:
-<span class="s2">&quot;i&quot;</span>, <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;ggLOcKPpMfgvVGtv&quot;</span>, <span class="s2">&quot;ressource_uri&quot;</span>:
-<span class="s2">&quot;/users/21/&quot;</span><span class="o">}]}</span>
+<span class="o">{</span>
+<span class="s2">&quot;meta&quot;</span>: <span class="o">{</span>
+    <span class="s2">&quot;count&quot;</span>: 20,
+    <span class="s2">&quot;filters&quot;</span>: <span class="o">{}</span>,
+    <span class="s2">&quot;next&quot;</span>: <span class="s2">&quot;?offset=20&quot;</span>,
+    <span class="s2">&quot;offset&quot;</span>: 0,
+    <span class="s2">&quot;previous&quot;</span>: <span class="s2">&quot;null&quot;</span>,
+    <span class="s2">&quot;total_count&quot;</span>: 802
+<span class="o">}</span>,
+<span class="s2">&quot;object_list&quot;</span>: <span class="o">[</span>
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;Captain&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;America&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/1/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;Captain&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;America&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/3/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;John&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;Doe&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/4/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;arRFOSYZT&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/5/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;iUJsYORMuYeMUDy&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;TqFpmcBQD&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/6/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;EU&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;FMSAbcUJBSBDPaF&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/7/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;mWAwamrMQARXW&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;yMNpEnYOPzY&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/8/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;y&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;yNiKP&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/9/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;s&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;TRT&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/10/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;zFUaBd&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/11/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;WA&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;priJ&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/12/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;XvpLttDqFmR&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;liU&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/13/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;ZhJqTgYoEUzmcN&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;KKDqHJwJMxPSaTX&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/14/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;qvUxiKIATdKdkC&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;wIVzfDlKCkjkHIaC&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/15/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;YSSMHxdDQQsW&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;UaKCKgKsgEe&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/16/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;EKLFTPJLKDINZio&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;nuilPTzHqattX&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/17/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;SPcDBtmDIi&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;MrytYqElXiIxA&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/18/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;OHxNppXiYp&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;AUvUXFRPICsJIB&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/19/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;WBFGxnoe&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;KG&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/20/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;i&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;ggLOcKPpMfgvVGtv&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/21/&quot;</span>
+    <span class="o">}</span>
+<span class="o">]</span>
+<span class="o">}</span>
 </pre></div>
 </div>
 </div>
@@ -237,6 +328,7 @@ Date: Tue, 15 Oct 2013 12:14:59 GMT
  <span class="o">}</span>
 </pre></div>
 </div>
+<p>Next: <a class="reference internal" href="adding_endpoint.html"><em>Loading multiple endpoint</em></a></p>
 </div>
 </div>
 
@@ -257,6 +349,12 @@ Date: Tue, 15 Oct 2013 12:14:59 GMT
 </li>
 </ul>
 
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="representing_data.html"
+                        title="previous chapter">Show data to users</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="related_ressources.html"
+                        title="next chapter">Linking ressource together</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/work_with_pagination.txt"
@@ -288,7 +386,14 @@ Date: Tue, 15 Oct 2013 12:14:59 GMT
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li> 
+        <li class="right" >
+          <a href="related_ressources.html" title="Linking ressource together"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="representing_data.html" title="Show data to users"
+             >previous</a> |</li>
+        <li><a href="index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li>
+          <li><a href="tutorial.html" >Tutorial building an adressebook API</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Representing relations &mdash; Python Rest Api Framework 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Python Rest Api Framework 0.1 documentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="representing-relations">
+<h1>Representing relations<a class="headerlink" href="#representing-relations" title="Permalink to this headline">¶</a></h1>
+<p>Even if now can query adress from a user and users from an adress,
+your users cannot know that the field &#8220;address&#8221;: 1 correspond to
+/address/1/ plus it break a common rule. The id of the relation
+correspond to yor internal logic. Users doesn&#8217;t have to know how it
+work, they just have to use it.</p>
+<p>What we will try to do in this part of the tutorial is the following:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://localhost:5000/users/1/">http://localhost:5000/users/1/</a> should return:</li>
+</ul>
+<div class="highlight-json"><pre>{
+    "address": /address/1/,
+    "first_name": "Super",
+    "last_name": "Dupont",
+    "ressource_uri": "/users/1/"
+}</pre>
+</div>
+<ul class="simple">
+<li>this request should work</li>
+</ul>
+<div class="highlight-bash"><div class="highlight"><pre>curl -i -H <span class="s2">&quot;Content-type: application/json&quot;</span> -X POST -d
+<span class="s1">&#39;{&quot;first_name&quot;:&quot;Super&quot;, &quot;last_name&quot;: &quot;Dupont&quot;, &quot;address&quot;:</span>
+<span class="s1">&quot;/adress/1/&quot;}&#39;</span>  http://localhost:5000/users/
+</pre></div>
+</div>
+<ul class="simple">
+<li>Of course, <a class="reference external" href="http://localhost:5000/users/?address=/adress/1/">http://localhost:5000/users/?address=/adress/1/</a>&#8221; should
+return the users with this address.</li>
+</ul>
+<div class="section" id="representiing-the-relation-on-the-user-side">
+<h2>Representiing the relation on the user side<a class="headerlink" href="#representiing-the-relation-on-the-user-side" title="Permalink to this headline">¶</a></h2>
+<p>This is the simplest task because you already changed the response
+result by adding remove_id function to the list of View formater in
+<a class="reference internal" href="representing_data.html"><em>Show data to users</em></a></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">format_address</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+    <span class="n">obj</span><span class="p">[</span><span class="s">&#39;address&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;/address/{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="s">&#39;address&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">obj</span>
+</pre></div>
+</div>
+<p>Sure this method will work but if you get a close look on how
+ForeignKeyField (IntForeign inherit from this class) You will see that
+the ForeignKeyField is filled with th options parameter you gave at
+the foreign key creation. You can so write:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">format_foreign_key</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">rest_api_framework.models.fields</span> <span class="kn">import</span> <span class="n">ForeignKeyField</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get_fields</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">ForeignKeyField</span><span class="p">):</span>
+            <span class="n">obj</span><span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;/{0}/{1}/&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s">&quot;foreign&quot;</span><span class="p">][</span><span class="s">&quot;table&quot;</span><span class="p">],</span>
+                                             <span class="n">obj</span><span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">obj</span>
+</pre></div>
+</div>
+<p>This function can then be used in all your project when you need to
+translate a foreignkey into a meaning full ressource uri</p>
+<p>For now, you can add this function to the list of formaters in your
+UserEndPoint views:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">view</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;response_class&quot;</span><span class="p">:</span> <span class="n">JsonResponse</span><span class="p">,</span>
+        <span class="s">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;formaters&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;add_ressource_uri&quot;</span><span class="p">,</span>
+                                  <span class="n">remove_id</span><span class="p">,</span>
+                                  <span class="n">format_foreign_key</span>
+
+                                  <span class="p">]}}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="check-the-formater">
+<h2>Check the formater<a class="headerlink" href="#check-the-formater" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">curl</span> <span class="o">-</span><span class="n">i</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">5000</span><span class="o">/</span><span class="n">users</span><span class="o">/</span>
+<span class="n">HTTP</span><span class="o">/</span><span class="mf">1.0</span> <span class="mi">200</span> <span class="n">OK</span>
+<span class="n">Content</span><span class="o">-</span><span class="n">Type</span><span class="p">:</span> <span class="n">application</span><span class="o">/</span><span class="n">json</span>
+<span class="n">Content</span><span class="o">-</span><span class="n">Length</span><span class="p">:</span> <span class="mi">226</span>
+<span class="n">Server</span><span class="p">:</span> <span class="n">Werkzeug</span><span class="o">/</span><span class="mf">0.8</span><span class="o">.</span><span class="mi">3</span> <span class="n">Python</span><span class="o">/</span><span class="mf">2.7</span><span class="o">.</span><span class="mi">2</span>
+<span class="n">Date</span><span class="p">:</span> <span class="n">Tue</span><span class="p">,</span> <span class="mi">15</span> <span class="n">Oct</span> <span class="mi">2013</span> <span class="mi">21</span><span class="p">:</span><span class="mi">21</span><span class="p">:</span><span class="mi">44</span> <span class="n">GMT</span>
+
+<span class="p">{</span>
+    <span class="s">&quot;meta&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+        <span class="s">&quot;filters&quot;</span><span class="p">:</span> <span class="p">{},</span>
+        <span class="s">&quot;next&quot;</span><span class="p">:</span> <span class="s">&quot;null&quot;</span><span class="p">,</span>
+        <span class="s">&quot;offset&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s">&quot;previous&quot;</span><span class="p">:</span> <span class="s">&quot;null&quot;</span><span class="p">,</span>
+        <span class="s">&quot;total_count&quot;</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="p">},</span>
+    <span class="s">&quot;object_list&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s">&quot;address&quot;</span><span class="p">:</span> <span class="s">&quot;/address/1/&quot;</span><span class="p">,</span>
+            <span class="s">&quot;first_name&quot;</span><span class="p">:</span> <span class="s">&quot;Super&quot;</span><span class="p">,</span>
+            <span class="s">&quot;last_name&quot;</span><span class="p">:</span> <span class="s">&quot;Dupont&quot;</span><span class="p">,</span>
+            <span class="s">&quot;ressource_uri&quot;</span><span class="p">:</span> <span class="s">&quot;/users/1/&quot;</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Representing relations</a><ul>
+<li><a class="reference internal" href="#representiing-the-relation-on-the-user-side">Representiing the relation on the user side</a></li>
+<li><a class="reference internal" href="#check-the-formater">Check the formater</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/represent_related.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Yohann Gabory.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

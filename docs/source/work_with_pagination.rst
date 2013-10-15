@@ -95,37 +95,118 @@ and try your new pagination:
     Server: Werkzeug/0.8.3 Python/2.7.2
     Date: Tue, 15 Oct 2013 11:32:55 GMT
 
-    {"meta": {"count": 20, "total_count": 802, "next": "?offset=20",
-    "filters": {}, "offset": 0, "previous": "null"}, "object_list":
-    [{"first_name": "Captain", "last_name": "America",
-    "ressource_uri": "/users/1/"}, {"first_name": "Captain",
-    "last_name": "America", "ressource_uri": "/users/3/"},
-    {"first_name": "John", "last_name": "Doe", "ressource_uri":
-    "/users/4/"}, {"first_name": "arRFOSYZT", "last_name": "",
-    "ressource_uri": "/users/5/"}, {"first_name": "iUJsYORMuYeMUDy",
-    "last_name": "TqFpmcBQD", "ressource_uri": "/users/6/"},
-    {"first_name": "EU", "last_name": "FMSAbcUJBSBDPaF",
-    "ressource_uri": "/users/7/"}, {"first_name": "mWAwamrMQARXW",
-    "last_name": "yMNpEnYOPzY", "ressource_uri": "/users/8/"},
-    {"first_name": "y", "last_name": "yNiKP", "ressource_uri":
-    "/users/9/"}, {"first_name": "s", "last_name": "TRT",
-    "ressource_uri": "/users/10/"}, {"first_name": "", "last_name":
-    "zFUaBd", "ressource_uri": "/users/11/"}, {"first_name": "WA",
-    "last_name": "priJ", "ressource_uri": "/users/12/"},
-    {"first_name": "XvpLttDqFmR", "last_name": "liU", "ressource_uri":
-    "/users/13/"}, {"first_name": "ZhJqTgYoEUzmcN", "last_name":
-    "KKDqHJwJMxPSaTX", "ressource_uri": "/users/14/"}, {"first_name":
-    "qvUxiKIATdKdkC", "last_name": "wIVzfDlKCkjkHIaC",
-    "ressource_uri": "/users/15/"}, {"first_name": "YSSMHxdDQQsW",
-    "last_name": "UaKCKgKsgEe", "ressource_uri": "/users/16/"},
-    {"first_name": "EKLFTPJLKDINZio", "last_name": "nuilPTzHqattX",
-    "ressource_uri": "/users/17/"}, {"first_name": "SPcDBtmDIi",
-    "last_name": "MrytYqElXiIxA", "ressource_uri": "/users/18/"},
-    {"first_name": "OHxNppXiYp", "last_name": "AUvUXFRPICsJIB",
-    "ressource_uri": "/users/19/"}, {"first_name": "WBFGxnoe",
-    "last_name": "KG", "ressource_uri": "/users/20/"}, {"first_name":
-    "i", "last_name": "ggLOcKPpMfgvVGtv", "ressource_uri":
-    "/users/21/"}]}
+    {
+    "meta": {
+        "count": 20, 
+        "filters": {}, 
+        "next": "?offset=20", 
+        "offset": 0, 
+        "previous": "null", 
+        "total_count": 802
+    }, 
+    "object_list": [
+        {
+            "first_name": "Captain", 
+            "last_name": "America", 
+            "ressource_uri": "/users/1/"
+        }, 
+        {
+            "first_name": "Captain", 
+            "last_name": "America", 
+            "ressource_uri": "/users/3/"
+        }, 
+        {
+            "first_name": "John", 
+            "last_name": "Doe", 
+            "ressource_uri": "/users/4/"
+        }, 
+        {
+            "first_name": "arRFOSYZT", 
+            "last_name": "", 
+            "ressource_uri": "/users/5/"
+        }, 
+        {
+            "first_name": "iUJsYORMuYeMUDy", 
+            "last_name": "TqFpmcBQD", 
+            "ressource_uri": "/users/6/"
+        }, 
+        {
+            "first_name": "EU", 
+            "last_name": "FMSAbcUJBSBDPaF", 
+            "ressource_uri": "/users/7/"
+        }, 
+        {
+            "first_name": "mWAwamrMQARXW", 
+            "last_name": "yMNpEnYOPzY", 
+            "ressource_uri": "/users/8/"
+        }, 
+        {
+            "first_name": "y", 
+            "last_name": "yNiKP", 
+            "ressource_uri": "/users/9/"
+        }, 
+        {
+            "first_name": "s", 
+            "last_name": "TRT", 
+            "ressource_uri": "/users/10/"
+        }, 
+        {
+            "first_name": "", 
+            "last_name": "zFUaBd", 
+            "ressource_uri": "/users/11/"
+        }, 
+        {
+            "first_name": "WA", 
+            "last_name": "priJ", 
+            "ressource_uri": "/users/12/"
+        }, 
+        {
+            "first_name": "XvpLttDqFmR", 
+            "last_name": "liU", 
+            "ressource_uri": "/users/13/"
+        }, 
+        {
+            "first_name": "ZhJqTgYoEUzmcN", 
+            "last_name": "KKDqHJwJMxPSaTX", 
+            "ressource_uri": "/users/14/"
+        }, 
+        {
+            "first_name": "qvUxiKIATdKdkC", 
+            "last_name": "wIVzfDlKCkjkHIaC", 
+            "ressource_uri": "/users/15/"
+        }, 
+        {
+            "first_name": "YSSMHxdDQQsW", 
+            "last_name": "UaKCKgKsgEe", 
+            "ressource_uri": "/users/16/"
+        }, 
+        {
+            "first_name": "EKLFTPJLKDINZio", 
+            "last_name": "nuilPTzHqattX", 
+            "ressource_uri": "/users/17/"
+        }, 
+        {
+            "first_name": "SPcDBtmDIi", 
+            "last_name": "MrytYqElXiIxA", 
+            "ressource_uri": "/users/18/"
+        }, 
+        {
+            "first_name": "OHxNppXiYp", 
+            "last_name": "AUvUXFRPICsJIB", 
+            "ressource_uri": "/users/19/"
+        }, 
+        {
+            "first_name": "WBFGxnoe", 
+            "last_name": "KG", 
+            "ressource_uri": "/users/20/"
+        }, 
+        {
+            "first_name": "i", 
+            "last_name": "ggLOcKPpMfgvVGtv", 
+            "ressource_uri": "/users/21/"
+        }
+    ]
+    }
 
 Browsering Through Paginated objects
 ------------------------------------
@@ -213,3 +294,5 @@ Pagination and filtering play nice together
                    "ressource_uri": "/users/3/"}
               ]
      }
+
+Next: :doc:`adding_endpoint`

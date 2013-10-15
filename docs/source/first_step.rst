@@ -7,6 +7,15 @@ book and for our authentication process.
 Users will be define with at least a first name and a last name. We
 also need an unique identifier to retreive the user.
 
+.. note::
+   
+   For this tutorial the file yyou create will be named app.py
+   To launch your application then just type in a terminal:
+
+   .. code-block:: bash
+  
+      python app.py
+
 Define a model
 ~~~~~~~~~~~~~~
 
@@ -121,5 +130,14 @@ So far, all of the code should look like this:
         from rest_api_framework.controllers import WSGIDispatcher
         app = WSGIDispatcher([UserEndPoint])
         run_simple('127.0.0.1', 5000, app, use_debugger=True, use_reloader=True)
+
+
+.. note::
+
+   to launch your application, just type in a terminal:
+
+   .. code-block:: bash
+
+      python app.py
 
 Next: :doc:`using_user_endpoint`

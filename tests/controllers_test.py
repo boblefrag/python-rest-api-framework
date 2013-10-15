@@ -58,6 +58,19 @@ class PartialSQLApp(SQLiteApp):
         }
 
 
+def controller_formater(data):
+    return int(data)
+
+
+class FormatedApp(ApiApp):
+    controller = {
+        "list_verbs": ["GET", "POST"],
+        "unique_verbs": ["GET", "PUT", "DElETE"],
+        "options": {"formaters": [{"function": controller_formater,
+                                   "field": "age"}]}
+        }
+
+
 class TestApiView(TestCase):
 
     def test_get_list(self):
@@ -377,3 +390,13 @@ class TestRateLimit(TestCase):
         time.sleep(1)
         resp = client.get("/address/?apikey=azerty")
         self.assertEqual(resp.status_code, 200)
+
+
+class TestControllerFormaters(TestCase):
+
+    def test_create(self):
+        client = Client(WSGIDispatcher([FormatedApp]),
+                        response_wrapper=BaseResponse)
+        resp = client.post("/address/",
+                           data=json.dumps({'name': 'bob', 'age': "34"}))
+        self.assertEqual(resp.status_code, 201)

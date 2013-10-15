@@ -80,7 +80,20 @@ The list of users is also updated:
     Server: Werkzeug/0.8.3 Python/2.7.2
     Date: Mon, 14 Oct 2013 17:03:00 GMT
 
-    {"meta": {"filters": {}}, "object_list": [{"first_name": "John", "last_name": "Doe", "id": 1, "ressource_uri": "/users/1/"}]}
+    {
+    "meta": {
+        "filters": {}
+    }, 
+    "object_list": [
+        {
+            "first_name": "John", 
+            "id": 1, 
+            "last_name": "Doe", 
+            "ressource_uri": "/users/1/"
+        }
+    ]
+    }
+
 
 Delete a user
 -------------
@@ -119,7 +132,10 @@ You can check that the user no longer exists:
     Server: Werkzeug/0.8.3 Python/2.7.2
     Date: Tue, 15 Oct 2013 11:16:33 GMT
 
-    {"error": "<p>The requested URL was not found on the server.</p><p>If you entered the URL manually please check your spelling and try again.</p>"}
+    { "error": "<p>The requested URL was not found on the
+    server.</p><p>If you entered the URL manually please check your
+    spelling and try again.</p>" }
+
 
 And the list is also updated:
 
@@ -132,7 +148,19 @@ And the list is also updated:
     Server: Werkzeug/0.8.3 Python/2.7.2
     Date: Tue, 15 Oct 2013 11:17:46 GMT
 
-    {"meta": {"filters": {}}, "object_list": [{"first_name": "John", "last_name": "Doe", "id": 1, "ressource_uri": "/users/1/"}]}
+    {
+    "meta": {
+        "filters": {}
+    }, 
+    "object_list": [
+        {
+            "first_name": "John", 
+            "id": 1, 
+            "last_name": "Doe", 
+            "ressource_uri": "/users/1/"
+        }
+    ]
+    }
 
 
 Update a User

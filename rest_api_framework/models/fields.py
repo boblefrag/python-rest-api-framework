@@ -48,22 +48,20 @@ class PkField(Field):
     base_type = int
     validators = []
 
+class ForeignKeyField(Field):
 
-class IntForeign(Field):
+    def __init__(self, name, **options):
+        self.validators = [IntegerValidator(), SQLiteForeign(**options)]
+        super(ForeignKeyField, self).__init__(name, **options)
+
+
+class IntForeign(ForeignKeyField):
 
     """
     A type of integer and a Foreign key to check
     """
 
     base_type = int
-
-
-
-    def __init__(self, name, **options):
-        self.validators = [IntegerValidator(), SQLiteForeign(**options)]
-        super(IntForeign, self).__init__(name, **options)
-        
-
 
 
 class StringPkField(PkField):

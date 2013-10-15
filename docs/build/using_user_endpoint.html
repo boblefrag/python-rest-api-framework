@@ -65,7 +65,12 @@ Content-Length: 44
 Server: Werkzeug/0.8.3 Python/2.7.2
 Date: Tue, 15 Oct 2013 11:13:44 GMT
 
-<span class="o">{</span><span class="s2">&quot;meta&quot;</span>: <span class="o">{</span><span class="s2">&quot;filters&quot;</span>: <span class="o">{}}</span>, <span class="s2">&quot;object_list&quot;</span>: <span class="o">[]}</span>
+<span class="o">{</span>
+<span class="s2">&quot;meta&quot;</span>: <span class="o">{</span>
+    <span class="s2">&quot;filters&quot;</span>: <span class="o">{}</span>
+<span class="o">}</span>,
+<span class="s2">&quot;object_list&quot;</span>: <span class="o">[]</span>
+<span class="o">}</span>
 </pre></div>
 </div>
 <p>Your endpoint is responding but does not have any data. Let&#8217;s add
@@ -96,7 +101,12 @@ Content-Length: 51
 Server: Werkzeug/0.8.3 Python/2.7.2
 Date: Mon, 14 Oct 2013 16:53:19 GMT
 
-<span class="o">{</span><span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;John&quot;</span>, <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;Doe&quot;</span>, <span class="s2">&quot;id&quot;</span>: 1, <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/1/&quot;</span><span class="o">}</span>
+<span class="o">{</span>
+<span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;John&quot;</span>,
+<span class="s2">&quot;id&quot;</span>: 1,
+<span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;Doe&quot;</span>,
+<span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/1/&quot;</span>
+<span class="o">}</span>
 </pre></div>
 </div>
 <p>You can see that ressource_uri was not part of the ressource. It have

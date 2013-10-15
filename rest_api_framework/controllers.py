@@ -215,8 +215,13 @@ class ApiController(WSGIWrapper):
 
         """
         obj = self.datastore.get(identifier=identifier)
+        data = json.loads(request.data)
+        if self.formaters:
+            for formater in self.formaters:
+                data[formater["field"]] = formater[
+                    "function"](data[formater["field"]])
         try:
-            obj = self.datastore.update(obj, json.loads(request.data))
+            obj = self.datastore.update(obj, data)
         except ValueError:
             raise BadRequest
 

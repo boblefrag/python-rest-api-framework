@@ -1,0 +1,190 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Show data to users &mdash; Python Rest Api Framework 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Python Rest Api Framework 0.1 documentation" href="index.html" />
+    <link rel="up" title="Tutorial building an adressebook API" href="tutorial.html" />
+    <link rel="next" title="Linking ressource together" href="related_ressources.html" />
+    <link rel="prev" title="Adding validators to your DataStore" href="adding_validator_datastore.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="related_ressources.html" title="Linking ressource together"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="adding_validator_datastore.html" title="Adding validators to your DataStore"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li>
+          <li><a href="tutorial.html" accesskey="U">Tutorial building an adressebook API</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="show-data-to-users">
+<h1>Show data to users<a class="headerlink" href="#show-data-to-users" title="Permalink to this headline">¶</a></h1>
+<p>The view you have used so far just added a ressource_uri. But preserve
+the id attribut. As id is an internal representation of the data you
+may wich to remove it.</p>
+<div class="section" id="define-a-formater-function">
+<h2>Define a formater function<a class="headerlink" href="#define-a-formater-function" title="Permalink to this headline">¶</a></h2>
+<p>To do so you&#8217;ll have to write a simple function to plug on the
+view. This function is a formater. When the View instanciate the
+formater, it give you access to the response object and the object to
+be rendered.</p>
+<p>Because you want to remove the id of the reprensentaion of your
+ressource, you can write:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">remove_id</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+    <span class="n">obj</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&quot;id&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">obj</span>
+</pre></div>
+</div>
+<p>and change the view part of your UserEndPoint as follow:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">view</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;response_class&quot;</span><span class="p">:</span> <span class="n">JsonResponse</span><span class="p">,</span>
+        <span class="s">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;formaters&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;add_ressource_uri&quot;</span><span class="p">,</span>
+        <span class="n">remove_id</span><span class="p">]}}</span>
+</pre></div>
+</div>
+<p>add_ressource_uri is the default formatter for this View. You dont
+need to remove it for now. But if you try, then it will work as
+expected. The ressource_uri field will be removed.</p>
+<p>The idea behind Python REST API Framework is to always get out of
+your way.</p>
+<p>You can check that it work as expected:</p>
+<div class="highlight-bash"><div class="highlight"><pre>curl -i <span class="s2">&quot;http://localhost:5000/users/1/&quot;</span>
+HTTP/1.0 200 OK
+Content-Type: application/json
+Content-Length: 80
+Server: Werkzeug/0.8.3 Python/2.7.2
+Date: Mon, 14 Oct 2013 23:41:55 GMT
+
+<span class="o">{</span><span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;Cap tain&quot;</span>, <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;America&quot;</span>,
+<span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/1/&quot;</span><span class="o">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="make-things-generics">
+<h2>Make things generics<a class="headerlink" href="#make-things-generics" title="Permalink to this headline">¶</a></h2>
+<p>This implementation work on your endpoint because you each object has
+an id. But, if later you create another endpoint with ressources
+lacking the &#8220;id&#8221; key, you&#8217;ll have to re-write your function.</p>
+<p>Instead, you can take advantage of the response wich is part of the
+parameters of your function.</p>
+<p>response object carry the attribut model who define your ressources
+fields. You can then get the name of the Pk field used with this
+ressource with:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">response</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">pk_field</span><span class="o">.</span><span class="n">name</span>
+</pre></div>
+</div>
+<p>Your code then become:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">remove_id</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+    <span class="n">obj</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">pk_field</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">obj</span>
+</pre></div>
+</div>
+<p>And reuse this formatter as long as you need</p>
+<p>Next <a class="reference internal" href="related_ressources.html"><em>Linking ressource together</em></a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Show data to users</a><ul>
+<li><a class="reference internal" href="#define-a-formater-function">Define a formater function</a></li>
+<li><a class="reference internal" href="#make-things-generics">Make things generics</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="adding_validator_datastore.html"
+                        title="previous chapter">Adding validators to your DataStore</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="related_ressources.html"
+                        title="next chapter">Linking ressource together</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/representing_data.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="related_ressources.html" title="Linking ressource together"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="adding_validator_datastore.html" title="Adding validators to your DataStore"
+             >previous</a> |</li>
+        <li><a href="index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li>
+          <li><a href="tutorial.html" >Tutorial building an adressebook API</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Yohann Gabory.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

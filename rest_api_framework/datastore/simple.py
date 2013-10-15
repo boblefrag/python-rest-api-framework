@@ -1,6 +1,7 @@
 """
 Define a sample datastore based on a list of python dict: PythonListDataStore
 """
+import copy
 from .base import DataStore
 from rest_api_framework import models
 from werkzeug.exceptions import NotFound, BadRequest
@@ -23,7 +24,7 @@ class PythonListDataStore(DataStore):
         """
         for elem in self.data:
             if elem[self.model.pk_field.name] == identifier:
-                return elem
+                return copy.deepcopy(elem)
         raise NotFound
 
     def filter(self, **kwargs):
@@ -33,7 +34,10 @@ class PythonListDataStore(DataStore):
                 data = [elem for elem in data if elem[k] == v]
             except KeyError:
                 pass
-        return data
+        results = []
+        for elem in data:
+            results.append(copy.deepcopy(elem))
+        return results
 
     def get_list(self, offset=0, count=None, **kwargs):
         """
@@ -91,7 +95,7 @@ class PythonListDataStore(DataStore):
                     self.model.pk_field.name]][0]
             self.data[index] = obj
         # return the object
-        return obj
+        return copy.deepcopy(obj)
 
     def delete(self, identifier):
         obj = self.get(identifier)

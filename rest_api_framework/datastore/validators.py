@@ -29,4 +29,5 @@ class UniqueTogether(Validator):
                 query_dict[k] = v
         resp = datastore.get_list(**query_dict)
         if len(resp) > 0:
-            raise BadRequest
+            raise BadRequest("{0} must be unique together".format(
+                    ",".join(self.fields)))

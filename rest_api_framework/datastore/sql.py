@@ -208,12 +208,13 @@ class SQLiteDataStore(DataStore):
                 values.append(v)
         conn = self.get_connector()
         cursor = conn.cursor()
-        update = " ".join(["{0}='{1}'".format(f, v) for f, v in zip(fields,
+        update = " ,".join(["{0}='{1}'".format(f, v) for f, v in zip(fields,
                                                                     values)])
         query = "update {0} set {1}".format(
             self.ressource_config["table"],
             update
             )
+        print query
         cursor.execute(query)
         conn.commit()
         conn.close()

@@ -65,6 +65,7 @@ class TestApiView(TestCase):
                         response_wrapper=BaseResponse)
         resp = client.get("/address/")
         self.assertEqual(resp.status_code, 200)
+        print resp.data
         self.assertIsInstance(json.loads(resp.data), list)
 
     def test_get(self):
@@ -82,7 +83,7 @@ class TestApiView(TestCase):
                            data=json.dumps({'name': 'bob', 'age': 34}))
         self.assertEqual(resp.status_code, 201)
         self.assertEqual(resp.headers['Location'],
-                         "http://localhost/address/100")
+                         "http://localhost/address/100/")
         resp = client.post("/address/",
                            data={"test": datetime.datetime.now()})
         self.assertEqual(resp.status_code, 400)
@@ -247,7 +248,8 @@ class TestPagination(TestCase):
         client = Client(WSGIDispatcher([ApiApp]),
                         response_wrapper=BaseResponse)
         resp = client.get("/address/?offset=2")
-        self.assertEqual(json.loads(resp.data)[0]['id'], 2)
+        self.assertEqual(json.loads(resp.data)[0]['ressource_uri'],
+                         "/address/2/")
 
 
 class TestSQlitePagination(TestCase):

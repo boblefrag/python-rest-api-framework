@@ -47,7 +47,7 @@ class WSGIWrapper(object):
             endpoint, values = adapter.match()
             return getattr(self, endpoint)(request, **values)
         except HTTPException, e:
-            return self.view['response_class'](
+            return self.view(
                 {"error": e.description},
                 status=e.code)
 
@@ -91,10 +91,6 @@ class ApiController(WSGIWrapper):
         super(ApiController, self).__init__(*args, **kwargs)
 
     def render_list(self, objs):
-        for obj in objs:
-            obj['ressource_uri'] = "/{0}/{1}/".format(
-                self.ressource['ressource_name'],
-                obj['id'])
         return objs
 
     def index(self, request):
@@ -134,13 +130,11 @@ class ApiController(WSGIWrapper):
             offset, count = None, None
             request_kwargs = request.values.to_dict()
         filters = request_kwargs
-        return self.view['response_class'](
-            self.render_list(
-                self.datastore.get_list(offset=offset,
-                                        count=count,
-                                        **filters)
-                ),
-            status=200)
+        objs = self.datastore.get_list(offset=offset,
+                                       count=count,
+                                       **filters)
+
+        return self.view(objs=objs, status=200)
 
     def get_list(self, request):
         """
@@ -176,9 +170,8 @@ class ApiController(WSGIWrapper):
         :type request: :class:`werkzeug.wrappers.Request`
         """
         obj = self.datastore.get(identifier=identifier)
-
-        return self.view['response_class'](
-            obj,
+        return self.view(
+            objs=obj,
             status=200)
 
     def create(self, request):
@@ -193,8 +186,8 @@ class ApiController(WSGIWrapper):
         except:
             raise BadRequest()
         response = self.datastore.create(data)
-        return self.view['response_class'](
-            headers={"location": str(response)}, status=201)
+        return self.view(
+            headers={"location": "{0}/".format(str(response))}, status=201)
 
     def update(self, request, identifier):
         """
@@ -206,8 +199,8 @@ class ApiController(WSGIWrapper):
         """
         obj = self.datastore.get(identifier=identifier)
         obj = self.datastore.update(obj, json.loads(request.data))
-        return self.view['response_class'](
-            obj,
+        return self.view(
+            objs=obj,
             status=200)
 
     def delete(self, request, identifier):
@@ -216,7 +209,7 @@ class ApiController(WSGIWrapper):
         :type request: :class:`werkzeug.wrappers.Request`
         """
         self.datastore.delete(identifier=identifier)
-        return self.view['response_class'](status=200)
+        return self.view(status=200)
 
 
 class Controller(ApiController):
@@ -229,18 +222,27 @@ class Controller(ApiController):
     __metaclass__ = ABCMeta
 
     def __init__(self, *args, **kwargs):
+
         self.urls = [
             ('/', 'index', self.controller['list_verbs']),
             ('/<int:identifier>/',
              'unique_uri',
              self.controller['unique_verbs']),
             ]
+
         self.url_map = self.load_urls()
+
         self.datastore = self.ressource['datastore'](
             self.ressource['ressource'],
             self.ressource['model'],
             **self.ressource.get('options', {})
             )
+
+        self.view = self.view['response_class'](
+            self.datastore.model,
+            self.ressource["ressource_name"],
+            **self.view.get('options', {}))
+
         if self.controller.get("options", None):
             self.make_options(self.controller["options"])
 

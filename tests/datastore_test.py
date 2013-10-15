@@ -296,6 +296,14 @@ class SQLiteDataStoreTest(TestCase):
                 {"name": "bob", "age": 34, "id": 34},
                 {"name": "boby mc gee"}
                 ),{"name": "boby mc gee", "age": 34, "id": 34})
+
+        self.assertEqual(
+            store.update(
+                {"name": "bob", "age": 35, "id": 35},
+                {"name": "boby mc gee", "age": 67}
+                ),{"name": "boby mc gee", "age": 67, "id": 35})
+
+
         # adress is not part of the ressource description, it should
         # raise
         self.assertRaises(BadRequest,

@@ -23,7 +23,10 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Python Rest Api Framework 0.1 documentation" href="index.html" /> 
+    <link rel="top" title="Python Rest Api Framework 0.1 documentation" href="index.html" />
+    <link rel="up" title="Tutorial building an adressebook API" href="tutorial.html" />
+    <link rel="next" title="Adding validators to your DataStore" href="adding_validator_datastore.html" />
+    <link rel="prev" title="First Step Building a user endpoint" href="first_step.html" /> 
   </head>
   <body>
     <div class="related">
@@ -35,7 +38,14 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li> 
+        <li class="right" >
+          <a href="adding_validator_datastore.html" title="Adding validators to your DataStore"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="first_step.html" title="First Step Building a user endpoint"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li>
+          <li><a href="tutorial.html" accesskey="U">Tutorial building an adressebook API</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -63,15 +73,107 @@ some:</p>
 <div class="highlight-bash"><div class="highlight"><pre>curl -i -H <span class="s2">&quot;Content-type: application/json&quot;</span> -X POST -d <span class="s1">&#39;{&quot;first_name&quot;:&quot;John&quot;, &quot;last_name&quot;: &quot;Doe&quot;}&#39;</span>  http://localhost:5000/users/
 
 HTTP/1.0 201 CREATED
-Location: http://localhost:5000/users/1
+Location: http://localhost:5000/users/1/
 Content-Type: application/json
 Content-Length: 0
 Server: Werkzeug/0.8.3 Python/2.7.2
 Date: Mon, 14 Oct 2013 13:00:13 GMT
 </pre></div>
 </div>
+<p>If you look carfully at the response, you can see the header
+&#8220;Location&#8221; giving you the ressource uri of the ressource you just
+created. This is usefull if you want to retreive your object. Let&#8217;s
+get a try:</p>
+</div>
+<div class="section" id="list-and-get">
+<h2>List and Get<a class="headerlink" href="#list-and-get" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash"><div class="highlight"><pre>curl -i <span class="s2">&quot;http://localhost:5000/users/1/&quot;</span>
+HTTP/1.0 200 OK
+Content-Type: application/json
+Content-Length: 51
+Server: Werkzeug/0.8.3 Python/2.7.2
+Date: Mon, 14 Oct 2013 16:53:19 GMT
+
+<span class="o">{</span><span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;John&quot;</span>, <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;Doe&quot;</span>, <span class="s2">&quot;id&quot;</span>: 1, <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/1/&quot;</span><span class="o">}</span>
+</pre></div>
+</div>
+<p>You can see that ressource_uri was not part of the ressource. It have
+been added by the View itself. View can add multiple
+metadata, remove or change some fields and so on. More on that in
+<a class="reference internal" href="representing_data.html"><em>Show data to users</em></a></p>
+<p>The list of users is also updated:</p>
+<div class="highlight-bash"><div class="highlight"><pre>curl -i <span class="s2">&quot;http://localhost:5000/users/1/&quot;</span>
+HTTP/1.0 200 OK
+Content-Type: application/json
+Content-Length: 83
+Server: Werkzeug/0.8.3 Python/2.7.2
+Date: Mon, 14 Oct 2013 17:03:00 GMT
+
+<span class="o">[{</span><span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;John&quot;</span>, <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;Doe&quot;</span>, <span class="s2">&quot;id&quot;</span>: 1, <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/1/&quot;</span><span class="o">}]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="delete-a-user">
+<h2>Delete a user<a class="headerlink" href="#delete-a-user" title="Permalink to this headline">¶</a></h2>
+<p>Let&#8217;s add a new user:</p>
+<div class="highlight-bash"><div class="highlight"><pre>curl -i -H <span class="s2">&quot;Content-type: application/json&quot;</span> -X POST -d <span class="s1">&#39;{&quot;first_name&quot;:&quot;Peter&quot;, &quot;last_name&quot;: &quot;Something&quot;}&#39;</span>  http://localhost:5000/users/
+
+HTTP/1.0 201 CREATED
+Location: http://localhost:5000/users/2/
+Content-Type: application/json
+Content-Length: 0
+Server: Werkzeug/0.8.3 Python/2.7.2
+Date: Mon, 14 Oct 2013 13:00:13 GMT
+</pre></div>
+</div>
+<p>and now delete it:</p>
+<div class="highlight-bash"><div class="highlight"><pre>curl -i -X DELETE <span class="s2">&quot;http://localhost:5000/users/2/&quot;</span>
+HTTP/1.0 200 OK
+Content-Type: application/json
+Content-Length: 0
+Server: Werkzeug/0.8.3 Python/2.7.2
+Date: Mon, 14 Oct 2013 20:41:46 GMT
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="update-a-user">
+<h1>Update a User<a class="headerlink" href="#update-a-user" title="Permalink to this headline">¶</a></h1>
+<p>Let&#8217;s go another time to the creation process:</p>
+<div class="highlight-bash"><div class="highlight"><pre>curl -i -H <span class="s2">&quot;Content-type: application/json&quot;</span> -X POST -d <span class="s1">&#39;{&quot;first_name&quot;:&quot;Steve&quot;, &quot;last_name&quot;: &quot;Roger&quot;}&#39;</span>  http://localhost:5000/users/
+HTTP/1.0 201 CREATED
+Location: http://localhost:5000/users/3/
+Content-Type: application/json
+Content-Length: 0
+Server: Werkzeug/0.8.3 Python/2.7.2
+Date: Mon, 14 Oct 2013 20:45:38 GMT
+</pre></div>
+</div>
+<p>But well everybody now that Steve Roger real name is Captain
+America. Let&#8217;s update this user:</p>
+<div class="highlight-bash"><div class="highlight"><pre>curl -i -H <span class="s2">&quot;Content-type: application/json&quot;</span> -X PUT -d <span class="s1">&#39;{&quot;first_name&quot;:&quot;Captain&quot;, &quot;last_name&quot;: &quot;America&quot;}&#39;</span>  http://localhost:5000/users/3/
+HTTP/1.0 200 OK
+Content-Type: application/json
+Content-Length: 58
+Server: Werkzeug/0.8.3 Python/2.7.2
+Date: Mon, 14 Oct 2013 20:57:47 GMT
+</pre></div>
+</div>
+<p>Partial update is also possible:</p>
+<div class="highlight-bash"><div class="highlight"><pre>curl -i -H <span class="s2">&quot;Content-type: application/json&quot;</span> -X PUT -d <span class="s1">&#39;{&quot;first_name&quot;:&quot;Cap tain&quot;}&#39;</span>  http://localhost:5000/users/3/
+HTTP/1.0 200 OK
+Content-Type: application/json
+Content-Length: 59
+Server: Werkzeug/0.8.3 Python/2.7.2
+Date: Mon, 14 Oct 2013 21:08:04 GMT
+</pre></div>
+</div>
 <div class="section" id="error-handling">
-<h3>Error handling<a class="headerlink" href="#error-handling" title="Permalink to this headline">¶</a></h3>
+<h2>Error handling<a class="headerlink" href="#error-handling" title="Permalink to this headline">¶</a></h2>
+<p>Of course, If data is not formated as expected by the API, the base
+error handling take place.</p>
+<div class="section" id="missing-data">
+<h3>Missing data<a class="headerlink" href="#missing-data" title="Permalink to this headline">¶</a></h3>
 <p>If you don&#8217;t provide a last_name, the API will raise a BAD REQUEST
 explaining your error:</p>
 <div class="highlight-bash"><div class="highlight"><pre>curl -i -H <span class="s2">&quot;Content-type: application/json&quot;</span> -X POST -d <span class="s1">&#39;{&quot;first_name&quot;:&quot;John&quot;}&#39;</span>  http://localhost:5000/users/
@@ -85,6 +187,9 @@ Date: Mon, 14 Oct 2013 13:21:10 GMT
 <span class="o">{</span><span class="s2">&quot;error&quot;</span>: <span class="s2">&quot;last_name is missing. Cannot create the ressource&quot;</span><span class="o">}</span>
 </pre></div>
 </div>
+</div>
+<div class="section" id="invalid-data">
+<h3>Invalid Data<a class="headerlink" href="#invalid-data" title="Permalink to this headline">¶</a></h3>
 <p>The same apply if you dont give coherent data:</p>
 <div class="highlight-bash"><div class="highlight"><pre>curl -i -H <span class="s2">&quot;Content-type: application/json&quot;</span> -X POST -d <span class="s1">&#39;{&quot;first_name&quot;:45, &quot;last_name&quot;: &quot;Doe&quot;}&#39;</span>  http://localhost:5000/users/
 
@@ -96,6 +201,13 @@ Date: Mon, 14 Oct 2013 13:24:53 GMT
 <span class="o">{</span><span class="s2">&quot;error&quot;</span>: <span class="s2">&quot;first_name does not validate&quot;</span><span class="o">}</span>
 </pre></div>
 </div>
+<p>however, there is no duplicate check. So you can create as many &#8220;John
+Doe&#8221; you want. This could be a huge problem if your not able to
+validate uniqueness of a user. For the API, this is not a problem
+because each user is uniquely identified by his id.</p>
+<p>If you need to ensure it can be only one John Doe, you must add a
+validator on your datastore.</p>
+<p>Next: <a class="reference internal" href="adding_validator_datastore.html"><em>Adding validators to your DataStore</em></a></p>
 </div>
 </div>
 </div>
@@ -109,14 +221,27 @@ Date: Mon, 14 Oct 2013 13:24:53 GMT
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Playing with the newly created endpoint</a><ul>
-<li><a class="reference internal" href="#create-a-user">Create a user</a><ul>
-<li><a class="reference internal" href="#error-handling">Error handling</a></li>
+<li><a class="reference internal" href="#create-a-user">Create a user</a></li>
+<li><a class="reference internal" href="#list-and-get">List and Get</a></li>
+<li><a class="reference internal" href="#delete-a-user">Delete a user</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#update-a-user">Update a User</a><ul>
+<li><a class="reference internal" href="#error-handling">Error handling</a><ul>
+<li><a class="reference internal" href="#missing-data">Missing data</a></li>
+<li><a class="reference internal" href="#invalid-data">Invalid Data</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="first_step.html"
+                        title="previous chapter">First Step Building a user endpoint</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="adding_validator_datastore.html"
+                        title="next chapter">Adding validators to your DataStore</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/using_user_endpoint.txt"
@@ -148,7 +273,14 @@ Date: Mon, 14 Oct 2013 13:24:53 GMT
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li> 
+        <li class="right" >
+          <a href="adding_validator_datastore.html" title="Adding validators to your DataStore"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="first_step.html" title="First Step Building a user endpoint"
+             >previous</a> |</li>
+        <li><a href="index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li>
+          <li><a href="tutorial.html" >Tutorial building an adressebook API</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

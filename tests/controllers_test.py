@@ -58,7 +58,8 @@ class PartialSQLApp(SQLiteApp):
         }
 
 
-def controller_formater(data):
+def controller_formater(view, data):
+    print view.datastore.model
     data["age"] = int(data["age"])
     return data
 

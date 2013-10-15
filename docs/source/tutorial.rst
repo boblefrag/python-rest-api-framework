@@ -1,5 +1,5 @@
-Tutorial building an adressebook API
-====================================
+Tutorial: building an adressebook API
+=====================================
 
 .. toctree::
    :maxdepth: 2
@@ -10,3 +10,5 @@ Tutorial building an adressebook API
    representing_data
    work_with_pagination
    related_ressources
+   represent_related
+   protect_api

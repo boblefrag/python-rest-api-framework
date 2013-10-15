@@ -26,7 +26,7 @@ What we will try to do in this part of the tutorial is the following:
 
   curl -i -H "Content-type: application/json" -X POST -d
   '{"first_name":"Super", "last_name": "Dupont", "address":
-  "/adress/1/"}'  http://localhost:5000/users/ 
+  "/adress/1/"}'  http://localhost:5000/users/
 
 * Of course, http://localhost:5000/users/?address=/adress/1/" should
   return the users with this address.
@@ -105,3 +105,94 @@ Check the formater
             }
         ]
     }
+
+Formating data for the system
+-----------------------------
+
+Because you hide the internal implementation of your API to your user,
+you have to give him a way to interact with your API.
+
+To do so, you need to create a formater, exactly like you have done
+for the View. But this time you must do it for the View.
+
+.. code-block:: python
+
+    def foreign_keys_format(view, obj):
+        from rest_api_framework.models.fields import ForeignKeyField
+        for f in view.datastore.model.get_fields():
+            if isinstance(f, ForeignKeyField):
+                if obj.get(f.name):
+                    obj[f.name] = int(obj[f.name].split("/")[-2])
+        return obj
+
+and add it to the controller formater. Change the UserEndPoint
+controller:
+
+.. code-block:: python
+
+    controller = {
+        "list_verbs": ["GET", "POST"],
+        "unique_verbs": ["GET", "PUT", "DElETE"],
+        "options": {"pagination": Pagination(20),
+                    "formaters": [foreign_keys_format]}
+        }
+
+Now, each time the endpoint will deal with a data fields corresponding
+to a ForeignKeyField it will retreive the id from the url supplied
+
+"/address/1/" will be translated in 1
+
+Check the Controller translation
+--------------------------------
+
+.. code-block:: bash
+
+    curl -i -H "Content-type: application/json" -X POST -d
+    '{"first_name":"Captain", "last_name": "America", "address":
+    "/adress/1/"}'  http://localhost:5000/users/
+
+
+    HTTP/1.0 201 CREATED
+    Location: http://localhost:5000/users/2/
+    Content-Type: application/json
+    Content-Length: 0
+    Server: Werkzeug/0.8.3 Python/2.7.2
+    Date: Tue, 15 Oct 2013 22:23:43 GMT
+
+.. code-block:: bash
+
+    curl -i http://localhost:5000/users/?address=/adress/1/
+    HTTP/1.0 200 OK
+    Content-Type: application/json
+    Content-Length: 341
+    Server: Werkzeug/0.8.3 Python/2.7.2
+    Date: Tue, 15 Oct 2013 22:33:47 GMT
+
+    {
+        "meta": {
+            "count": 20, 
+            "filters": {
+                "address": 1
+            }, 
+            "next": "null", 
+            "offset": 0, 
+            "previous": "null", 
+            "total_count": 2
+        }, 
+        "object_list": [
+            {
+                "address": "/address/1/", 
+                "first_name": "Super", 
+                "last_name": "Dupont", 
+                "ressource_uri": "/users/1/"
+            }, 
+            {
+                "address": "/address/1/", 
+                "first_name": "Supe", 
+                "last_name": "Dupont", 
+                "ressource_uri": "/users/2/"
+            }
+        ]
+    }
+
+next: :doc:`protect_api`

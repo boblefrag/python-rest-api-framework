@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Authentication and Authorization: Protecting your API &mdash; Python Rest Api Framework 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Python Rest Api Framework 0.1 documentation" href="index.html" />
+    <link rel="up" title="Tutorial: building an adressebook API" href="tutorial.html" />
+    <link rel="prev" title="Representing relations" href="represent_related.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="represent_related.html" title="Representing relations"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li>
+          <li><a href="tutorial.html" accesskey="U">Tutorial: building an adressebook API</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="authentication-and-authorization-protecting-your-api">
+<h1>Authentication and Authorization: Protecting your API<a class="headerlink" href="#authentication-and-authorization-protecting-your-api" title="Permalink to this headline">¶</a></h1>
+<p>Authentication and Authorization are different topics as you can
+implement Authentication without Authorization (For rate-limiting or
+loggin for example).</p>
+<div class="section" id="authentication">
+<h2>Authentication<a class="headerlink" href="#authentication" title="Permalink to this headline">¶</a></h2>
+<p>The fist thing you can do is to add an Authentication
+backend. Authentication backend needs a datastore to retreive the user
+accessing the API. This datastore can be used by another endpoint of
+your API or a datastore aimed for this purpose only.</p>
+<p>In this example, we will use a very simple datastore, meant for
+testing purpose: the PythonListDataStore.</p>
+</div>
+<div class="section" id="define-a-backend">
+<h2>Define a backend<a class="headerlink" href="#define-a-backend" title="Permalink to this headline">¶</a></h2>
+<p>The PythonListDataStore is just a list of python dictionnary. So let&#8217;s
+first create this list:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">ressource</span> <span class="o">=</span> <span class="p">[{</span><span class="s">&quot;accesskey&quot;</span><span class="p">:</span> <span class="s">&quot;hackme&quot;</span><span class="p">,</span> <span class="s">&quot;accesskey&quot;</span><span class="p">:</span> <span class="s">&quot;nopassword&quot;</span><span class="p">}]</span>
+</pre></div>
+</div>
+<p>Like any other datastore, you need a Model to describe your datastore:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">KeyModel</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">models</span><span class="o">.</span><span class="n">StringPkField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;id&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="p">]</span>
+</pre></div>
+</div>
+<p>Then you can instanciate your datastore:</p>
+<p>from rest_api_framework.datastore import PythonListDataStore</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">datastore</span> <span class="o">=</span> <span class="n">PythonListDataStore</span><span class="p">(</span><span class="n">ressources</span><span class="p">,</span> <span class="n">KeyModel</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="instanciate-the-authentication-backend">
+<h2>Instanciate the Authentication backend<a class="headerlink" href="#instanciate-the-authentication-backend" title="Permalink to this headline">¶</a></h2>
+<p>To keep this example simple we will use another testing tool, the
+ApiKeyAuthentication</p>
+<p>ApiKeyAuthentication will inspect the query for an &#8220;apikey&#8221;
+parameter. If the &#8220;apikey&#8221; correspond to an existing object in the
+datastore, it will return this object. Otherwise, the user is
+anonymous.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">rest_api_framework.authentication</span> <span class="kn">import</span> <span class="n">ApiKeyAuthentication</span>
+<span class="n">authentication</span> <span class="o">=</span> <span class="n">ApiKeyAuthentication</span><span class="p">(</span><span class="n">datastore</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Then you can plug this authentication backend to your endpoint:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">controller</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&quot;list_verbs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;POST&quot;</span><span class="p">],</span>
+    <span class="s">&quot;unique_verbs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;PUT&quot;</span><span class="p">,</span> <span class="s">&quot;DElETE&quot;</span><span class="p">],</span>
+    <span class="s">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;pagination&quot;</span><span class="p">:</span> <span class="n">Pagination</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span>
+                <span class="s">&quot;formaters&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">foreign_keys_format</span><span class="p">],</span>
+                <span class="s">&quot;authentication&quot;</span><span class="p">:</span> <span class="n">authentication</span><span class="p">,}</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Authentication and Authorization: Protecting your API</a><ul>
+<li><a class="reference internal" href="#authentication">Authentication</a></li>
+<li><a class="reference internal" href="#define-a-backend">Define a backend</a></li>
+<li><a class="reference internal" href="#instanciate-the-authentication-backend">Instanciate the Authentication backend</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="represent_related.html"
+                        title="previous chapter">Representing relations</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/protect_api.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="represent_related.html" title="Representing relations"
+             >previous</a> |</li>
+        <li><a href="index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li>
+          <li><a href="tutorial.html" >Tutorial: building an adressebook API</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Yohann Gabory.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

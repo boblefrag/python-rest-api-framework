@@ -28,7 +28,7 @@ It also implement:
 
 * PAGINATION
 * AUTHENTICATION
-* TROOTLING (comming soon)
+* RATE-LIMIT
 * DATA VALIDATION
 * ...
 

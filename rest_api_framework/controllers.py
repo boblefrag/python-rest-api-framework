@@ -133,8 +133,7 @@ class ApiController(WSGIWrapper):
         filters = request_kwargs
         if self.formaters:
             for formater in self.formaters:
-                if filters.get(formater["field"], None):
-                    filters  = formater(filters)
+                filters  = formater(self, filters)
 
         objs = self.datastore.get_list(offset=offset,
                                        count=count,
@@ -203,7 +202,7 @@ class ApiController(WSGIWrapper):
             raise BadRequest()
         if self.formaters:
             for formater in self.formaters:
-                data = formater(data)
+                data = formater(self, data)
         response = self.datastore.create(data)
 
         return self.view(
@@ -221,7 +220,7 @@ class ApiController(WSGIWrapper):
         data = json.loads(request.data)
         if self.formaters:
             for formater in self.formaters:
-                data = formater(data)
+                data = formater(self, data)
 
         try:
             obj = self.datastore.update(obj, data)

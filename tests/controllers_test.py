@@ -59,7 +59,7 @@ class PartialSQLApp(SQLiteApp):
 
 
 def controller_formater(data):
-    data["age"] = int(data)
+    data["age"] = int(data["age"])
     return data
 
 
@@ -67,8 +67,9 @@ class FormatedApp(ApiApp):
     controller = {
         "list_verbs": ["GET", "POST"],
         "unique_verbs": ["GET", "PUT", "DElETE"],
-        "options": {"formaters": [{"function": controller_formater,
-                                   "field": "age"}]}
+        "options": {"formaters": [controller_formater,
+                                  ]
+                    }
         }
 
 

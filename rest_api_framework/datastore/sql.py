@@ -59,7 +59,10 @@ class SQLiteDataStore(DataStore):
         conn.commit()
         conn.close()
         self.fields = self.model.get_fields()
- 
+        for field in self.fields:
+            print field.options
+
+
     def create_database(self, cursor, table):
         statement = []
         for field in self.model.get_fields():

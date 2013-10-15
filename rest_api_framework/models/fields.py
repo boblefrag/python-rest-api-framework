@@ -3,7 +3,8 @@ Fields type used with models
 """
 
 from abc import ABCMeta
-from .validators import IntegerValidator, StringValidator, FloatValidator
+from .validators import (IntegerValidator, StringValidator,
+                         FloatValidator, SQLiteForeign)
 
 
 class Field(object):
@@ -17,6 +18,7 @@ class Field(object):
     def __init__(self, name, **options):
         self.name = name
         self.options = options
+
 
 
 class IntegerField(Field):
@@ -47,13 +49,29 @@ class PkField(Field):
     validators = []
 
 
+class IntForeign(Field):
+
+    """
+    A type of integer and a Foreign key to check
+    """
+
+    base_type = int
+
+
+
+    def __init__(self, name, **options):
+        self.validators = [IntegerValidator(), SQLiteForeign(**options)]
+        super(IntForeign, self).__init__(name, **options)
+        
+
+
+
 class StringPkField(PkField):
     """
     A string based PkField
     """
-    base_type = str
+    base_type = basestring
     validators = []
-
 
 class TimestampField(Field):
     """

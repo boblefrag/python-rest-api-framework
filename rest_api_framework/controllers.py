@@ -197,6 +197,7 @@ class ApiController(WSGIWrapper):
         except:
             raise BadRequest()
         response = self.datastore.create(data)
+
         return self.view(
             headers={"location": "{0}/".format(str(response))}, status=201)
 

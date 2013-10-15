@@ -48,7 +48,9 @@ class SQLiteDataStore(DataStore):
                }
 
     def __init__(self, ressource_config, model, **options):
-        self.table = ressource_config["name"]
+
+        self.db = ressource_config["name"]
+        conn = sqlite3.connect(ressource_config["name"])
         conn = sqlite3.connect(ressource_config["name"])
         cursor = conn.cursor()
         table = ressource_config["table"]
@@ -59,9 +61,6 @@ class SQLiteDataStore(DataStore):
         conn.commit()
         conn.close()
         self.fields = self.model.get_fields()
-        for field in self.fields:
-            print field.options
-
 
     def create_database(self, cursor, table):
         statement = []
@@ -70,18 +69,27 @@ class SQLiteDataStore(DataStore):
             if isinstance(field, PkField):
                 query += " primary key autoincrement"
             statement.append(query)
+            if "required" in field.options and field.options['required'] is True:
+                query += " NOT NULL"
         fields = ", ".join(statement)
+        for field in self.model.get_fields():
+
+            if "foreign" in field.options:
+                fields += ",FOREIGN KEY ({0}) REFERENCES {1}({2})".format(
+                    field.name, field.options["foreign"]["table"],
+                    field.options["foreign"]["column"]
+                    )
 
         sql = 'create table if not exists {0} ({1})'.format(table, fields)
         cursor.execute(sql)
 
-
     def get_connector(self):
         """
         return a sqlite3 connection to communicate with the table
-        define in self.table
+        define in self.db
         """
-        conn = sqlite3.connect(self.table)
+        conn = sqlite3.connect(self.db)
+        conn.execute('pragma foreign_keys=on')
         return conn
 
     def filter(self, **kwargs):

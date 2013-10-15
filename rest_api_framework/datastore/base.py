@@ -132,9 +132,9 @@ class DataStore(object):
 
         Used to create new ressources
         """
-
         if not isinstance(data, dict):
             raise BadRequest()
+
         for field in self.model.fields:
             for validator in field.validators:
                 if not field.name in data:
@@ -142,10 +142,18 @@ class DataStore(object):
                         "{0} is missing. Cannot create the ressource".format(
                             field.name)
                         )
-                if not validator.validate(data[field.name]):
-                    raise BadRequest("{0} does not validate".format(
-                            field.name)
-                                     )
+
+                if hasattr(validator, "need_datastore"):
+                    if not validator.validate(data[field.name], self):
+                        raise BadRequest("{0} does not validate".format(
+                                field.name)
+                                         )
+                else:
+                    if not validator.validate(data[field.name]):
+                        raise BadRequest("{0} does not validate".format(
+                                field.name)
+                                         )
+
         if self.validators:
             for elem in self.validators:
                 elem.validate(self, data)

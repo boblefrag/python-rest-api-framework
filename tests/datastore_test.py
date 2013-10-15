@@ -16,6 +16,18 @@ class ApiModel(models.Model):
               ]
 
 
+class UserModel(models.Model):
+    fields = [models.StringField(name="first_name", required=True),
+              models.StringField(name="last_name", required=True),
+              models.PkField(name="id"),
+              models.IntForeign(name="address",
+                                 foreign={"table": "address",
+                                          "column": "id",
+                                          }
+                                 )
+              ]
+
+
 class ModelTest(TestCase):
 
     def test_badlyconfigured_model(self):
@@ -279,6 +291,30 @@ class SQLiteDataStoreTest(TestCase):
         self.assertEqual(store.create({"name": "bob", "age": 35}), 2)
         self.assertEqual(store.create({"name": "bob", "age": 34}), 3)
         self.assertEqual(store.get(3)["id"], 3)
+        os.remove("test.db")
+
+    def test_foreign_keys(self):
+        data = {"name": "test.db", "table": "address"}
+        store = SQLiteDataStore(
+            data,
+            ApiModel)
+        self.assertEqual(store.create({"name": "bob", "age": 34}), 1)
+
+        data = {"name": "test.db", "table": "user"}
+        store = SQLiteDataStore(
+            data,
+            UserModel)
+        self.assertEqual(store.create({"last_name": "bob",
+                                       "first_name": "Dick",
+                                       "address": 1}), 1)
+
+        self.assertRaises(BadRequest,
+                          store.create,
+                          {"last_name": "moby",
+                           "first_name": "Dick",
+                           "address": 2}
+                          )
+
         os.remove("test.db")
 
     def test_update(self):

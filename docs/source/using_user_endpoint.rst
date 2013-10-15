@@ -9,9 +9,11 @@ First you can check that your endpoint is up
 
     HTTP/1.0 200 OK
     Content-Type: application/json
-    Content-Length: 2
+    Content-Length: 44
     Server: Werkzeug/0.8.3 Python/2.7.2
-    Date: Mon, 14 Oct 2013 12:52:22 GMT
+    Date: Tue, 15 Oct 2013 11:13:44 GMT
+
+    {"meta": {"filters": {}}, "object_list": []}
 
 Your endpoint is responding but does not have any data. Let's add
 some:
@@ -59,14 +61,14 @@ The list of users is also updated:
 
 .. code-block:: bash
 
-    curl -i "http://localhost:5000/users/1/"
+    curl -i "http://localhost:5000/users/"
     HTTP/1.0 200 OK
     Content-Type: application/json
     Content-Length: 83
     Server: Werkzeug/0.8.3 Python/2.7.2
     Date: Mon, 14 Oct 2013 17:03:00 GMT
 
-    [{"first_name": "John", "last_name": "Doe", "id": 1, "ressource_uri": "/users/1/"}]
+    {"meta": {"filters": {}}, "object_list": [{"first_name": "John", "last_name": "Doe", "id": 1, "ressource_uri": "/users/1/"}]}
 
 Delete a user
 -------------
@@ -94,8 +96,35 @@ and now delete it:
     Server: Werkzeug/0.8.3 Python/2.7.2
     Date: Mon, 14 Oct 2013 20:41:46 GMT
 
+You can check that the user no longer exists:
+
+.. code-block:: bash
+
+    curl -i "http://localhost:5000/users/2/"
+    HTTP/1.0 404 NOT FOUND
+    Content-Type: application/json
+    Connection: close
+    Server: Werkzeug/0.8.3 Python/2.7.2
+    Date: Tue, 15 Oct 2013 11:16:33 GMT
+
+    {"error": "<p>The requested URL was not found on the server.</p><p>If you entered the URL manually please check your spelling and try again.</p>"}
+
+And the list is also updated:
+
+.. code-block:: bash
+
+    curl -i "http://localhost:5000/users/"
+    HTTP/1.0 200 OK
+    Content-Type: application/json
+    Content-Length: 125
+    Server: Werkzeug/0.8.3 Python/2.7.2
+    Date: Tue, 15 Oct 2013 11:17:46 GMT
+
+    {"meta": {"filters": {}}, "object_list": [{"first_name": "John", "last_name": "Doe", "id": 1, "ressource_uri": "/users/1/"}]}
+
+
 Update a User
-=============
+-------------
 
 Let's go another time to the creation process:
 
@@ -114,24 +143,63 @@ America. Let's update this user:
 
 .. code-block:: bash
 
-    curl -i -H "Content-type: application/json" -X PUT -d '{"first_name":"Captain", "last_name": "America"}'  http://localhost:5000/users/3/
+    curl -i -H "Content-type: application/json" -X PUT -d '{"first_name":"Capitain", "last_name": "America"}'  http://localhost:5000/users/3/
     HTTP/1.0 200 OK
     Content-Type: application/json
     Content-Length: 58
     Server: Werkzeug/0.8.3 Python/2.7.2
     Date: Mon, 14 Oct 2013 20:57:47 GMT
 
-Partial update is also possible:
+    {"first_name": "Capitain", "last_name": "America", "id": 3, "ressource_uri": "/users/3/"}
+
+Argh! Thats a typo. the fist name is "Captain", not "Capitain". Let's
+correct this:
 
 .. code-block:: bash
 
-    curl -i -H "Content-type: application/json" -X PUT -d '{"first_name":"Cap tain"}'  http://localhost:5000/users/3/
+    curl -i -H "Content-type: application/json" -X PUT -d '{"first_name":"Captain"}'  http://localhost:5000/users/3/
     HTTP/1.0 200 OK
     Content-Type: application/json
     Content-Length: 59
     Server: Werkzeug/0.8.3 Python/2.7.2
     Date: Mon, 14 Oct 2013 21:08:04 GMT
 
+    {"first_name": "Captain", "last_name": "America", "id": 3, "ressource_uri": "/users/3/"}
+
+
+Filtering
+---------
+
+Ressources can be filtered easily using parameters:
+
+.. code-block:: bash
+
+    curl -i "http://localhost:5000/users/?last_name=America"
+    HTTP/1.0 200 OK
+    Content-Type: application/json
+    Content-Length: 236
+    Server: Werkzeug/0.8.3 Python/2.7.2
+    Date: Tue, 15 Oct 2013 12:07:21 GMT
+
+    {"meta": {"filters": {"last_name": "America"}}, "object_list":
+    [{"first_name": "Joe", "last_name": "America", "id": 1,
+    "ressource_uri": "/users/1/"}, {"first_name": "Bob", "last_name":
+    "America", "id": 3, "ressource_uri": "/users/3/"}]
+
+Multiple filters are allowed:
+
+.. code-block:: bash
+
+    curl -i "http://localhost:5000/users/?last_name=America&first_name=Joe"
+    HTTP/1.0 200 OK
+    Content-Type: application/json
+    Content-Length: 171
+    Server: Werkzeug/0.8.3 Python/2.7.2
+    Date: Tue, 15 Oct 2013 12:09:32 GMT
+
+    {"meta": {"filters": {"first_name": "Joe", "last_name": "America"}},
+    "object_list": [{"first_name": "Joe", "last_name": "America", "id": 1,
+    "ressource_uri": "/users/1/"}]}
 
 Error handling
 --------------

@@ -28,18 +28,31 @@ class JsonResponse(object):
 
     def __call__(self, *args, **kwargs):
 
+        meta = None
+
+        if "meta" in kwargs:
+            meta = kwargs.pop("meta")
+
         if "objs" in kwargs:
             objs = self.format(kwargs.pop('objs'))
-            return Response(json.dumps(objs),
+            if meta:
+                response = {"meta": meta,
+                            "object_list": objs}
+            else:
+                response = objs
+            return Response(json.dumps(response),
                             mimetype="application/json",
                             **kwargs)
         else:
-            return Response(*args,
-                             mimetype="application/json",
-                             **kwargs)
+            response = ""
+            if args:
+                response = json.dumps(*args)
+            return Response(response,
+                            mimetype="application/json",
+                            **kwargs)
 
     def make_options(self, **options):
-        print options
+        pass
 
     def format(self, objs):
 

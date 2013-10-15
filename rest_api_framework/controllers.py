@@ -130,11 +130,22 @@ class ApiController(WSGIWrapper):
             offset, count = None, None
             request_kwargs = request.values.to_dict()
         filters = request_kwargs
+
         objs = self.datastore.get_list(offset=offset,
                                        count=count,
                                        **filters)
+        if self.pagination:
+            total = self.datastore.count(**filters)
+            meta = self.pagination.get_metadata(count=count,
+                                                     offset=offset,
+                                                     total=total,
+                                                     **filters)
+        else:
+            meta = {"filters": {}}
+            for k, v in filters.iteritems():
+                meta["filters"][k] = v
 
-        return self.view(objs=objs, status=200)
+        return self.view(objs=objs, meta=meta, status=200)
 
     def get_list(self, request):
         """
@@ -198,7 +209,11 @@ class ApiController(WSGIWrapper):
 
         """
         obj = self.datastore.get(identifier=identifier)
-        obj = self.datastore.update(obj, json.loads(request.data))
+        try:
+            obj = self.datastore.update(obj, json.loads(request.data))
+        except ValueError:
+            raise BadRequest
+
         return self.view(
             objs=obj,
             status=200)

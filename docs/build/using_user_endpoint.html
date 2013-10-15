@@ -61,9 +61,11 @@
 
 HTTP/1.0 200 OK
 Content-Type: application/json
-Content-Length: 2
+Content-Length: 44
 Server: Werkzeug/0.8.3 Python/2.7.2
-Date: Mon, 14 Oct 2013 12:52:22 GMT
+Date: Tue, 15 Oct 2013 11:13:44 GMT
+
+<span class="o">{</span><span class="s2">&quot;meta&quot;</span>: <span class="o">{</span><span class="s2">&quot;filters&quot;</span>: <span class="o">{}}</span>, <span class="s2">&quot;object_list&quot;</span>: <span class="o">[]}</span>
 </pre></div>
 </div>
 <p>Your endpoint is responding but does not have any data. Let&#8217;s add
@@ -102,14 +104,14 @@ been added by the View itself. View can add multiple
 metadata, remove or change some fields and so on. More on that in
 <a class="reference internal" href="representing_data.html"><em>Show data to users</em></a></p>
 <p>The list of users is also updated:</p>
-<div class="highlight-bash"><div class="highlight"><pre>curl -i <span class="s2">&quot;http://localhost:5000/users/1/&quot;</span>
+<div class="highlight-bash"><div class="highlight"><pre>curl -i <span class="s2">&quot;http://localhost:5000/users/&quot;</span>
 HTTP/1.0 200 OK
 Content-Type: application/json
 Content-Length: 83
 Server: Werkzeug/0.8.3 Python/2.7.2
 Date: Mon, 14 Oct 2013 17:03:00 GMT
 
-<span class="o">[{</span><span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;John&quot;</span>, <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;Doe&quot;</span>, <span class="s2">&quot;id&quot;</span>: 1, <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/1/&quot;</span><span class="o">}]</span>
+<span class="o">{</span><span class="s2">&quot;meta&quot;</span>: <span class="o">{</span><span class="s2">&quot;filters&quot;</span>: <span class="o">{}}</span>, <span class="s2">&quot;object_list&quot;</span>: <span class="o">[{</span><span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;John&quot;</span>, <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;Doe&quot;</span>, <span class="s2">&quot;id&quot;</span>: 1, <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/1/&quot;</span><span class="o">}]}</span>
 </pre></div>
 </div>
 </div>
@@ -135,10 +137,31 @@ Server: Werkzeug/0.8.3 Python/2.7.2
 Date: Mon, 14 Oct 2013 20:41:46 GMT
 </pre></div>
 </div>
+<p>You can check that the user no longer exists:</p>
+<div class="highlight-bash"><div class="highlight"><pre>curl -i <span class="s2">&quot;http://localhost:5000/users/2/&quot;</span>
+HTTP/1.0 404 NOT FOUND
+Content-Type: application/json
+Connection: close
+Server: Werkzeug/0.8.3 Python/2.7.2
+Date: Tue, 15 Oct 2013 11:16:33 GMT
+
+<span class="o">{</span><span class="s2">&quot;error&quot;</span>: <span class="s2">&quot;&lt;p&gt;The requested URL was not found on the server.&lt;/p&gt;&lt;p&gt;If you entered the URL manually please check your spelling and try again.&lt;/p&gt;&quot;</span><span class="o">}</span>
+</pre></div>
+</div>
+<p>And the list is also updated:</p>
+<div class="highlight-bash"><div class="highlight"><pre>curl -i <span class="s2">&quot;http://localhost:5000/users/&quot;</span>
+HTTP/1.0 200 OK
+Content-Type: application/json
+Content-Length: 125
+Server: Werkzeug/0.8.3 Python/2.7.2
+Date: Tue, 15 Oct 2013 11:17:46 GMT
+
+<span class="o">{</span><span class="s2">&quot;meta&quot;</span>: <span class="o">{</span><span class="s2">&quot;filters&quot;</span>: <span class="o">{}}</span>, <span class="s2">&quot;object_list&quot;</span>: <span class="o">[{</span><span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;John&quot;</span>, <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;Doe&quot;</span>, <span class="s2">&quot;id&quot;</span>: 1, <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/1/&quot;</span><span class="o">}]}</span>
+</pre></div>
 </div>
 </div>
 <div class="section" id="update-a-user">
-<h1>Update a User<a class="headerlink" href="#update-a-user" title="Permalink to this headline">¶</a></h1>
+<h2>Update a User<a class="headerlink" href="#update-a-user" title="Permalink to this headline">¶</a></h2>
 <p>Let&#8217;s go another time to the creation process:</p>
 <div class="highlight-bash"><div class="highlight"><pre>curl -i -H <span class="s2">&quot;Content-type: application/json&quot;</span> -X POST -d <span class="s1">&#39;{&quot;first_name&quot;:&quot;Steve&quot;, &quot;last_name&quot;: &quot;Roger&quot;}&#39;</span>  http://localhost:5000/users/
 HTTP/1.0 201 CREATED
@@ -151,22 +174,58 @@ Date: Mon, 14 Oct 2013 20:45:38 GMT
 </div>
 <p>But well everybody now that Steve Roger real name is Captain
 America. Let&#8217;s update this user:</p>
-<div class="highlight-bash"><div class="highlight"><pre>curl -i -H <span class="s2">&quot;Content-type: application/json&quot;</span> -X PUT -d <span class="s1">&#39;{&quot;first_name&quot;:&quot;Captain&quot;, &quot;last_name&quot;: &quot;America&quot;}&#39;</span>  http://localhost:5000/users/3/
+<div class="highlight-bash"><div class="highlight"><pre>curl -i -H <span class="s2">&quot;Content-type: application/json&quot;</span> -X PUT -d <span class="s1">&#39;{&quot;first_name&quot;:&quot;Capitain&quot;, &quot;last_name&quot;: &quot;America&quot;}&#39;</span>  http://localhost:5000/users/3/
 HTTP/1.0 200 OK
 Content-Type: application/json
 Content-Length: 58
 Server: Werkzeug/0.8.3 Python/2.7.2
 Date: Mon, 14 Oct 2013 20:57:47 GMT
+
+<span class="o">{</span><span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;Capitain&quot;</span>, <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;America&quot;</span>, <span class="s2">&quot;id&quot;</span>: 3, <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/3/&quot;</span><span class="o">}</span>
 </pre></div>
 </div>
-<p>Partial update is also possible:</p>
-<div class="highlight-bash"><div class="highlight"><pre>curl -i -H <span class="s2">&quot;Content-type: application/json&quot;</span> -X PUT -d <span class="s1">&#39;{&quot;first_name&quot;:&quot;Cap tain&quot;}&#39;</span>  http://localhost:5000/users/3/
+<p>Argh! Thats a typo. the fist name is &#8220;Captain&#8221;, not &#8220;Capitain&#8221;. Let&#8217;s
+correct this:</p>
+<div class="highlight-bash"><div class="highlight"><pre>curl -i -H <span class="s2">&quot;Content-type: application/json&quot;</span> -X PUT -d <span class="s1">&#39;{&quot;first_name&quot;:&quot;Captain&quot;}&#39;</span>  http://localhost:5000/users/3/
 HTTP/1.0 200 OK
 Content-Type: application/json
 Content-Length: 59
 Server: Werkzeug/0.8.3 Python/2.7.2
 Date: Mon, 14 Oct 2013 21:08:04 GMT
+
+<span class="o">{</span><span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;Captain&quot;</span>, <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;America&quot;</span>, <span class="s2">&quot;id&quot;</span>: 3, <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/3/&quot;</span><span class="o">}</span>
 </pre></div>
+</div>
+</div>
+<div class="section" id="filtering">
+<h2>Filtering<a class="headerlink" href="#filtering" title="Permalink to this headline">¶</a></h2>
+<p>Ressources can be filtered easily using parameters:</p>
+<div class="highlight-bash"><div class="highlight"><pre>curl -i <span class="s2">&quot;http://localhost:5000/users/?last_name=America&quot;</span>
+HTTP/1.0 200 OK
+Content-Type: application/json
+Content-Length: 236
+Server: Werkzeug/0.8.3 Python/2.7.2
+Date: Tue, 15 Oct 2013 12:07:21 GMT
+
+<span class="o">{</span><span class="s2">&quot;meta&quot;</span>: <span class="o">{</span><span class="s2">&quot;filters&quot;</span>: <span class="o">{</span><span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;America&quot;</span><span class="o">}}</span>, <span class="s2">&quot;object_list&quot;</span>:
+<span class="o">[{</span><span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;Joe&quot;</span>, <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;America&quot;</span>, <span class="s2">&quot;id&quot;</span>: 1,
+<span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/1/&quot;</span><span class="o">}</span>, <span class="o">{</span><span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;Bob&quot;</span>, <span class="s2">&quot;last_name&quot;</span>:
+<span class="s2">&quot;America&quot;</span>, <span class="s2">&quot;id&quot;</span>: 3, <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/3/&quot;</span><span class="o">}]</span>
+</pre></div>
+</div>
+<p>Multiple filters are allowed:</p>
+<div class="highlight-bash"><div class="highlight"><pre>curl -i <span class="s2">&quot;http://localhost:5000/users/?last_name=America&amp;first_name=Joe&quot;</span>
+HTTP/1.0 200 OK
+Content-Type: application/json
+Content-Length: 171
+Server: Werkzeug/0.8.3 Python/2.7.2
+Date: Tue, 15 Oct 2013 12:09:32 GMT
+
+<span class="o">{</span><span class="s2">&quot;meta&quot;</span>: <span class="o">{</span><span class="s2">&quot;filters&quot;</span>: <span class="o">{</span><span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;Joe&quot;</span>, <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;America&quot;</span><span class="o">}}</span>,
+<span class="s2">&quot;object_list&quot;</span>: <span class="o">[{</span><span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;Joe&quot;</span>, <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;America&quot;</span>, <span class="s2">&quot;id&quot;</span>: 1,
+<span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/1/&quot;</span><span class="o">}]}</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="error-handling">
 <h2>Error handling<a class="headerlink" href="#error-handling" title="Permalink to this headline">¶</a></h2>
@@ -224,9 +283,8 @@ validator on your datastore.</p>
 <li><a class="reference internal" href="#create-a-user">Create a user</a></li>
 <li><a class="reference internal" href="#list-and-get">List and Get</a></li>
 <li><a class="reference internal" href="#delete-a-user">Delete a user</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#update-a-user">Update a User</a><ul>
+<li><a class="reference internal" href="#update-a-user">Update a User</a></li>
+<li><a class="reference internal" href="#filtering">Filtering</a></li>
 <li><a class="reference internal" href="#error-handling">Error handling</a><ul>
 <li><a class="reference internal" href="#missing-data">Missing data</a></li>
 <li><a class="reference internal" href="#invalid-data">Invalid Data</a></li>

@@ -27,3 +27,29 @@ class Pagination(object):
         if count > self.max:
             count = self.max
         return offset, count, request_kwargs
+
+    def get_metadata(self, total=0, offset=0, count=0, **filters):
+        meta = {self.offset_key: offset,
+                self.count_key: count,
+                "total_count": total,
+                "filters": {}
+                }
+        for k, v in filters.iteritems():
+            meta["filters"][k] = v
+        if offset == 0:
+            meta['previous'] = "null"
+        else:
+            meta["previous"] = offset - count
+        if meta["previous"] < 0:
+            meta["previous"] = 0
+        if meta['previous'] != "null":
+            meta["previous"] = "?{0}={1}".format(self.offset_key,
+                                                 meta["previous"])
+
+        meta["next"] = offset + count
+        if meta["next"] > total:
+            meta["next"] = "null"
+        if meta['next'] != "null":
+            meta["next"] = "?{0}={1}".format(self.offset_key,
+                                                 meta["next"])
+        return meta

@@ -346,5 +346,5 @@ is the same as with the PythonListDataStore.
 Where to go from here
 ---------------------
 
-* :doc:`Authentication and Authorization </authentication>`
-* :doc:`multiple_endpoint`
+.. * :doc:`Authentication and Authorization </authentication>`
+.. * :doc:`multiple_endpoint`

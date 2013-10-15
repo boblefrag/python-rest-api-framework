@@ -65,8 +65,7 @@ class TestApiView(TestCase):
                         response_wrapper=BaseResponse)
         resp = client.get("/address/")
         self.assertEqual(resp.status_code, 200)
-        print resp.data
-        self.assertIsInstance(json.loads(resp.data), list)
+        self.assertIsInstance(json.loads(resp.data)["object_list"], list)
 
     def test_get(self):
         client = Client(WSGIDispatcher([ApiApp]),
@@ -230,7 +229,8 @@ class TestPagination(TestCase):
         client = Client(WSGIDispatcher([ApiApp]),
                         response_wrapper=BaseResponse)
         resp = client.get("/address/")
-        self.assertEqual(len(json.loads(resp.data)), 20)
+
+        self.assertEqual(len(json.loads(resp.data)["object_list"]), 20)
 
     def test_base_pagination_count(self):
         client = Client(WSGIDispatcher([ApiApp]),
@@ -242,13 +242,13 @@ class TestPagination(TestCase):
         client = Client(WSGIDispatcher([ApiApp]),
                         response_wrapper=BaseResponse)
         resp = client.get("/address/?count=200")
-        self.assertEqual(len(json.loads(resp.data)), 20)
+        self.assertEqual(len(json.loads(resp.data)["object_list"]), 20)
 
     def test_base_pagination_offset(self):
         client = Client(WSGIDispatcher([ApiApp]),
                         response_wrapper=BaseResponse)
         resp = client.get("/address/?offset=2")
-        self.assertEqual(json.loads(resp.data)[0]['ressource_uri'],
+        self.assertEqual(json.loads(resp.data)["object_list"][0]['ressource_uri'],
                          "/address/2/")
 
 
@@ -261,7 +261,7 @@ class TestSQlitePagination(TestCase):
             client.post("/address/",
                         data=json.dumps({"name": "bob", "age": 34}))
         resp = client.get("/address/")
-        self.assertEqual(len(json.loads(resp.data)), 20)
+        self.assertEqual(len(json.loads(resp.data)["object_list"]), 20)
         os.remove("test.db")
 
     def test_base_pagination_offset(self):
@@ -271,7 +271,7 @@ class TestSQlitePagination(TestCase):
             client.post("/address/",
                         data=json.dumps({"name": "bob", "age": 34}))
         resp = client.get("/address/?offset=2")
-        self.assertEqual(json.loads(resp.data)[0]['id'], 2)
+        self.assertEqual(json.loads(resp.data)["object_list"][0]['id'], 2)
         os.remove("test.db")
 
     def test_base_pagination_count(self):
@@ -292,7 +292,7 @@ class TestSQlitePagination(TestCase):
                         data=json.dumps({"name": "bob", "age": 34}))
         resp = client.get("/address/?count=2&offset=4")
         self.assertEqual(len(json.loads(resp.data)), 2)
-        self.assertEqual(json.loads(resp.data)[0]['id'], 4)
+        self.assertEqual(json.loads(resp.data)["object_list"][0]['id'], 4)
         os.remove("test.db")
 
 
@@ -303,7 +303,7 @@ class TestPartialResponse(TestCase):
                         response_wrapper=BaseResponse)
         resp = client.get("/address/?fields=age")
         # we only want "age". get_list add id, JsonResponse add ressource_uri
-        self.assertEqual(len(json.loads(resp.data)[0].keys()), 3)
+        self.assertEqual(len(json.loads(resp.data)["object_list"][0].keys()), 3)
 
     def test_get_partial_raise(self):
         client = Client(WSGIDispatcher([PartialApiApp]),
@@ -322,8 +322,7 @@ class TestPartialSQLResponse(TestCase):
 
         resp = client.get("/address/?fields=age")
         # we only want "age". get_list add id, JsonResponse add ressource_uri
-        print resp
-        self.assertEqual(len(json.loads(resp.data)[0].keys()), 3)
+        self.assertEqual(len(json.loads(resp.data)["object_list"][0].keys()), 3)
         os.remove("test.db")
 
     def test_get_partial_sql_raise(self):

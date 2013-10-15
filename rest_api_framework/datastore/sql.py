@@ -69,6 +69,7 @@ class SQLiteDataStore(DataStore):
         conn.close()
         self.fields = self.model.get_fields()
 
+
     def get_connector(self):
         """
         return a sqlite3 connection to communicate with the table
@@ -86,6 +87,32 @@ class SQLiteDataStore(DataStore):
         kwargs['query'] += ' FROM {0}'
         return kwargs
 
+    def count(self, **data):
+        cdt = self.build_conditions(data)
+        if len(cdt) == 0:
+            query = "SELECT COUNT (*) FROM {0}".format(
+                self.ressource_config['table'])
+        else:
+            cdt = " AND  ".join(cdt)
+            query = "SELECT COUNT (*) FROM {0} WHERE {1}".format(
+                self.ressource_config['table'],
+                cdt
+                )
+        cursor = self.get_connector().cursor()
+        cursor.execute(query)
+        return cursor.fetchone()[0]
+
+    def build_conditions(self, data):
+        return [
+            ["{0}='{1}'".format(
+                    e[0], e[1]) for e in condition.iteritems()
+             ][0] for condition in self.get_conditions(data)]
+
+    def get_conditions(self, data):
+        return [
+            {k: v} for k, v in data.iteritems() if k not in ["query", "fields"]
+            ]
+
     def paginate(self, data, **kwargs):
         """
         paginate the result of filter using ids limits.  Obviously, to
@@ -93,10 +120,9 @@ class SQLiteDataStore(DataStore):
         receive from the last call on this method. The max number of
         row this method can give back depend on the paginate_by option.
         """
-        print kwargs
+
+        where_query = self.build_conditions(data)
         args = []
-        where_query = [
-            "{0}='{1}'".format(k, v) for k, v in data.iteritems() if k not in ["query", "fields"]]
         limit = kwargs.pop("end", None)
         if kwargs.get("start", None):
             where_query.append(" id >=?")
@@ -105,14 +131,14 @@ class SQLiteDataStore(DataStore):
         if len(where_query) > 0:
             data["query"] += " WHERE "
         data["query"] += " AND ".join(where_query)
+        cursor = self.get_connector().cursor()
 
         # a hook for ordering
         data["query"] += " ORDER BY id ASC"
 
         if limit:
             data["query"] += " LIMIT {0}".format(limit)
-        cursor = self.get_connector().cursor()
-        print data["query"]
+
         cursor.execute(data["query"].format(self.ressource_config['table']),
                        tuple(args)
                        )
@@ -210,11 +236,12 @@ class SQLiteDataStore(DataStore):
         cursor = conn.cursor()
         update = " ,".join(["{0}='{1}'".format(f, v) for f, v in zip(fields,
                                                                     values)])
-        query = "update {0} set {1}".format(
+        query = "update {0} set {1} WHERE {2}={3}".format(
             self.ressource_config["table"],
-            update
+            update,
+            self.model.pk_field.name,
+            obj[self.model.pk_field.name]
             )
-        print query
         cursor.execute(query)
         conn.commit()
         conn.close()

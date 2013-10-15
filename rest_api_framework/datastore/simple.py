@@ -71,6 +71,9 @@ class PythonListDataStore(DataStore):
         self.data.append(obj)
         return obj[self.model.pk_field.name]
 
+    def count(self, **kwargs):
+        return len(self.filter(**kwargs))
+
     def update(self, obj, data):
         """
         Update a single object

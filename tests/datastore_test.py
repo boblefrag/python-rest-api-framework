@@ -244,7 +244,6 @@ class SQLiteDataStoreTest(TestCase):
             ApiModel)
         for i in range(100):
             store.create({"name": "bob", "age": 34})
-        print store.get_list(count=10)
         self.assertEqual(len(store.get_list(count=10)), 10)
         self.assertEqual(store.get_list(count=10)[-1]["id"], 10)
         self.assertEqual(store.get_list(offset=15)[0]["id"], 15)
@@ -279,7 +278,6 @@ class SQLiteDataStoreTest(TestCase):
         self.assertEqual(store.create({"name": "bob", "age": 34}), 1)
         self.assertEqual(store.create({"name": "bob", "age": 35}), 2)
         self.assertEqual(store.create({"name": "bob", "age": 34}), 3)
-        print store.get(3)
         self.assertEqual(store.get(3)["id"], 3)
         os.remove("test.db")
 

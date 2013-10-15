@@ -48,7 +48,7 @@ You can check that it work as expected:
     Server: Werkzeug/0.8.3 Python/2.7.2
     Date: Mon, 14 Oct 2013 23:41:55 GMT
 
-    {"first_name": "Cap tain", "last_name": "America",
+    {"first_name": "Captain", "last_name": "America",
     "ressource_uri": "/users/1/"}
 
 Make things generics
@@ -77,6 +77,11 @@ Your code then become:
         obj.pop(response.model.pk_field.name)
         return obj
 
-And reuse this formatter as long as you need
+And reuse this formatter as long as you need.
 
-Next :doc:`related_ressources`
+Formaters are here to help you build clean and meaningful ressources
+representations. It should hide internal representation of your
+ressources and return all of the fields needed to manipulate and
+represent your data.
+
+Next :doc:`work_with_pagination`

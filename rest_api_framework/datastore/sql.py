@@ -55,6 +55,12 @@ class SQLiteDataStore(DataStore):
         super(SQLiteDataStore, self).__init__({"conn": conn, "table": table},
                                               model,
                                               **options)
+        self.create_database(cursor, table)
+        conn.commit()
+        conn.close()
+        self.fields = self.model.get_fields()
+ 
+    def create_database(self, cursor, table):
         statement = []
         for field in self.model.get_fields():
             query = "{0} {1}".format(field.name, self.wrapper[field.base_type])
@@ -65,9 +71,6 @@ class SQLiteDataStore(DataStore):
 
         sql = 'create table if not exists {0} ({1})'.format(table, fields)
         cursor.execute(sql)
-        conn.commit()
-        conn.close()
-        self.fields = self.model.get_fields()
 
 
     def get_connector(self):

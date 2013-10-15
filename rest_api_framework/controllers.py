@@ -131,6 +131,11 @@ class ApiController(WSGIWrapper):
             offset, count = None, None
             request_kwargs = request.values.to_dict()
         filters = request_kwargs
+        if self.formaters:
+            for formater in self.formaters:
+                if filters.get(formater["field"], None):
+                    filters[formater["field"]] = formater[
+                        "function"](filters[formater["field"]])
 
         objs = self.datastore.get_list(offset=offset,
                                        count=count,

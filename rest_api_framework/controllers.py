@@ -134,8 +134,7 @@ class ApiController(WSGIWrapper):
         if self.formaters:
             for formater in self.formaters:
                 if filters.get(formater["field"], None):
-                    filters[formater["field"]] = formater[
-                        "function"](filters[formater["field"]])
+                    filters  = formater(filters)
 
         objs = self.datastore.get_list(offset=offset,
                                        count=count,
@@ -204,8 +203,7 @@ class ApiController(WSGIWrapper):
             raise BadRequest()
         if self.formaters:
             for formater in self.formaters:
-                data[formater["field"]] = formater[
-                    "function"](data[formater["field"]])
+                data = formater(data)
         response = self.datastore.create(data)
 
         return self.view(
@@ -223,8 +221,8 @@ class ApiController(WSGIWrapper):
         data = json.loads(request.data)
         if self.formaters:
             for formater in self.formaters:
-                data[formater["field"]] = formater[
-                    "function"](data[formater["field"]])
+                data = formater(data)
+
         try:
             obj = self.datastore.update(obj, data)
         except ValueError:

@@ -59,7 +59,8 @@ class PartialSQLApp(SQLiteApp):
 
 
 def controller_formater(data):
-    return int(data)
+    data["age"] = int(data)
+    return data
 
 
 class FormatedApp(ApiApp):

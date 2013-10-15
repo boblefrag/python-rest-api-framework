@@ -106,4 +106,10 @@ Check the formater
         ]
     }
 
-Formati
+Formating data for the system
+-----------------------------
+
+Because you hide the internal implementation of your API to your user,
+you have to give him a way to interact with your API.
+
+To do so, you need to create a 

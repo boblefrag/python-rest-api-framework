@@ -125,3 +125,5 @@ Let's give a try:
     Content-Length: 350
     Server: Werkzeug/0.8.3 Python/2.7.2
     Date: Wed, 16 Oct 2013 12:19:45 GMT
+
+next: :doc:`rate-limit`

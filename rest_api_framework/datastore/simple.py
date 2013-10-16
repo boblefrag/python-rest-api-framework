@@ -59,15 +59,17 @@ class PythonListDataStore(DataStore):
         self.validate(data)
         obj = {}
         for k, v in data.iteritems():
-            if k in self.model.get_fields():
+            if k in self.model.get_fields_name():
                 obj[k] = v
-
         for field in self.model.get_fields():
             if isinstance(field, models.PkField):
-                self.data.sort(lambda a, b: a[field.name] > b[field.name])
-                last = self.data[-1][field.name]
-                obj[field.name] = last + 1
-
+                if field.base_type == "integer":
+                    self.data.sort(lambda a, b: a[field.name] > b[field.name])
+                    if len(self.data) == 0:
+                        obj[field.name] = 1
+                    else:
+                        last = self.data[-1][field.name]
+                        obj[field.name] = last + 1
         self.data.append(obj)
         return obj[self.model.pk_field.name]
 

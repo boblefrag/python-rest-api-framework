@@ -12,3 +12,4 @@ Tutorial: building an adressebook API
    related_ressources
    represent_related
    protect_api
+   rate-limit

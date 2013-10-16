@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Implementing Partial Response &mdash; Python Rest Api Framework 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Python Rest Api Framework 0.1 documentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="implementing-partial-response">
+<h1>Implementing Partial Response<a class="headerlink" href="#implementing-partial-response" title="Permalink to this headline">¶</a></h1>
+<p>You can give your user the ability to retreive only the data they need
+instead of all of an object representation. For the adress field, some
+can want to retreive only the country and the city field but do not
+care about the others.</p>
+<p>with Python REST API Framework, it&#8217;s easy to make this happend.</p>
+<p>First import the Partial base class:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">rest_api_framework.partials</span> <span class="kn">import</span> <span class="n">Partial</span>
+</pre></div>
+</div>
+<p>Then add the partial option to the AddressEndPoint:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">AddressEndPoint</span><span class="p">(</span><span class="n">UserEndPoint</span><span class="p">):</span>
+    <span class="n">ressource</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&quot;ressource_name&quot;</span><span class="p">:</span> <span class="s">&quot;address&quot;</span><span class="p">,</span>
+        <span class="s">&quot;ressource&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="s">&quot;adress_book.db&quot;</span><span class="p">,</span> <span class="s">&quot;table&quot;</span><span class="p">:</span> <span class="s">&quot;address&quot;</span><span class="p">},</span>
+        <span class="s">&quot;model&quot;</span><span class="p">:</span> <span class="n">AddressModel</span><span class="p">,</span>
+        <span class="s">&quot;datastore&quot;</span><span class="p">:</span> <span class="n">SQLiteDataStore</span><span class="p">,</span>
+        <span class="s">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;partial&quot;</span><span class="p">:</span> <span class="n">Partial</span><span class="p">()}</span>
+        <span class="p">}</span>
+</pre></div>
+</div>
+<div class="section" id="test-the-partial">
+<h2>Test the Partial<a class="headerlink" href="#test-the-partial" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash"><div class="highlight"><pre>curl -i -X GET <span class="s2">&quot;http://localhost:5000/address/?accesskey=hackme&amp;fields=city,country&quot;</span>
+HTTP/1.0 200 OK
+Content-Type: application/json
+Content-Length: 241
+Server: Werkzeug/0.8.3 Python/2.7.2
+Date: Wed, 16 Oct 2013 15:50:27 GMT
+
+<span class="o">{</span>
+    <span class="s2">&quot;meta&quot;</span>: <span class="o">{</span>
+        <span class="s2">&quot;count&quot;</span>: 20,
+        <span class="s2">&quot;filters&quot;</span>: <span class="o">{</span>
+            <span class="s2">&quot;accesskey&quot;</span>: <span class="s2">&quot;hackme&quot;</span>,
+            <span class="s2">&quot;fields&quot;</span>: <span class="s2">&quot;city,country&quot;</span>
+        <span class="o">}</span>,
+        <span class="s2">&quot;next&quot;</span>: <span class="s2">&quot;null&quot;</span>,
+        <span class="s2">&quot;offset&quot;</span>: 0,
+        <span class="s2">&quot;previous&quot;</span>: <span class="s2">&quot;null&quot;</span>,
+        <span class="s2">&quot;total_count&quot;</span>: 1
+    <span class="o">}</span>,
+    <span class="s2">&quot;object_list&quot;</span>: <span class="o">[</span>
+        <span class="o">{</span>
+            <span class="s2">&quot;city&quot;</span>: <span class="s2">&quot;Paris&quot;</span>,
+            <span class="s2">&quot;country&quot;</span>: <span class="s2">&quot;France&quot;</span>,
+            <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/address/1/&quot;</span>
+        <span class="o">}</span>
+    <span class="o">]</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>next: <a class="reference internal" href="wole_application.html"><em>The application you have done so far</em></a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Implementing Partial Response</a><ul>
+<li><a class="reference internal" href="#test-the-partial">Test the Partial</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/partial-response.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Yohann Gabory.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

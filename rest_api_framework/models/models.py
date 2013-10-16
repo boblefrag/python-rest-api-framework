@@ -27,7 +27,6 @@ class Model(object):
         fields = self.get_fields()
         response = {}
         for field in fields:
-            print field == self.pk_field
             if field == self.pk_field:
                 continue
             response[field.name] = {"type": str(field.base_type),

@@ -53,7 +53,6 @@ class ApiKeyAuthentication(Authentication):
         data = request.values.to_dict()
         if self.identifier in data:
             try:
-                print data[self.identifier]
                 user = self.datastore.get(data[self.identifier])
                 return user
             except NotFound:

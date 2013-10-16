@@ -1,7 +1,7 @@
 """
 Handle the rate limit option for a Controller.
 """
-from werkzeug.exceptions import Unauthorized, HTTPException
+from werkzeug.exceptions import Unauthorized, HTTPException, NotFound
 from werkzeug._internal import HTTP_STATUS_CODES
 import time
 
@@ -30,6 +30,7 @@ class RateLimit(object):
         self.interval = interval
         self.quota = quota
 
+
     def __call__(self, authentication):
         self.authentication = authentication
         return self
@@ -46,7 +47,20 @@ class RateLimit(object):
         """
         user = self.authentication.get_user(request)
         if user:
-            quota = self.datastore.get(user['id'])
+            user_pk = user[self.authentication.datastore.model.pk_field.name]
+            try:
+                quota = self.datastore.get_list(
+                    **{self.datastore.model.pk_field.name: user_pk})[0]
+            except IndexError:
+                dico = {self.datastore.model.pk_field.name: user_pk,
+                        "quota": self.quota,
+                        "last_request": 0.0
+                        }
+                self.datastore.create(
+                    dico
+                    )
+                quota = self.datastore.get_list(
+                    **{self.datastore.model.pk_field.name: user_pk})[0]
             last_request = quota.get("last_request", None)
             if last_request:
                 if time.time() < last_request + self.interval:
@@ -58,7 +72,7 @@ class RateLimit(object):
             else:
                 new_quota = quota.get('quota', self.quota) - 1
 
-            self.datastore.update(user,
+            self.datastore.update(quota,
                                   {'last_request': time.time(),
                                    'quota': new_quota}
                                   )

@@ -64,7 +64,6 @@ class SQLiteForeign(Validator):
         self.options = options
 
     def validate(self, field, datastore):
-        print datastore.db
         conn = sqlite3.connect(datastore.db)
         cursor = conn.cursor()
         query = "SELECT {0} FROM {1} WHERE {2}={3}".format(

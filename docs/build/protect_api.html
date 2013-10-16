@@ -68,7 +68,7 @@ testing purpose: the PythonListDataStore.</p>
 <h2>Define a backend<a class="headerlink" href="#define-a-backend" title="Permalink to this headline">¶</a></h2>
 <p>The PythonListDataStore is just a list of python dictionnary. So let&#8217;s
 first create this list:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">ressource</span> <span class="o">=</span> <span class="p">[{</span><span class="s">&quot;accesskey&quot;</span><span class="p">:</span> <span class="s">&quot;hackme&quot;</span><span class="p">,</span> <span class="s">&quot;accesskey&quot;</span><span class="p">:</span> <span class="s">&quot;nopassword&quot;</span><span class="p">}]</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">ressources</span> <span class="o">=</span> <span class="p">[{</span><span class="s">&quot;accesskey&quot;</span><span class="p">:</span> <span class="s">&quot;hackme&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s">&quot;accesskey&quot;</span><span class="p">:</span> <span class="s">&quot;nopassword&quot;</span><span class="p">}]</span>
 </pre></div>
 </div>
 <p>Like any other datastore, you need a Model to describe your datastore:</p>
@@ -94,7 +94,7 @@ parameter. If the &#8220;apikey&#8221; correspond to an existing object in the
 datastore, it will return this object. Otherwise, the user is
 anonymous.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">rest_api_framework.authentication</span> <span class="kn">import</span> <span class="n">ApiKeyAuthentication</span>
-<span class="n">authentication</span> <span class="o">=</span> <span class="n">ApiKeyAuthentication</span><span class="p">(</span><span class="n">datastore</span><span class="p">)</span>
+<span class="n">authentication</span> <span class="o">=</span> <span class="n">ApiKeyAuthentication</span><span class="p">(</span><span class="n">datastore</span><span class="p">,</span> <span class="n">identifier</span><span class="o">=</span><span class="s">&quot;accesskey&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Then you can plug this authentication backend to your endpoint:</p>
@@ -106,6 +106,56 @@ anonymous.</p>
                 <span class="s">&quot;authentication&quot;</span><span class="p">:</span> <span class="n">authentication</span><span class="p">}</span>
     <span class="p">}</span>
 </pre></div>
+</div>
+</div>
+<div class="section" id="instanciate-the-authorization-backend">
+<h2>Instanciate the Authorization backend<a class="headerlink" href="#instanciate-the-authorization-backend" title="Permalink to this headline">¶</a></h2>
+<p>The Authorization backend relies on the Authentication backend to
+retreive a user. With this user and the request, it will grant access
+or raise an Unauthorized error.</p>
+<p>For this example we will use the base Authentication class. This class
+tries to authenticate the user. If the user is authenticated, then
+access is granted. Otherwise, it is not.</p>
+<dl class="docutils">
+<dt>from rest_api_framework.authentication import Authorization</dt>
+<dd>then add it to the controller options:</dd>
+</dl>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">controller</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&quot;list_verbs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;POST&quot;</span><span class="p">],</span>
+    <span class="s">&quot;unique_verbs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;PUT&quot;</span><span class="p">,</span> <span class="s">&quot;DElETE&quot;</span><span class="p">],</span>
+    <span class="s">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;pagination&quot;</span><span class="p">:</span> <span class="n">Pagination</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span>
+                <span class="s">&quot;formaters&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">foreign_keys_format</span><span class="p">],</span>
+                <span class="s">&quot;authentication&quot;</span><span class="p">:</span> <span class="n">authentication</span><span class="p">,</span>
+                <span class="s">&quot;authorization&quot;</span><span class="p">:</span> <span class="n">Authorization</span><span class="p">,</span>
+                <span class="p">}</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="testing-authentication-and-authorization-backend">
+<h2>Testing Authentication and Authorization Backend<a class="headerlink" href="#testing-authentication-and-authorization-backend" title="Permalink to this headline">¶</a></h2>
+<p>Let&#8217;s give a try:</p>
+<div class="highlight-python"><pre>curl -i -X GET http://localhost:5000/users/?accesskey=hackme
+HTTP/1.0 200 OK
+Content-Type: application/json
+Content-Length: 350
+Server: Werkzeug/0.8.3 Python/2.7.2
+Date: Wed, 16 Oct 2013 12:18:52 GMT
+
+
+curl -i -X GET http://localhost:5000/users/?accesskey=helloworld
+HTTP/1.0 401 UNAUTHORIZED
+Content-Type: application/json
+Content-Length: 350
+Server: Werkzeug/0.8.3 Python/2.7.2
+Date: Wed, 16 Oct 2013 12:19:26 GMT
+
+curl -i -X GET http://localhost:5000/users/
+HTTP/1.0 401 UNAUTHORIZED
+Content-Type: application/json
+Content-Length: 350
+Server: Werkzeug/0.8.3 Python/2.7.2
+Date: Wed, 16 Oct 2013 12:19:45 GMT</pre>
 </div>
 </div>
 </div>
@@ -122,6 +172,8 @@ anonymous.</p>
 <li><a class="reference internal" href="#authentication">Authentication</a></li>
 <li><a class="reference internal" href="#define-a-backend">Define a backend</a></li>
 <li><a class="reference internal" href="#instanciate-the-authentication-backend">Instanciate the Authentication backend</a></li>
+<li><a class="reference internal" href="#instanciate-the-authorization-backend">Instanciate the Authorization backend</a></li>
+<li><a class="reference internal" href="#testing-authentication-and-authorization-backend">Testing Authentication and Authorization Backend</a></li>
 </ul>
 </li>
 </ul>

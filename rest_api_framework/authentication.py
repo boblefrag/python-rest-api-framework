@@ -20,8 +20,10 @@ class Authorization(object):
         :param request:
         :type request: :class:`werkzeug.wrappers.Request`
         """
-
-        raise NotImplementedError
+        if self.authentication.get_user(request):
+            return
+        else:
+            raise Unauthorized
 
 
 class Authentication(object):
@@ -39,7 +41,9 @@ class ApiKeyAuthentication(Authentication):
     """
     Authentication based on an apikey stored in a datastore.
     """
-    def __init__(self, datastore):
+
+    def __init__(self, datastore, identifier="apikey"):
+        self.identifier = identifier
         self.datastore = datastore
 
     def get_user(self, request):
@@ -47,10 +51,10 @@ class ApiKeyAuthentication(Authentication):
         return a user or None.
         """
         data = request.values.to_dict()
-        identifier = "apikey"
-        if identifier in data:
+        if self.identifier in data:
             try:
-                user = self.datastore.get(data[identifier])
+                print data[self.identifier]
+                user = self.datastore.get(data[self.identifier])
                 return user
             except NotFound:
                 return None
@@ -63,11 +67,4 @@ class ApiKeyAuthorization(Authorization):
     authorize users
     """
 
-    def check_auth(self, request):
-        """
-        Check if a user is authorized to perform a particular action.
-        """
-        if self.authentication.get_user(request):
-            return
-        else:
-            raise Unauthorized
+    pass

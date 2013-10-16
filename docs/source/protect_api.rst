@@ -24,7 +24,7 @@ first create this list:
 
 .. code-block:: python
 
-    ressources = [{"accesskey": "hackme", "accesskey": "nopassword"}]
+    ressources = [{"accesskey": "hackme"}, {"accesskey": "nopassword"}]
 
 Like any other datastore, you need a Model to describe your datastore:
 
@@ -57,7 +57,7 @@ anonymous.
 .. code-block:: python
 
     from rest_api_framework.authentication import ApiKeyAuthentication
-    authentication = ApiKeyAuthentication(datastore)
+    authentication = ApiKeyAuthentication(datastore, identifier="accesskey")
 
 Then you can plug this authentication backend to your endpoint:
 
@@ -70,3 +70,58 @@ Then you can plug this authentication backend to your endpoint:
                     "formaters": [foreign_keys_format],
                     "authentication": authentication}
         }
+
+Instanciate the Authorization backend
+-------------------------------------
+
+The Authorization backend relies on the Authentication backend to
+retreive a user. With this user and the request, it will grant access
+or raise an Unauthorized error.
+
+For this example we will use the base Authentication class. This class
+tries to authenticate the user. If the user is authenticated, then
+access is granted. Otherwise, it is not.
+
+from rest_api_framework.authentication import Authorization
+ then add it to the controller options:
+
+.. code-block:: python
+
+    controller = {
+        "list_verbs": ["GET", "POST"],
+        "unique_verbs": ["GET", "PUT", "DElETE"],
+        "options": {"pagination": Pagination(20),
+                    "formaters": [foreign_keys_format],
+                    "authentication": authentication,
+                    "authorization": Authorization,
+                    }
+        }
+
+Testing Authentication and Authorization Backend
+------------------------------------------------
+
+Let's give a try:
+
+.. code-block:: python
+
+    curl -i -X GET http://localhost:5000/users/?accesskey=hackme
+    HTTP/1.0 200 OK
+    Content-Type: application/json
+    Content-Length: 350
+    Server: Werkzeug/0.8.3 Python/2.7.2
+    Date: Wed, 16 Oct 2013 12:18:52 GMT
+
+
+    curl -i -X GET http://localhost:5000/users/?accesskey=helloworld
+    HTTP/1.0 401 UNAUTHORIZED
+    Content-Type: application/json
+    Content-Length: 350
+    Server: Werkzeug/0.8.3 Python/2.7.2
+    Date: Wed, 16 Oct 2013 12:19:26 GMT
+
+    curl -i -X GET http://localhost:5000/users/
+    HTTP/1.0 401 UNAUTHORIZED
+    Content-Type: application/json
+    Content-Length: 350
+    Server: Werkzeug/0.8.3 Python/2.7.2
+    Date: Wed, 16 Oct 2013 12:19:45 GMT

@@ -42,9 +42,9 @@ class SQLiteDataStore(DataStore):
          The connection is closed after each operations
     """
 
-    wrapper = {int: "integer",
-               float: "real",
-               basestring: "text"
+    wrapper = {"integer": "integer",
+               "float": "real",
+               "string": "text"
                }
 
     def __init__(self, ressource_config, model, **options):

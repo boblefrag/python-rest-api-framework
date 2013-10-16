@@ -23,6 +23,21 @@ class Model(object):
             raise ValueError
         self.pk_field = pk_field[0]
 
+    def get_schema(self):
+        fields = self.get_fields()
+        response = {}
+        for field in fields:
+            print field == self.pk_field
+            if field == self.pk_field:
+                continue
+            response[field.name] = {"type": str(field.base_type),
+                                    "example": field.example
+                                    }
+            if field.options.get("required") and\
+                    field.options["required"] == True:
+                response[field.name]['required'] = "true" 
+        return response
+
     def get_fields_name(self):
         """
         return the name of each fields registered with this model

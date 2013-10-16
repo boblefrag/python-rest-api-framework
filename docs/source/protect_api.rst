@@ -32,14 +32,14 @@ Like any other datastore, you need a Model to describe your datastore:
 
     class KeyModel(models.Model):
         fields = [
-            models.StringPkField(name="id", required=True)
+            models.StringPkField(name="accesskey", required=True)
             ]
 
 Then you can instanciate your datastore:
 
-from rest_api_framework.datastore import PythonListDataStore
-
 .. code-block:: python
+
+    from rest_api_framework.datastore import PythonListDataStore
 
     datastore = PythonListDataStore(ressources, KeyModel)
 
@@ -68,5 +68,5 @@ Then you can plug this authentication backend to your endpoint:
         "unique_verbs": ["GET", "PUT", "DElETE"],
         "options": {"pagination": Pagination(20),
                     "formaters": [foreign_keys_format],
-                    "authentication": authentication,}
+                    "authentication": authentication}
         }

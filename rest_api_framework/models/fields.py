@@ -25,18 +25,18 @@ class IntegerField(Field):
     """
     An integer field. python type int, with IntegerValidator
     """
-    base_type = int
+    base_type = "integer"
     validators = [IntegerValidator()]
-
+    example = 42
 
 class StringField(Field):
     """
     An string field. python type basestring (either str or
     basestring), with StringValidator
     """
-    base_type = basestring
+    base_type = "string"
     validators = [StringValidator()]
-
+    example = "Hello World"
 
 class PkField(Field):
     """
@@ -45,8 +45,9 @@ class PkField(Field):
     field, you have to inherit from this class and implement your own.
     see StringPkField
     """
-    base_type = int
+    base_type = "integer"
     validators = []
+    example = 42
 
 class ForeignKeyField(Field):
 
@@ -61,19 +62,21 @@ class IntForeign(ForeignKeyField):
     A type of integer and a Foreign key to check
     """
 
-    base_type = int
-
+    base_type = "integer"
+    example = 42
 
 class StringPkField(PkField):
     """
     A string based PkField
     """
-    base_type = basestring
+    base_type = "string"
     validators = []
+    example = "i6HOCjvZMQ4"
 
 class TimestampField(Field):
     """
     A unix timestamp
     """
-    base_type = float
+    base_type = "float"
     validators = [FloatValidator()]
+    example = 34.8

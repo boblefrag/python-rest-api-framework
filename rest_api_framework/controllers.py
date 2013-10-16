@@ -5,7 +5,7 @@ import json
 from werkzeug.exceptions import BadRequest
 from werkzeug.wrappers import Request
 from werkzeug.routing import Map, Rule
-from werkzeug.exceptions import HTTPException
+from werkzeug.exceptions import HTTPException, NotFound
 from abc import ABCMeta
 from werkzeug.wsgi import DispatcherMiddleware
 from werkzeug.exceptions import NotFound
@@ -51,6 +51,38 @@ class WSGIWrapper(object):
                 {"error": e.description},
                 status=e.code)
 
+class AutoDocGenerator(WSGIWrapper):
+
+    def __init__(self, apps):
+        from werkzeug.wrappers import Response
+        self.apps = apps
+        self.url_map = Map([
+                Rule('/', endpoint='schema'),
+                Rule('/<ressource>/', endpoint='ressource_schema')
+                ])
+        self.view = Response
+
+    def schema(self, request):
+        response = {}
+        for elem in self.apps:
+            response[elem.ressource['ressource_name']] = {
+                "list_endpoint" : "/{0}/".format(
+                    elem.ressource['ressource_name']),
+                "allowed list_verbs": elem.controller["list_verbs"],
+                "allowed unique ressource": elem.controller["unique_verbs"],
+                }
+
+        return self.view(json.dumps(response), mimetype="application/json")
+
+    def ressource_schema(self, request, ressource):
+        app = [elem for elem in self.apps \
+                if elem.ressource['ressource_name'] == ressource]
+        if app:
+            app = app[0]
+            response = app.ressource['model']().get_schema()
+        else:
+            raise NotFound
+        return self.view(json.dumps(response), mimetype="application/json")
 
 class WSGIDispatcher(DispatcherMiddleware):
     """
@@ -64,12 +96,15 @@ class WSGIDispatcher(DispatcherMiddleware):
     """
 
     def __init__(self, apps):
-        endpoints = {}
+        endpoints = {"/schema": self.make_schema(apps)}
         for elem in apps:
             endpoints["/{0}".format(elem.ressource["ressource_name"])] = elem()
         app = NotFound()
         mounts = endpoints
         super(WSGIDispatcher, self).__init__(app, mounts=mounts)
+
+    def make_schema(self, apps):
+        return AutoDocGenerator(apps)
 
 
 class ApiController(WSGIWrapper):
@@ -107,6 +142,14 @@ class ApiController(WSGIWrapper):
         :return: :meth:`.get_list` if request.method is GET,
                  :meth:`.create` if request.method is POST
         """
+        if request.method == "HEAD":
+            verbs = list(
+                set(
+                    self.controller[
+                        'list_verbs'] + self.controller['unique_verbs']))
+            return self.view(
+                headers={"Allow": ",".join(verbs)},
+                status=200)
         if self.authorization:
             self.authorization.check_auth(request)
         if self.ratelimit:

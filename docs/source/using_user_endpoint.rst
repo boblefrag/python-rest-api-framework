@@ -290,4 +290,61 @@ because each user is uniquely identified by his id.
 If you need to ensure it can be only one John Doe, you must add a
 validator on your datastore.
 
+
+Autodocumentation
+-----------------
+
+Your API is autodocumented by Python REST API Framework.
+
+.. code-block:: bash
+
+    curl -i -X GET http://localhost:5000/schema/
+    HTTP/1.0 200 OK
+    Content-Type: application/json
+    Content-Length: 268
+    Server: Werkzeug/0.8.3 Python/2.7.2
+    Date: Wed, 16 Oct 2013 08:24:13 GMT
+
+
+    {
+        "users": {
+            "allowed list_verbs": [
+                "GET", 
+                "POST"
+            ], 
+            "allowed unique ressource": [
+                "GET", 
+                "PUT", 
+                "DElETE"
+            ], 
+            "list_endpoint": "/users/", 
+            "schema_endpoint": "/schema/users/"
+        }
+    }
+
+.. code-block:: bash
+
+    url -i -X GET http://localhost:5000/schema/users/
+    HTTP/1.0 200 OK
+    Content-Type: application/json
+    Content-Length: 206
+    Server: Werkzeug/0.8.3 Python/2.7.2
+    Date: Wed, 16 Oct 2013 09:04:16 GMT
+
+    {
+        "first_name": {
+            "example": "Hello World", 
+            "required": "true", 
+            "type": "string"
+        }, 
+        "last_name": {
+            "example": "Hello World", 
+            "required": "true", 
+            "type": "string"
+        }
+    }
+
+
+
 Next: :doc:`adding_validator_datastore`
+

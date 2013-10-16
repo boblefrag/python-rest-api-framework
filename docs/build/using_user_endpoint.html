@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Python Rest Api Framework 0.1 documentation" href="index.html" />
-    <link rel="up" title="Tutorial building an adressebook API" href="tutorial.html" />
+    <link rel="up" title="Tutorial: building an adressebook API" href="tutorial.html" />
     <link rel="next" title="Adding validators to your DataStore" href="adding_validator_datastore.html" />
     <link rel="prev" title="First Step Building a user endpoint" href="first_step.html" /> 
   </head>
@@ -45,7 +45,7 @@
           <a href="first_step.html" title="First Step Building a user endpoint"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li>
-          <li><a href="tutorial.html" accesskey="U">Tutorial building an adressebook API</a> &raquo;</li> 
+          <li><a href="tutorial.html" accesskey="U">Tutorial: building an adressebook API</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -302,8 +302,58 @@ validate uniqueness of a user. For the API, this is not a problem
 because each user is uniquely identified by his id.</p>
 <p>If you need to ensure it can be only one John Doe, you must add a
 validator on your datastore.</p>
-<p>Next: <a class="reference internal" href="adding_validator_datastore.html"><em>Adding validators to your DataStore</em></a></p>
 </div>
+</div>
+<div class="section" id="autodocumentation">
+<h2>Autodocumentation<a class="headerlink" href="#autodocumentation" title="Permalink to this headline">¶</a></h2>
+<p>Your API is autodocumented by Python REST API Framework.</p>
+<div class="highlight-bash"><div class="highlight"><pre>curl -i -X GET http://localhost:5000/schema/
+HTTP/1.0 200 OK
+Content-Type: application/json
+Content-Length: 268
+Server: Werkzeug/0.8.3 Python/2.7.2
+Date: Wed, 16 Oct 2013 08:24:13 GMT
+
+
+<span class="o">{</span>
+    <span class="s2">&quot;users&quot;</span>: <span class="o">{</span>
+        <span class="s2">&quot;allowed list_verbs&quot;</span>: <span class="o">[</span>
+            <span class="s2">&quot;GET&quot;</span>,
+            <span class="s2">&quot;POST&quot;</span>
+        <span class="o">]</span>,
+        <span class="s2">&quot;allowed unique ressource&quot;</span>: <span class="o">[</span>
+            <span class="s2">&quot;GET&quot;</span>,
+            <span class="s2">&quot;PUT&quot;</span>,
+            <span class="s2">&quot;DElETE&quot;</span>
+        <span class="o">]</span>,
+        <span class="s2">&quot;list_endpoint&quot;</span>: <span class="s2">&quot;/users/&quot;</span>,
+        <span class="s2">&quot;schema_endpoint&quot;</span>: <span class="s2">&quot;/schema/users/&quot;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<div class="highlight-bash"><div class="highlight"><pre>url -i -X GET http://localhost:5000/schema/users/
+HTTP/1.0 200 OK
+Content-Type: application/json
+Content-Length: 206
+Server: Werkzeug/0.8.3 Python/2.7.2
+Date: Wed, 16 Oct 2013 09:04:16 GMT
+
+<span class="o">{</span>
+    <span class="s2">&quot;first_name&quot;</span>: <span class="o">{</span>
+        <span class="s2">&quot;example&quot;</span>: <span class="s2">&quot;Hello World&quot;</span>,
+        <span class="s2">&quot;required&quot;</span>: <span class="s2">&quot;true&quot;</span>,
+        <span class="s2">&quot;type&quot;</span>: <span class="s2">&quot;string&quot;</span>
+    <span class="o">}</span>,
+    <span class="s2">&quot;last_name&quot;</span>: <span class="o">{</span>
+        <span class="s2">&quot;example&quot;</span>: <span class="s2">&quot;Hello World&quot;</span>,
+        <span class="s2">&quot;required&quot;</span>: <span class="s2">&quot;true&quot;</span>,
+        <span class="s2">&quot;type&quot;</span>: <span class="s2">&quot;string&quot;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>Next: <a class="reference internal" href="adding_validator_datastore.html"><em>Adding validators to your DataStore</em></a></p>
 </div>
 </div>
 
@@ -326,6 +376,7 @@ validator on your datastore.</p>
 <li><a class="reference internal" href="#invalid-data">Invalid Data</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#autodocumentation">Autodocumentation</a></li>
 </ul>
 </li>
 </ul>
@@ -374,7 +425,7 @@ validator on your datastore.</p>
           <a href="first_step.html" title="First Step Building a user endpoint"
              >previous</a> |</li>
         <li><a href="index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li>
-          <li><a href="tutorial.html" >Tutorial building an adressebook API</a> &raquo;</li> 
+          <li><a href="tutorial.html" >Tutorial: building an adressebook API</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

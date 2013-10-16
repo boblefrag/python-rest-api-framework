@@ -24,7 +24,7 @@ first create this list:
 
 .. code-block:: python
 
-    ressource = [{"accesskey": "hackme", "accesskey": "nopassword"}]
+    ressources = [{"accesskey": "hackme", "accesskey": "nopassword"}]
 
 Like any other datastore, you need a Model to describe your datastore:
 

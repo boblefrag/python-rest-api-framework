@@ -74,13 +74,14 @@ first create this list:</p>
 <p>Like any other datastore, you need a Model to describe your datastore:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">KeyModel</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
     <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">models</span><span class="o">.</span><span class="n">StringPkField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;id&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">models</span><span class="o">.</span><span class="n">StringPkField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;accesskey&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
         <span class="p">]</span>
 </pre></div>
 </div>
 <p>Then you can instanciate your datastore:</p>
-<p>from rest_api_framework.datastore import PythonListDataStore</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">datastore</span> <span class="o">=</span> <span class="n">PythonListDataStore</span><span class="p">(</span><span class="n">ressources</span><span class="p">,</span> <span class="n">KeyModel</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">rest_api_framework.datastore</span> <span class="kn">import</span> <span class="n">PythonListDataStore</span>
+
+<span class="n">datastore</span> <span class="o">=</span> <span class="n">PythonListDataStore</span><span class="p">(</span><span class="n">ressources</span><span class="p">,</span> <span class="n">KeyModel</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -102,7 +103,7 @@ anonymous.</p>
     <span class="s">&quot;unique_verbs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;PUT&quot;</span><span class="p">,</span> <span class="s">&quot;DElETE&quot;</span><span class="p">],</span>
     <span class="s">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;pagination&quot;</span><span class="p">:</span> <span class="n">Pagination</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span>
                 <span class="s">&quot;formaters&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">foreign_keys_format</span><span class="p">],</span>
-                <span class="s">&quot;authentication&quot;</span><span class="p">:</span> <span class="n">authentication</span><span class="p">,}</span>
+                <span class="s">&quot;authentication&quot;</span><span class="p">:</span> <span class="n">authentication</span><span class="p">}</span>
     <span class="p">}</span>
 </pre></div>
 </div>

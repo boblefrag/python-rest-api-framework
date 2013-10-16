@@ -70,6 +70,8 @@ class AutoDocGenerator(WSGIWrapper):
                     elem.ressource['ressource_name']),
                 "allowed list_verbs": elem.controller["list_verbs"],
                 "allowed unique ressource": elem.controller["unique_verbs"],
+                "schema_endpoint": "/schema/{0}/".format(
+                    elem.ressource["ressource_name"])
                 }
 
         return self.view(json.dumps(response), mimetype="application/json")
@@ -150,6 +152,7 @@ class ApiController(WSGIWrapper):
             return self.view(
                 headers={"Allow": ",".join(verbs)},
                 status=200)
+
         if self.authorization:
             self.authorization.check_auth(request)
         if self.ratelimit:
@@ -351,7 +354,7 @@ class Controller(ApiController):
 
         if options.get("authentication", None):
             self.authentication = options["authentication"]
-
+            
         if options.get("ratelimit", None):
             if not hasattr(self, "authentication"):
                 raise ValueError(

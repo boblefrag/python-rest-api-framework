@@ -113,7 +113,7 @@ Because you hide the internal implementation of your API to your user,
 you have to give him a way to interact with your API.
 
 To do so, you need to create a formater, exactly like you have done
-for the View. But this time you must do it for the View.
+for the View. But this time you must do it for the Controller.
 
 .. code-block:: python
 

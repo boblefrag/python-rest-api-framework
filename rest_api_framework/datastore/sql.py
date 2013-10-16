@@ -123,6 +123,13 @@ class SQLiteDataStore(DataStore):
              ][0] for condition in self.get_conditions(data)]
 
     def get_conditions(self, data):
+        rm = []
+        for elem in data:
+            if elem not in ['query', 'fields']:
+                if elem not in self.model.get_fields_name():
+                    rm.append(elem)
+        for elem in rm:
+            data.pop(elem)
         return [
             {k: v} for k, v in data.iteritems() if k not in ["query", "fields"]
             ]

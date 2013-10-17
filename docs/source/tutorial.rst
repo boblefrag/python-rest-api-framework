@@ -13,3 +13,5 @@ Tutorial: building an adressebook API
    represent_related
    protect_api
    rate-limit
+   partial-response
+   wole_application

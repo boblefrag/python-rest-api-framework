@@ -1,0 +1,292 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Linking ressource together &mdash; Python Rest Api Framework 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Python Rest Api Framework 0.1 documentation" href="../index.html" />
+    <link rel="up" title="Tutorial: building an adressebook API" href="../tutorial.html" />
+    <link rel="next" title="Representing relations" href="represent_related.html" />
+    <link rel="prev" title="Working with Pagination" href="work_with_pagination.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="represent_related.html" title="Representing relations"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="work_with_pagination.html" title="Working with Pagination"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li>
+          <li><a href="../tutorial.html" accesskey="U">Tutorial: building an adressebook API</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="linking-ressource-together">
+<h1>Linking ressource together<a class="headerlink" href="#linking-ressource-together" title="Permalink to this headline">¶</a></h1>
+<p>Now that you have users and address, you want to link them
+together. Adding a reference from a user to his user.</p>
+<p>Not all the datastore can handle this type of relation but hopefully,
+the SQLiteDataStore does.</p>
+<p>First you will need to change your UserModel definition:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="n">models</span><span class="o">.</span><span class="n">StringField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;country&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+          <span class="n">models</span><span class="o">.</span><span class="n">StringField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;city&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+          <span class="n">models</span><span class="o">.</span><span class="n">StringField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;street&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+          <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;number&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+          <span class="n">models</span><span class="o">.</span><span class="n">IntForeign</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;user&quot;</span><span class="p">,</span>
+                            <span class="n">foreign</span><span class="o">=</span><span class="p">{</span><span class="s">&quot;table&quot;</span><span class="p">:</span> <span class="s">&quot;users&quot;</span><span class="p">,</span>
+                                     <span class="s">&quot;column&quot;</span><span class="p">:</span> <span class="s">&quot;id&quot;</span><span class="p">,</span>
+                                     <span class="p">}</span>
+                            <span class="p">),</span>
+          <span class="n">models</span><span class="o">.</span><span class="n">PkField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;id&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+          <span class="p">]</span>
+</pre></div>
+</div>
+<p>The part we added is:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">models</span><span class="o">.</span><span class="n">IntForeign</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;address&quot;</span><span class="p">,</span>
+                  <span class="n">foreign</span><span class="o">=</span><span class="p">{</span><span class="s">&quot;table&quot;</span><span class="p">:</span> <span class="s">&quot;address&quot;</span><span class="p">,</span>
+                           <span class="s">&quot;column&quot;</span><span class="p">:</span> <span class="s">&quot;id&quot;</span><span class="p">,</span>
+                           <span class="p">}</span>
+                  <span class="p">),</span>
+</pre></div>
+</div>
+<p>This will add a foreign key constrain on the user ensuring the address
+id you give corresspond to an existing address.</p>
+<ul class="simple">
+<li>table : is the table of the ressource your are linking</li>
+<li>column: is the column you will check for the constrain</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>unfortunately, at the time of writing, there is no way to
+update the schema automaticaly. You will need either to destroy
+your database (Python Rest Framework will create a fresh one) or do
+an alter table by hands. As this is just a tutorial, we will choose
+the second option and delete the file &#8220;adress.db&#8221;</p>
+<p class="last">It&#8217;s also important to note the your endpoints must be listed in
+the Wrapper in the order of foreing keys. First the model to link
+to, then the model that will be linked</p>
+</div>
+<div class="section" id="adding-an-adress">
+<h2>Adding an adress<a class="headerlink" href="#adding-an-adress" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash"><div class="highlight"><pre>curl -i -H <span class="s2">&quot;Content-type: application/json&quot;</span> -X POST -d
+<span class="s1">&#39;{&quot;country&quot;:&quot;France&quot;, &quot;city&quot;: &quot;Paris&quot;, &quot;street&quot;: &quot;quais de Valmy&quot;,</span>
+<span class="s1">&quot;number&quot;: 45}&#39;</span> http://localhost:5000/address/
+
+HTTP/1.0 201 CREATED
+Location: http://localhost:5000/address/1/
+Content-Type: application/json
+Content-Length: 0
+Server: Werkzeug/0.8.3 Python/2.7.2
+Date: Tue, 15 Oct 2013 17:23:49 GMT
+</pre></div>
+</div>
+</div>
+<div class="section" id="create-a-user-linked-to-an-address">
+<h2>Create a user linked to an address<a class="headerlink" href="#create-a-user-linked-to-an-address" title="Permalink to this headline">¶</a></h2>
+<p>Because, as the API developper you know that
+<a class="reference external" href="http://localhost:5000/address/1/">http://localhost:5000/address/1/</a> corresond to the address with the
+&#8220;id&#8221; 1 you can create a user:</p>
+<div class="highlight-bash"><div class="highlight"><pre>curl -i -H <span class="s2">&quot;Content-type: application/json&quot;</span> -X POST -d
+<span class="s1">&#39;{&quot;first_name&quot;:&quot;Super&quot;, &quot;last_name&quot;: &quot;Dupont&quot;, &quot;address&quot;: 1}&#39;</span>
+http://localhost:5000/users/
+
+HTTP/1.0 201 CREATED
+Location: http://localhost:5000/users/1/
+Content-Type: application/json
+Content-Length: 0
+Server: Werkzeug/0.8.3 Python/2.7.2
+Date: Tue, 15 Oct 2013 17:27:34 GMT
+</pre></div>
+</div>
+<p>You can check that your Foreign constrain is working with:</p>
+<div class="highlight-bash"><div class="highlight"><pre>curl -i -H <span class="s2">&quot;Content-type: application/json&quot;</span> -X POST -d
+<span class="s1">&#39;{&quot;first_name&quot;:&quot;Super&quot;, &quot;last_name&quot;: &quot;Man&quot;, &quot;address&quot;: 2}&#39;</span>
+http://localhost:5000/users/
+
+HTTP/1.0 400 BAD REQUEST
+Content-Type: application/json
+Content-Length: 38
+Server: Werkzeug/0.8.3 Python/2.7.2
+Date: Tue, 15 Oct 2013 17:30:03 GMT
+
+<span class="o">{</span><span class="s2">&quot;error&quot;</span>: <span class="s2">&quot;address does not validate&quot;</span><span class="o">}</span>
+</pre></div>
+</div>
+<p>This fail because address 2 does not exists.</p>
+</div>
+<div class="section" id="retreive-the-adress-of-a-user">
+<h2>Retreive the adress of a user<a class="headerlink" href="#retreive-the-adress-of-a-user" title="Permalink to this headline">¶</a></h2>
+<p>If you now the user, it&#8217;s easy to get the adress.</p>
+<p>First get the user:</p>
+<div class="highlight-bash"><div class="highlight"><pre>curl -i http://localhost:5000/users/1/
+HTTP/1.0 200 OK
+Content-Type: application/json
+Content-Length: 90
+Server: Werkzeug/0.8.3 Python/2.7.2
+Date: Tue, 15 Oct 2013 17:42:18 GMT
+
+<span class="o">{</span>
+<span class="s2">&quot;address&quot;</span>: 1,
+<span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;Super&quot;</span>,
+<span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;Dupont&quot;</span>,
+<span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/1/&quot;</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>His adress has the id &#8220;1&#8221;. We can issue a request:</p>
+<div class="highlight-bash"><div class="highlight"><pre>curl -i http://localhost:5000/address/1/
+HTTP/1.0 200 OK
+Content-Type: application/json
+Content-Length: 112
+Server: Werkzeug/0.8.3 Python/2.7.2
+Date: Tue, 15 Oct 2013 17:44:07 GMT
+
+<span class="o">{</span>
+    <span class="s2">&quot;city&quot;</span>: <span class="s2">&quot;Paris&quot;</span>,
+    <span class="s2">&quot;country&quot;</span>: <span class="s2">&quot;France&quot;</span>,
+    <span class="s2">&quot;number&quot;</span>: 45,
+    <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/address/1/&quot;</span>,
+    <span class="s2">&quot;street&quot;</span>: <span class="s2">&quot;quais de Valmy&quot;</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="retreive-users-from-an-adress">
+<h2>Retreive users from an adress<a class="headerlink" href="#retreive-users-from-an-adress" title="Permalink to this headline">¶</a></h2>
+<p>The same apply in the other side. As we know the adress id:</p>
+<div class="highlight-bash"><div class="highlight"><pre>curl -i http://localhost:5000/users/?address<span class="o">=</span>1
+HTTP/1.0 200 OK
+Content-Type: application/json
+Content-Length: 228
+Server: Werkzeug/0.8.3 Python/2.7.2
+Date: Tue, 15 Oct 2013 17:46:13 GMT
+
+<span class="o">{</span>
+    <span class="s2">&quot;meta&quot;</span>: <span class="o">{</span>
+        <span class="s2">&quot;count&quot;</span>: 20,
+        <span class="s2">&quot;filters&quot;</span>: <span class="o">{</span>
+            <span class="s2">&quot;address&quot;</span>: <span class="s2">&quot;1&quot;</span>
+        <span class="o">}</span>,
+        <span class="s2">&quot;next&quot;</span>: <span class="s2">&quot;null&quot;</span>,
+        <span class="s2">&quot;offset&quot;</span>: 0,
+        <span class="s2">&quot;previous&quot;</span>: <span class="s2">&quot;null&quot;</span>,
+        <span class="s2">&quot;total_count&quot;</span>: 1
+    <span class="o">}</span>,
+    <span class="s2">&quot;object_list&quot;</span>: <span class="o">[</span>
+        <span class="o">{</span>
+            <span class="s2">&quot;address&quot;</span>: 1,
+            <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;Super&quot;</span>,
+            <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;Dupont&quot;</span>,
+            <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/1/&quot;</span>
+        <span class="o">}</span>
+    <span class="o">]</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>next: <a class="reference internal" href="represent_related.html"><em>Representing relations</em></a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Linking ressource together</a><ul>
+<li><a class="reference internal" href="#adding-an-adress">Adding an adress</a></li>
+<li><a class="reference internal" href="#create-a-user-linked-to-an-address">Create a user linked to an address</a></li>
+<li><a class="reference internal" href="#retreive-the-adress-of-a-user">Retreive the adress of a user</a></li>
+<li><a class="reference internal" href="#retreive-users-from-an-adress">Retreive users from an adress</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="work_with_pagination.html"
+                        title="previous chapter">Working with Pagination</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="represent_related.html"
+                        title="next chapter">Representing relations</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/tutorial/related_ressources.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="represent_related.html" title="Representing relations"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="work_with_pagination.html" title="Working with Pagination"
+             >previous</a> |</li>
+        <li><a href="../index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li>
+          <li><a href="../tutorial.html" >Tutorial: building an adressebook API</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Yohann Gabory.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

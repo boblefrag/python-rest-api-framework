@@ -1,0 +1,404 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Working with Pagination &mdash; Python Rest Api Framework 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Python Rest Api Framework 0.1 documentation" href="../index.html" />
+    <link rel="up" title="Tutorial: building an adressebook API" href="../tutorial.html" />
+    <link rel="next" title="Linking ressource together" href="related_ressources.html" />
+    <link rel="prev" title="Adding validators to your DataStore" href="adding_validator_datastore.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="related_ressources.html" title="Linking ressource together"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="adding_validator_datastore.html" title="Adding validators to your DataStore"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li>
+          <li><a href="../tutorial.html" accesskey="U">Tutorial: building an adressebook API</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="working-with-pagination">
+<h1>Working with Pagination<a class="headerlink" href="#working-with-pagination" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="creating-fixtures">
+<h2>Creating fixtures<a class="headerlink" href="#creating-fixtures" title="Permalink to this headline">¶</a></h2>
+<p>When your address book will be full of entry, you will need to add a
+pagination on your API. As it is a common need, REST API Framework
+implement a very easy way of doing so.</p>
+<p>Before you can play with the pagination process, you will need to
+create more data. You can create those records the way you want:</p>
+<ul class="simple">
+<li>direct insert into the database</li>
+</ul>
+<div class="highlight-bash"><div class="highlight"><pre>sqlite3 adress_book.db
+INSERT INTO users VALUES <span class="o">(</span><span class="s2">&quot;Nick&quot;</span>, <span class="s2">&quot;Furry&quot;</span>, 6<span class="o">)</span>;
+</pre></div>
+</div>
+<ul class="simple">
+<li>using the datastore directly</li>
+</ul>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">store</span> <span class="o">=</span> <span class="n">SQLiteDataStore</span><span class="p">({</span><span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="s">&quot;adress_book.db&quot;</span><span class="p">,</span> <span class="s">&quot;table&quot;</span><span class="p">:</span> <span class="s">&quot;users&quot;</span><span class="p">},</span> <span class="n">UserModel</span><span class="p">)</span>
+<span class="n">store</span><span class="o">.</span><span class="n">create</span><span class="p">({</span><span class="s">&quot;first_name&quot;</span><span class="p">:</span> <span class="s">&quot;Nick&quot;</span><span class="p">,</span> <span class="s">&quot;last_name&quot;</span><span class="p">:</span> <span class="s">&quot;Furry&quot;</span><span class="p">})</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>using your API</li>
+</ul>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">curl</span> <span class="o">-</span><span class="n">i</span> <span class="o">-</span><span class="n">H</span> <span class="s">&quot;Content-type: application/json&quot;</span> <span class="o">-</span><span class="n">X</span> <span class="n">POST</span> <span class="o">-</span><span class="n">d</span> <span class="s">&#39;{&quot;first_name&quot;: &quot;Nick&quot;, &quot;last_name&quot;: &quot;Furry&quot;}&#39;</span>  <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">5000</span><span class="o">/</span><span class="n">users</span><span class="o">/</span>
+</pre></div>
+</div>
+<p>each on of those methods have advantages and disavantages but they all
+make the work done. For this example, I propose to use the well know
+requests package with a script to create a bunch of random records:</p>
+<p>For this to work you need to install resquests : <a class="reference external" href="http://docs.python-requests.org/en/latest/user/install/#install">http://docs.python-requests.org/en/latest/user/install/#install</a></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">string</span>
+
+<span class="k">def</span> <span class="nf">get_random</span><span class="p">():</span>
+    <span class="k">return</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                   <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+                     <span class="n">string</span><span class="o">.</span><span class="n">ascii_letters</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span>
+                     <span class="nb">int</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">20</span><span class="p">)</span>
+                     <span class="p">)</span>
+                   <span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">200</span><span class="p">):</span>
+    <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s">&quot;http://localhost:5000/users/&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&quot;first_name&quot;</span><span class="p">:</span> <span class="n">get_random</span><span class="p">(),</span> <span class="s">&quot;last_name&quot;</span><span class="p">:</span> <span class="n">get_random</span><span class="p">()}))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="pagination">
+<h2>Pagination<a class="headerlink" href="#pagination" title="Permalink to this headline">¶</a></h2>
+<p>Now your datastore is filled with more than 200 records, it&#8217;s time to
+paginate. To do so import Pagination and change the controller part of
+your app.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">rest_api_framework.pagination</span> <span class="kn">import</span> <span class="n">Pagination</span>
+
+<span class="k">class</span> <span class="nc">UserEndPoint</span><span class="p">(</span><span class="n">Controller</span><span class="p">):</span>
+    <span class="n">ressource</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&quot;ressource_name&quot;</span><span class="p">:</span> <span class="s">&quot;users&quot;</span><span class="p">,</span>
+        <span class="s">&quot;ressource&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="s">&quot;adress_book.db&quot;</span><span class="p">,</span> <span class="s">&quot;table&quot;</span><span class="p">:</span> <span class="s">&quot;users&quot;</span><span class="p">},</span>
+        <span class="s">&quot;model&quot;</span><span class="p">:</span> <span class="n">UserModel</span><span class="p">,</span>
+        <span class="s">&quot;datastore&quot;</span><span class="p">:</span> <span class="n">SQLiteDataStore</span><span class="p">,</span>
+        <span class="s">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;validators&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">UniqueTogether</span><span class="p">(</span><span class="s">&quot;first_name&quot;</span><span class="p">,</span> <span class="s">&quot;last_name&quot;</span><span class="p">)]}</span>
+        <span class="p">}</span>
+
+    <span class="n">controller</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&quot;list_verbs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;POST&quot;</span><span class="p">],</span>
+        <span class="s">&quot;unique_verbs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;PUT&quot;</span><span class="p">,</span> <span class="s">&quot;DElETE&quot;</span><span class="p">],</span>
+        <span class="s">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;pagination&quot;</span><span class="p">:</span> <span class="n">Pagination</span><span class="p">(</span><span class="mi">20</span><span class="p">)}</span>
+        <span class="p">}</span>
+
+    <span class="n">view</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;response_class&quot;</span><span class="p">:</span> <span class="n">JsonResponse</span><span class="p">,</span>
+            <span class="s">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;formaters&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;add_ressource_uri&quot;</span><span class="p">,</span> <span class="n">remove_id</span><span class="p">]}}</span>
+</pre></div>
+</div>
+<p>and try your new pagination:</p>
+<div class="highlight-bash"><div class="highlight"><pre>curl -i <span class="s2">&quot;http://localhost:5000/users/&quot;</span>
+HTTP/1.0 200 OK
+Content-Type: application/json
+Content-Length: 1811
+Server: Werkzeug/0.8.3 Python/2.7.2
+Date: Tue, 15 Oct 2013 11:32:55 GMT
+
+<span class="o">{</span>
+<span class="s2">&quot;meta&quot;</span>: <span class="o">{</span>
+    <span class="s2">&quot;count&quot;</span>: 20,
+    <span class="s2">&quot;filters&quot;</span>: <span class="o">{}</span>,
+    <span class="s2">&quot;next&quot;</span>: <span class="s2">&quot;?offset=20&quot;</span>,
+    <span class="s2">&quot;offset&quot;</span>: 0,
+    <span class="s2">&quot;previous&quot;</span>: <span class="s2">&quot;null&quot;</span>,
+    <span class="s2">&quot;total_count&quot;</span>: 802
+<span class="o">}</span>,
+<span class="s2">&quot;object_list&quot;</span>: <span class="o">[</span>
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;Captain&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;America&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/1/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;Captain&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;America&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/3/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;John&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;Doe&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/4/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;arRFOSYZT&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/5/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;iUJsYORMuYeMUDy&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;TqFpmcBQD&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/6/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;EU&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;FMSAbcUJBSBDPaF&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/7/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;mWAwamrMQARXW&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;yMNpEnYOPzY&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/8/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;y&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;yNiKP&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/9/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;s&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;TRT&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/10/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;zFUaBd&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/11/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;WA&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;priJ&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/12/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;XvpLttDqFmR&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;liU&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/13/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;ZhJqTgYoEUzmcN&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;KKDqHJwJMxPSaTX&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/14/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;qvUxiKIATdKdkC&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;wIVzfDlKCkjkHIaC&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/15/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;YSSMHxdDQQsW&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;UaKCKgKsgEe&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/16/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;EKLFTPJLKDINZio&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;nuilPTzHqattX&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/17/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;SPcDBtmDIi&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;MrytYqElXiIxA&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/18/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;OHxNppXiYp&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;AUvUXFRPICsJIB&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/19/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;WBFGxnoe&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;KG&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/20/&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+        <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;i&quot;</span>,
+        <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;ggLOcKPpMfgvVGtv&quot;</span>,
+        <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/21/&quot;</span>
+    <span class="o">}</span>
+<span class="o">]</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="browsering-through-paginated-objects">
+<h2>Browsering Through Paginated objects<a class="headerlink" href="#browsering-through-paginated-objects" title="Permalink to this headline">¶</a></h2>
+<p>Of course you get 20 records but the most usefull part is the meta
+key:</p>
+<div class="highlight-json"><div class="highlight"><pre><span class="p">{</span><span class="nt">&quot;meta&quot;</span><span class="p">:</span>
+    <span class="p">{</span><span class="nt">&quot;count&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+    <span class="nt">&quot;total_count&quot;</span><span class="p">:</span> <span class="mi">802</span><span class="p">,</span>
+    <span class="nt">&quot;next&quot;</span><span class="p">:</span> <span class="s2">&quot;?offset=20&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;filters&quot;</span><span class="p">:</span> <span class="p">{},</span>
+    <span class="nt">&quot;offset&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="nt">&quot;previous&quot;</span><span class="p">:</span> <span class="s2">&quot;null&quot;</span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>You can use the &#8220;next&#8221; key to retreive the 20 next rows:</p>
+<div class="highlight-bash"><div class="highlight"><pre>curl -i <span class="s2">&quot;http://localhost:5000/users/?offset=20&quot;</span>
+HTTP/1.0 200 OK
+Content-Type: application/json
+Content-Length: 1849
+Server: Werkzeug/0.8.3 Python/2.7.2
+Date: Tue, 15 Oct 2013 11:38:59 GMT
+</pre></div>
+</div>
+<div class="highlight-json"><pre>{"meta": {"count": 20, "total_count": 802, "next": "?offset=40",
+"filters": {}, "offset": 20, "previous": "?offset=0"}, "object_list":
+[&lt;snip for readability&gt;]}</pre>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The count and offset keywords can be easily changed to match your
+needs. pagination class may take an offset_key and count_key
+parameters. So if you prefer to use first_id and limit, you can
+change your Paginator class to do so:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="s">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;pagination&quot;</span><span class="p">:</span> <span class="n">Pagination</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span>
+                                 <span class="n">offset_key</span><span class="o">=</span><span class="s">&quot;first_id&quot;</span><span class="p">,</span>
+                                 <span class="n">count_key</span><span class="o">=</span><span class="s">&quot;limit&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Wich will results in the following:</p>
+<div class="last highlight-bash"><div class="highlight"><pre>curl -i <span class="s2">&quot;http://localhost:5000/users/&quot;</span>
+<span class="o">{</span><span class="s2">&quot;meta&quot;</span>: <span class="o">{</span><span class="s2">&quot;first_id&quot;</span>: 0, <span class="s2">&quot;total_count&quot;</span>: 802, <span class="s2">&quot;next&quot;</span>: <span class="s2">&quot;?first_id=20&quot;</span>,
+<span class="s2">&quot;limit&quot;</span>: 20, <span class="s2">&quot;filters&quot;</span>: <span class="o">{}</span>, <span class="s2">&quot;previous&quot;</span>: <span class="s2">&quot;null&quot;</span><span class="o">}</span>, <span class="s2">&quot;object_list&quot;</span>: <span class="o">[</span>&lt;snip
+<span class="k">for </span>readability&gt;<span class="o">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="pagination-and-filters">
+<h2>Pagination and Filters<a class="headerlink" href="#pagination-and-filters" title="Permalink to this headline">¶</a></h2>
+<p>Pagination and filtering play nice together</p>
+<div class="highlight-bash"><div class="highlight"><pre>curl -i <span class="s2">&quot;http://localhost:5000/users/?last_name=America&quot;</span>
+HTTP/1.0 200 OK
+Content-Type: application/json
+Content-Length: 298
+Server: Werkzeug/0.8.3 Python/2.7.2
+Date: Tue, 15 Oct 2013 12:14:59 GMT
+
+<span class="o">{</span><span class="s2">&quot;meta&quot;</span>: <span class="o">{</span><span class="s2">&quot;count&quot;</span>: 20,
+          <span class="s2">&quot;total_count&quot;</span>: 2,
+          <span class="s2">&quot;next&quot;</span>: <span class="s2">&quot;null&quot;</span>,
+          <span class="s2">&quot;filters&quot;</span>: <span class="o">{</span><span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;America&quot;</span><span class="o">}</span>,
+          <span class="s2">&quot;offset&quot;</span>: 0,
+          <span class="s2">&quot;previous&quot;</span>: <span class="s2">&quot;null&quot;</span><span class="o">}</span>,
+          <span class="s2">&quot;object_list&quot;</span>: <span class="o">[</span>
+              <span class="o">{</span><span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;Joe&quot;</span>,
+               <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;America&quot;</span>,
+               <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/1/&quot;</span><span class="o">}</span>,
+              <span class="o">{</span><span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;Bob&quot;</span>,
+               <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;America&quot;</span>,
+               <span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/3/&quot;</span><span class="o">}</span>
+          <span class="o">]</span>
+ <span class="o">}</span>
+</pre></div>
+</div>
+<p>Next: <a class="reference internal" href="adding_endpoint.html"><em>Loading multiple endpoint</em></a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Working with Pagination</a><ul>
+<li><a class="reference internal" href="#creating-fixtures">Creating fixtures</a></li>
+<li><a class="reference internal" href="#pagination">Pagination</a></li>
+<li><a class="reference internal" href="#browsering-through-paginated-objects">Browsering Through Paginated objects</a></li>
+<li><a class="reference internal" href="#pagination-and-filters">Pagination and Filters</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="adding_validator_datastore.html"
+                        title="previous chapter">Adding validators to your DataStore</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="related_ressources.html"
+                        title="next chapter">Linking ressource together</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/tutorial/work_with_pagination.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="related_ressources.html" title="Linking ressource together"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="adding_validator_datastore.html" title="Adding validators to your DataStore"
+             >previous</a> |</li>
+        <li><a href="../index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li>
+          <li><a href="../tutorial.html" >Tutorial: building an adressebook API</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Yohann Gabory.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

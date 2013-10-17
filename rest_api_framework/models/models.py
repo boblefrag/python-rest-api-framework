@@ -33,8 +33,8 @@ class Model(object):
                                     "example": field.example
                                     }
             if field.options.get("required") and\
-                    field.options["required"] == True:
-                response[field.name]['required'] = "true" 
+                    field.options["required"] is True:
+                response[field.name]['required'] = "true"
         return response
 
     def get_fields_name(self):

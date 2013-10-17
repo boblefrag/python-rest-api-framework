@@ -23,6 +23,7 @@ common verbs:
 * POST
 * UPDATE
 * DELETE
+* HEAD
 
 It also implement:
 
@@ -30,33 +31,24 @@ It also implement:
 * AUTHENTICATION
 * RATE-LIMIT
 * DATA VALIDATION
-* ...
+* PARTIAL RESPONSE
 
 Architecture
 ------------
 
-Python REST API Framework is base on the MVC pattern.
+Python REST API Framework is base on the MVC pattern. You define some
+endpoints defining a Ressource, a Controller and a View with a set of
+options to configure them.
 
-To create an API, you will need to create or reuse existing class:
 
 Controller
 ~~~~~~~~~~
 
-manage the routing of the urls. For a ressource, 2 urls are
-created:
+Manage the way you handle request. Controller create the urls
+endpoints for you. List, Unique and Autodocumented endpoints.
 
-  * /ressource_name/ : this url will show a list of ressources
-      (GET) or create new one (POST)
-
-  * /ressource_name/identifier/ : this url will show a particular
-      object (GET), update an existion object (PUT) or delete an
-      existing object (DELETE)
-
-Controller also check the authorized verbs. You can disable POST, PUT
-and DELETE to make a read-only API for exemple.
-
-If authentication is enabled, Controller call the
-Authorisation/Authentication backend to manage user management
+Controller also manage pagination, formaters, authentication,
+authorization, rate-limit and allowed method.
 
 DataStore
 ~~~~~~~~~
@@ -71,83 +63,25 @@ able to validate data, create new ressources, update existing
 ressources, manage filters and pagination.
 
 Optional configuration option, that can be unique for a particular
-datastore make it very easy to configure, inherit and extend
-
-Model
-~~~~~
-
-When you create a DataStoreInstance, you must feed it with a Model.
-A Model is the python representation of a ressource object.
-
-A Model will contain a list of Fields describing the ressource.
-
-Field
-~~~~~
-
-Each fields of a Model must have a name to identify it. This name
-correspond to the name of the field or property of the ressource.
-
-Each Field can take optionals parameters to control its behavior. It
-can also implment as many Validators than needed to control data integrity.
-
-Validator
-~~~~~~~~~
-
-Each Validator implement the validate method. The validate method will
-check a value and return True if the value is valide, False otherwise.
+datastore like Ressource level validation (unique together and so),
+ForeignKey management...
 
 View
 ~~~~
 
 Views defines how the data must be send to the client. It send a
 Response object and set the needed headers, mime-type and other
-presentation options
+presentation options like formaters.
 
-
-Authentication
-~~~~~~~~~~~~~~
-
-Authentication are class too. This mean that you can easily create
-your own Authentication flow with REST API Framework.
-
-Authentication Backend can use DataStore to get authentication and
-authorization informations. As Backend can be anything from database
-to other API, you do not need to store user informations on the same
-machine or instance than your API.
-
-It is moer secure, more scallable, easy to extend to suit your needs
 
 How To use it
 -------------
 
-Python REST API framework is based on the MVC pattern. You define
-Controllers, DataStore and Views. Each of them are based on backends
-easily extendable and reusable.
+To create as many endpoint as you need. Each endpoints defining a
+ressource, a controller and a view. Then add them to the
+:class:`rest_api_framework.controllers.WSGIDispatcher`
 
-Each of those part are totaly unrelated. You can use any controllers
-with any datastore and any View
-
-Datastore
-~~~~~~~~~
-
-First of all you have to decide where the data you want to expose
-lies. It can be anything from a database, another API, even a list of
-dictonary living in memory.
-
-Depending on your data, you can reuse à datastore class or create a
-new one to fit your needs. The datastore hanle the communication
-between your API and the data
-
-Controllers
-~~~~~~~~~~~
-
-The controller define your API. authorized verbs, pagination and
-authentication. You will also need to describe your ressource to allow
-validation on data.
-
-Finaly you will need to hook your Controller to a Datastore. Once this is
-done, your application is up and running.
-
+See `QuickStart` for an example or the :doc:`tutorial` for the whole picture.
 
 QuickStart
 ----------
@@ -305,7 +239,7 @@ is the same as with the PythonListDataStore.
 
 .. note::
 
-  if the database does not exist, REST API Framework create it for you
+  if the sqlite3 database does not exist, REST API Framework create it for you
 
 .. code-block:: python
 
@@ -346,5 +280,5 @@ is the same as with the PythonListDataStore.
 Where to go from here
 ---------------------
 
-.. * :doc:`Authentication and Authorization </authentication>`
-.. * :doc:`multiple_endpoint`
+ * :doc:`tutorial`
+ * :doc:`references`

@@ -20,12 +20,13 @@ Contents:
 
    introduction
    tutorial
+   references
 ..   datastore
 ..   controller
 ..   pagination
 ..   authentication
 ..   multiple_endpoint
-..   references
+
 
 
 A Full working example

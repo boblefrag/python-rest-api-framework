@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Adding validators to your DataStore &mdash; Python Rest Api Framework 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Python Rest Api Framework 0.1 documentation" href="../index.html" />
+    <link rel="up" title="Tutorial: building an adressebook API" href="../tutorial.html" />
+    <link rel="next" title="Show data to users" href="representing_data.html" />
+    <link rel="prev" title="Playing with the newly created endpoint" href="using_user_endpoint.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="representing_data.html" title="Show data to users"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="using_user_endpoint.html" title="Playing with the newly created endpoint"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li>
+          <li><a href="../tutorial.html" accesskey="U">Tutorial: building an adressebook API</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="adding-validators-to-your-datastore">
+<h1>Adding validators to your DataStore<a class="headerlink" href="#adding-validators-to-your-datastore" title="Permalink to this headline">¶</a></h1>
+<p>In this exemple, you want to check that a user with the same last_name
+and same first_name does not exist in your datastore before creating a
+new user.</p>
+<p>For this you can use UniqueTogether:</p>
+<div class="section" id="uniquetogether">
+<h2>UniqueTogether<a class="headerlink" href="#uniquetogether" title="Permalink to this headline">¶</a></h2>
+<p>Change your UserEndPoint to get:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">rest_api_framework.datastore.validators</span> <span class="kn">import</span> <span class="n">UniqueTogether</span>
+
+<span class="k">class</span> <span class="nc">UserEndPoint</span><span class="p">(</span><span class="n">Controller</span><span class="p">):</span>
+    <span class="n">ressource</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&quot;ressource_name&quot;</span><span class="p">:</span> <span class="s">&quot;users&quot;</span><span class="p">,</span>
+        <span class="s">&quot;ressource&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="s">&quot;adress_book.db&quot;</span><span class="p">,</span> <span class="s">&quot;table&quot;</span><span class="p">:</span> <span class="s">&quot;users&quot;</span><span class="p">},</span>
+        <span class="s">&quot;model&quot;</span><span class="p">:</span> <span class="n">UserModel</span><span class="p">,</span>
+        <span class="s">&quot;datastore&quot;</span><span class="p">:</span> <span class="n">SQLiteDataStore</span><span class="p">,</span>
+        <span class="s">&quot;options&quot;</span><span class="p">:{</span><span class="s">&quot;validators&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">UniqueTogether</span><span class="p">(</span><span class="s">&quot;first_name&quot;</span><span class="p">,</span> <span class="s">&quot;last_name&quot;</span><span class="p">)]}</span>
+        <span class="p">}</span>
+
+    <span class="n">controller</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&quot;list_verbs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;POST&quot;</span><span class="p">],</span>
+        <span class="s">&quot;unique_verbs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;PUT&quot;</span><span class="p">,</span> <span class="s">&quot;DElETE&quot;</span><span class="p">]</span>
+        <span class="p">}</span>
+
+    <span class="n">view</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;response_class&quot;</span><span class="p">:</span> <span class="n">JsonResponse</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>each of ressource, controller and views can have various options to
+add new functionality to them. The &#8220;validators&#8221; option of ressource
+enable some datastore based validators. As you can see, validators are
+a list. This meen that you can add many validators for a single datastore.</p>
+<p>UniqueTogether will ensure that a user with first_name: John and
+last_name: Doe cannot be created.</p>
+<p>Let&#8217;s try:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">curl</span> <span class="o">-</span><span class="n">i</span> <span class="o">-</span><span class="n">H</span> <span class="s">&quot;Content-type: application/json&quot;</span> <span class="o">-</span><span class="n">X</span> <span class="n">POST</span> <span class="o">-</span><span class="n">d</span> <span class="s">&#39;{&quot;first_name&quot;: &quot;John&quot;, &quot;last_name&quot;: &quot;Doe&quot;}&#39;</span>  <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">5000</span><span class="o">/</span><span class="n">users</span><span class="o">/</span>
+<span class="n">HTTP</span><span class="o">/</span><span class="mf">1.0</span> <span class="mi">400</span> <span class="n">BAD</span> <span class="n">REQUEST</span>
+<span class="n">Content</span><span class="o">-</span><span class="n">Type</span><span class="p">:</span> <span class="n">application</span><span class="o">/</span><span class="n">json</span>
+<span class="n">Content</span><span class="o">-</span><span class="n">Length</span><span class="p">:</span> <span class="mi">57</span>
+<span class="n">Server</span><span class="p">:</span> <span class="n">Werkzeug</span><span class="o">/</span><span class="mf">0.8</span><span class="o">.</span><span class="mi">3</span> <span class="n">Python</span><span class="o">/</span><span class="mf">2.7</span><span class="o">.</span><span class="mi">2</span>
+<span class="n">Date</span><span class="p">:</span> <span class="n">Mon</span><span class="p">,</span> <span class="mi">14</span> <span class="n">Oct</span> <span class="mi">2013</span> <span class="mi">17</span><span class="p">:</span><span class="mi">13</span><span class="p">:</span><span class="mi">41</span> <span class="n">GMT</span>
+
+<span class="p">{</span><span class="s">&quot;error&quot;</span><span class="p">:</span> <span class="s">&quot;first_name,last_name must be unique together&quot;</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>Next: <a class="reference internal" href="representing_data.html"><em>Show data to users</em></a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Adding validators to your DataStore</a><ul>
+<li><a class="reference internal" href="#uniquetogether">UniqueTogether</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="using_user_endpoint.html"
+                        title="previous chapter">Playing with the newly created endpoint</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="representing_data.html"
+                        title="next chapter">Show data to users</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/tutorial/adding_validator_datastore.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="representing_data.html" title="Show data to users"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="using_user_endpoint.html" title="Playing with the newly created endpoint"
+             >previous</a> |</li>
+        <li><a href="../index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li>
+          <li><a href="../tutorial.html" >Tutorial: building an adressebook API</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Yohann Gabory.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

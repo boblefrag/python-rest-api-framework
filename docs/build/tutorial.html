@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Python Rest Api Framework 0.1 documentation" href="index.html" />
-    <link rel="next" title="First Step Building a user endpoint" href="first_step.html" />
+    <link rel="next" title="First Step Building a user endpoint" href="tutorial/first_step.html" />
     <link rel="prev" title="What is Python REST API Framework" href="introduction.html" /> 
   </head>
   <body>
@@ -35,10 +35,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="first_step.html" title="First Step Building a user endpoint"
+          <a href="tutorial/first_step.html" title="First Step Building a user endpoint"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="introduction.html" title="What is Python REST API Framework"
@@ -56,66 +53,70 @@
 <h1>Tutorial: building an adressebook API<a class="headerlink" href="#tutorial-building-an-adressebook-api" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="first_step.html">First Step Building a user endpoint</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="first_step.html#define-a-model">Define a model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="first_step.html#chose-a-datastore">Chose a DataStore</a></li>
-<li class="toctree-l2"><a class="reference internal" href="first_step.html#chose-a-view">Chose a view</a></li>
-<li class="toctree-l2"><a class="reference internal" href="first_step.html#create-the-user-endpoint">Create The user endpoint</a></li>
-<li class="toctree-l2"><a class="reference internal" href="first_step.html#summary">Summary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/first_step.html">First Step Building a user endpoint</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/first_step.html#define-a-model">Define a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/first_step.html#chose-a-datastore">Chose a DataStore</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/first_step.html#chose-a-view">Chose a view</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/first_step.html#create-the-user-endpoint">Create The user endpoint</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/first_step.html#summary">Summary</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="using_user_endpoint.html">Playing with the newly created endpoint</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="using_user_endpoint.html#create-a-user">Create a user</a></li>
-<li class="toctree-l2"><a class="reference internal" href="using_user_endpoint.html#list-and-get">List and Get</a></li>
-<li class="toctree-l2"><a class="reference internal" href="using_user_endpoint.html#delete-a-user">Delete a user</a></li>
-<li class="toctree-l2"><a class="reference internal" href="using_user_endpoint.html#update-a-user">Update a User</a></li>
-<li class="toctree-l2"><a class="reference internal" href="using_user_endpoint.html#filtering">Filtering</a></li>
-<li class="toctree-l2"><a class="reference internal" href="using_user_endpoint.html#error-handling">Error handling</a></li>
-<li class="toctree-l2"><a class="reference internal" href="using_user_endpoint.html#autodocumentation">Autodocumentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/using_user_endpoint.html">Playing with the newly created endpoint</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/using_user_endpoint.html#create-a-user">Create a user</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/using_user_endpoint.html#list-and-get">List and Get</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/using_user_endpoint.html#delete-a-user">Delete a user</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/using_user_endpoint.html#update-a-user">Update a User</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/using_user_endpoint.html#filtering">Filtering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/using_user_endpoint.html#error-handling">Error handling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/using_user_endpoint.html#autodocumentation">Autodocumentation</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="adding_validator_datastore.html">Adding validators to your DataStore</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="adding_validator_datastore.html#uniquetogether">UniqueTogether</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/adding_validator_datastore.html">Adding validators to your DataStore</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/adding_validator_datastore.html#uniquetogether">UniqueTogether</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="representing_data.html">Show data to users</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="representing_data.html#define-a-formater-function">Define a formater function</a></li>
-<li class="toctree-l2"><a class="reference internal" href="representing_data.html#make-things-generics">Make things generics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/representing_data.html">Show data to users</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/representing_data.html#define-a-formater-function">Define a formater function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/representing_data.html#make-things-generics">Make things generics</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="work_with_pagination.html">Working with Pagination</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="work_with_pagination.html#creating-fixtures">Creating fixtures</a></li>
-<li class="toctree-l2"><a class="reference internal" href="work_with_pagination.html#pagination">Pagination</a></li>
-<li class="toctree-l2"><a class="reference internal" href="work_with_pagination.html#browsering-through-paginated-objects">Browsering Through Paginated objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="work_with_pagination.html#pagination-and-filters">Pagination and Filters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/work_with_pagination.html">Working with Pagination</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/work_with_pagination.html#creating-fixtures">Creating fixtures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/work_with_pagination.html#pagination">Pagination</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/work_with_pagination.html#browsering-through-paginated-objects">Browsering Through Paginated objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/work_with_pagination.html#pagination-and-filters">Pagination and Filters</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="related_ressources.html">Linking ressource together</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="related_ressources.html#adding-an-adress">Adding an adress</a></li>
-<li class="toctree-l2"><a class="reference internal" href="related_ressources.html#create-a-user-linked-to-an-address">Create a user linked to an address</a></li>
-<li class="toctree-l2"><a class="reference internal" href="related_ressources.html#retreive-the-adress-of-a-user">Retreive the adress of a user</a></li>
-<li class="toctree-l2"><a class="reference internal" href="related_ressources.html#retreive-users-from-an-adress">Retreive users from an adress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/related_ressources.html">Linking ressource together</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/related_ressources.html#adding-an-adress">Adding an adress</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/related_ressources.html#create-a-user-linked-to-an-address">Create a user linked to an address</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/related_ressources.html#retreive-the-adress-of-a-user">Retreive the adress of a user</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/related_ressources.html#retreive-users-from-an-adress">Retreive users from an adress</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="represent_related.html">Representing relations</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="represent_related.html#representiing-the-relation-on-the-user-side">Representiing the relation on the user side</a></li>
-<li class="toctree-l2"><a class="reference internal" href="represent_related.html#check-the-formater">Check the formater</a></li>
-<li class="toctree-l2"><a class="reference internal" href="represent_related.html#formating-data-for-the-system">Formating data for the system</a></li>
-<li class="toctree-l2"><a class="reference internal" href="represent_related.html#check-the-controller-translation">Check the Controller translation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/represent_related.html">Representing relations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/represent_related.html#representiing-the-relation-on-the-user-side">Representiing the relation on the user side</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/represent_related.html#check-the-formater">Check the formater</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/represent_related.html#formating-data-for-the-system">Formating data for the system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/represent_related.html#check-the-controller-translation">Check the Controller translation</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="protect_api.html">Authentication and Authorization: Protecting your API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="protect_api.html#authentication">Authentication</a></li>
-<li class="toctree-l2"><a class="reference internal" href="protect_api.html#define-a-backend">Define a backend</a></li>
-<li class="toctree-l2"><a class="reference internal" href="protect_api.html#instanciate-the-authentication-backend">Instanciate the Authentication backend</a></li>
-<li class="toctree-l2"><a class="reference internal" href="protect_api.html#instanciate-the-authorization-backend">Instanciate the Authorization backend</a></li>
-<li class="toctree-l2"><a class="reference internal" href="protect_api.html#testing-authentication-and-authorization-backend">Testing Authentication and Authorization Backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/protect_api.html">Authentication and Authorization: Protecting your API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/protect_api.html#authentication">Authentication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/protect_api.html#define-a-backend">Define a backend</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/protect_api.html#instanciate-the-authentication-backend">Instanciate the Authentication backend</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/protect_api.html#instanciate-the-authorization-backend">Instanciate the Authorization backend</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/protect_api.html#testing-authentication-and-authorization-backend">Testing Authentication and Authorization Backend</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="rate-limit.html">Rate Limiting your endpoints</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="rate-limit.html#create-a-datastore-for-rate-limit">Create a datastore for rate-limit:</a></li>
-<li class="toctree-l2"><a class="reference internal" href="rate-limit.html#add-rate-limit-to-your-api">Add Rate-limit to your API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="rate-limit.html#test">Test!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/rate-limit.html">Rate Limiting your endpoints</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/rate-limit.html#create-a-datastore-for-rate-limit">Create a datastore for rate-limit:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/rate-limit.html#add-rate-limit-to-your-api">Add Rate-limit to your API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/rate-limit.html#test">Test!</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/partial-response.html">Implementing Partial Response</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/partial-response.html#test-the-partial">Test the Partial</a></li>
 </ul>
 </li>
 </ul>
@@ -132,7 +133,7 @@
   <p class="topless"><a href="introduction.html"
                         title="previous chapter">What is Python REST API Framework</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="first_step.html"
+  <p class="topless"><a href="tutorial/first_step.html"
                         title="next chapter">First Step Building a user endpoint</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
@@ -163,10 +164,7 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="first_step.html" title="First Step Building a user endpoint"
+          <a href="tutorial/first_step.html" title="First Step Building a user endpoint"
              >next</a> |</li>
         <li class="right" >
           <a href="introduction.html" title="What is Python REST API Framework"

@@ -1,0 +1,198 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Rate Limiting your endpoints &mdash; Python Rest Api Framework 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Python Rest Api Framework 0.1 documentation" href="../index.html" />
+    <link rel="up" title="Tutorial: building an adressebook API" href="../tutorial.html" />
+    <link rel="next" title="Implementing Partial Response" href="partial-response.html" />
+    <link rel="prev" title="Authentication and Authorization: Protecting your API" href="protect_api.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="partial-response.html" title="Implementing Partial Response"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="protect_api.html" title="Authentication and Authorization: Protecting your API"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li>
+          <li><a href="../tutorial.html" accesskey="U">Tutorial: building an adressebook API</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="rate-limiting-your-endpoints">
+<h1>Rate Limiting your endpoints<a class="headerlink" href="#rate-limiting-your-endpoints" title="Permalink to this headline">¶</a></h1>
+<p>Now that your users are authenticated and that you put an
+authorization backend, you can add a rate limit on your api. Rate
+limit will prevent your users to over use your endpoints.</p>
+<p>With rate limit, a user can call your API at a certain rate. A number
+of calls per an interval. You have to decide how many call and wich
+interval.</p>
+<p>For this example, let say something like 100 call per 10 minutes. For
+Python REST Framework, interval are counted in seconds so 10 minutes
+equals 10*60 = 600</p>
+<div class="section" id="create-a-datastore-for-rate-limit">
+<h2>Create a datastore for rate-limit:<a class="headerlink" href="#create-a-datastore-for-rate-limit" title="Permalink to this headline">¶</a></h2>
+<p>The rate-limit implementation need a datastore to store
+rate-limit. Let&#8217;s create one:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">RateLimitModel</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="n">models</span><span class="o">.</span><span class="n">StringPkField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;access_key&quot;</span><span class="p">),</span>
+              <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;quota&quot;</span><span class="p">),</span>
+              <span class="n">models</span><span class="o">.</span><span class="n">TimestampField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;last_request&quot;</span><span class="p">)]</span>
+</pre></div>
+</div>
+<p>You can then add your new datastore to the list of options of you
+controller:</p>
+</div>
+<div class="section" id="add-rate-limit-to-your-api">
+<h2>Add Rate-limit to your API<a class="headerlink" href="#add-rate-limit-to-your-api" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">rest_api_framework.ratelimit</span> <span class="kn">import</span> <span class="n">RateLimit</span>
+
+    <span class="n">controller</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&quot;list_verbs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;POST&quot;</span><span class="p">],</span>
+        <span class="s">&quot;unique_verbs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;PUT&quot;</span><span class="p">,</span> <span class="s">&quot;DElETE&quot;</span><span class="p">],</span>
+        <span class="s">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;pagination&quot;</span><span class="p">:</span> <span class="n">Pagination</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span>
+                    <span class="s">&quot;formaters&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">foreign_keys_format</span><span class="p">],</span>
+                    <span class="s">&quot;authentication&quot;</span><span class="p">:</span> <span class="n">authentication</span><span class="p">,</span>
+                    <span class="s">&quot;authorization&quot;</span><span class="p">:</span> <span class="n">Authorization</span><span class="p">,</span>
+                    <span class="s">&quot;ratelimit&quot;</span><span class="p">:</span> <span class="n">RateLimit</span><span class="p">(</span>
+                <span class="n">PythonListDataStore</span><span class="p">([],</span><span class="n">RateLimitModel</span><span class="p">),</span>
+                <span class="n">interval</span><span class="o">=</span><span class="mi">10</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span>
+                <span class="n">quota</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+                    <span class="p">}</span>
+        <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="test">
+<h2>Test!<a class="headerlink" href="#test" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash"><div class="highlight"><pre>curl -i -X GET http://localhost:5000/users/?accesskey<span class="o">=</span>hackme
+HTTP/1.0 200 OK
+Content-Type: application/json
+Content-Length: 350
+Server: Werkzeug/0.8.3 Python/2.7.2
+Date: Wed, 16 Oct 2013 15:22:12 GMT
+
+<span class="o">{</span><span class="s2">&quot;meta&quot;</span>: <span class="o">{</span><span class="s2">&quot;count&quot;</span>: 20, <span class="s2">&quot;total_count&quot;</span>: 2, <span class="s2">&quot;next&quot;</span>: <span class="s2">&quot;null&quot;</span>, <span class="s2">&quot;filters&quot;</span>:
+<span class="o">{</span><span class="s2">&quot;accesskey&quot;</span>: <span class="s2">&quot;hackme&quot;</span><span class="o">}</span>, <span class="s2">&quot;offset&quot;</span>: 0, <span class="s2">&quot;previous&quot;</span>: <span class="s2">&quot;null&quot;</span><span class="o">}</span>,
+<span class="s2">&quot;object_list&quot;</span>: <span class="o">[{</span><span class="s2">&quot;ressource_uri&quot;</span>: <span class="s2">&quot;/users/1/&quot;</span>, <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;Super&quot;</span>,
+<span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;Dupont&quot;</span>, <span class="s2">&quot;address&quot;</span>: <span class="s2">&quot;/address/1/&quot;</span><span class="o">}</span>, <span class="o">{</span><span class="s2">&quot;ressource_uri&quot;</span>:
+<span class="s2">&quot;/users/2/&quot;</span>, <span class="s2">&quot;first_name&quot;</span>: <span class="s2">&quot;Supe&quot;</span>, <span class="s2">&quot;last_name&quot;</span>: <span class="s2">&quot;Dupont&quot;</span>, <span class="s2">&quot;address&quot;</span>:
+<span class="s2">&quot;/address/1/&quot;</span><span class="o">}]}</span>
+</pre></div>
+</div>
+<div class="highlight-bash"><div class="highlight"><pre>curl -i -X GET http://localhost:5000/users/?accesskey<span class="o">=</span>hackme
+HTTP/1.0 429 TOO MANY REQUESTS
+Content-Type: application/json
+Content-Length: 23
+Server: Werkzeug/0.8.3 Python/2.7.2
+Date: Wed, 16 Oct 2013 15:22:14 GMT
+</pre></div>
+</div>
+<p>next: <a class="reference internal" href="partial-response.html"><em>Implementing Partial Response</em></a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Rate Limiting your endpoints</a><ul>
+<li><a class="reference internal" href="#create-a-datastore-for-rate-limit">Create a datastore for rate-limit:</a></li>
+<li><a class="reference internal" href="#add-rate-limit-to-your-api">Add Rate-limit to your API</a></li>
+<li><a class="reference internal" href="#test">Test!</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="protect_api.html"
+                        title="previous chapter">Authentication and Authorization: Protecting your API</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="partial-response.html"
+                        title="next chapter">Implementing Partial Response</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/tutorial/rate-limit.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="partial-response.html" title="Implementing Partial Response"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="protect_api.html" title="Authentication and Authorization: Protecting your API"
+             >previous</a> |</li>
+        <li><a href="../index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li>
+          <li><a href="../tutorial.html" >Tutorial: building an adressebook API</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Yohann Gabory.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

@@ -72,6 +72,7 @@ common verbs:</p>
 <li>POST</li>
 <li>UPDATE</li>
 <li>DELETE</li>
+<li>HEAD</li>
 </ul>
 <p>It also implement:</p>
 <ul class="simple">
@@ -79,37 +80,19 @@ common verbs:</p>
 <li>AUTHENTICATION</li>
 <li>RATE-LIMIT</li>
 <li>DATA VALIDATION</li>
-<li>...</li>
+<li>PARTIAL RESPONSE</li>
 </ul>
 <div class="section" id="architecture">
 <h2>Architecture<a class="headerlink" href="#architecture" title="Permalink to this headline">¶</a></h2>
-<p>Python REST API Framework is base on the MVC pattern.</p>
-<p>To create an API, you will need to create or reuse existing class:</p>
+<p>Python REST API Framework is base on the MVC pattern. You define some
+endpoints defining a Ressource, a Controller and a View with a set of
+options to configure them.</p>
 <div class="section" id="controller">
 <h3>Controller<a class="headerlink" href="#controller" title="Permalink to this headline">¶</a></h3>
-<p>manage the routing of the urls. For a ressource, 2 urls are
-created:</p>
-<blockquote>
-<div><ul>
-<li><dl class="first docutils">
-<dt>/ressource_name/ <span class="classifier-delimiter">:</span> <span class="classifier">this url will show a list of ressources</span></dt>
-<dd><p class="first last">(GET) or create new one (POST)</p>
-</dd>
-</dl>
-</li>
-<li><dl class="first docutils">
-<dt>/ressource_name/identifier/ <span class="classifier-delimiter">:</span> <span class="classifier">this url will show a particular</span></dt>
-<dd><p class="first last">object (GET), update an existion object (PUT) or delete an
-existing object (DELETE)</p>
-</dd>
-</dl>
-</li>
-</ul>
-</div></blockquote>
-<p>Controller also check the authorized verbs. You can disable POST, PUT
-and DELETE to make a read-only API for exemple.</p>
-<p>If authentication is enabled, Controller call the
-Authorisation/Authentication backend to manage user management</p>
+<p>Manage the way you handle request. Controller create the urls
+endpoints for you. List, Unique and Autodocumented endpoints.</p>
+<p>Controller also manage pagination, formaters, authentication,
+authorization, rate-limit and allowed method.</p>
 </div>
 <div class="section" id="datastore">
 <h3>DataStore<a class="headerlink" href="#datastore" title="Permalink to this headline">¶</a></h3>
@@ -121,67 +104,22 @@ ressource.</p>
 able to validate data, create new ressources, update existing
 ressources, manage filters and pagination.</p>
 <p>Optional configuration option, that can be unique for a particular
-datastore make it very easy to configure, inherit and extend</p>
-</div>
-<div class="section" id="model">
-<h3>Model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h3>
-<p>When you create a DataStoreInstance, you must feed it with a Model.
-A Model is the python representation of a ressource object.</p>
-<p>A Model will contain a list of Fields describing the ressource.</p>
-</div>
-<div class="section" id="field">
-<h3>Field<a class="headerlink" href="#field" title="Permalink to this headline">¶</a></h3>
-<p>Each fields of a Model must have a name to identify it. This name
-correspond to the name of the field or property of the ressource.</p>
-<p>Each Field can take optionals parameters to control its behavior. It
-can also implment as many Validators than needed to control data integrity.</p>
-</div>
-<div class="section" id="validator">
-<h3>Validator<a class="headerlink" href="#validator" title="Permalink to this headline">¶</a></h3>
-<p>Each Validator implement the validate method. The validate method will
-check a value and return True if the value is valide, False otherwise.</p>
+datastore like Ressource level validation (unique together and so),
+ForeignKey management...</p>
 </div>
 <div class="section" id="view">
 <h3>View<a class="headerlink" href="#view" title="Permalink to this headline">¶</a></h3>
 <p>Views defines how the data must be send to the client. It send a
 Response object and set the needed headers, mime-type and other
-presentation options</p>
-</div>
-<div class="section" id="authentication">
-<h3>Authentication<a class="headerlink" href="#authentication" title="Permalink to this headline">¶</a></h3>
-<p>Authentication are class too. This mean that you can easily create
-your own Authentication flow with REST API Framework.</p>
-<p>Authentication Backend can use DataStore to get authentication and
-authorization informations. As Backend can be anything from database
-to other API, you do not need to store user informations on the same
-machine or instance than your API.</p>
-<p>It is moer secure, more scallable, easy to extend to suit your needs</p>
+presentation options like formaters.</p>
 </div>
 </div>
 <div class="section" id="how-to-use-it">
 <h2>How To use it<a class="headerlink" href="#how-to-use-it" title="Permalink to this headline">¶</a></h2>
-<p>Python REST API framework is based on the MVC pattern. You define
-Controllers, DataStore and Views. Each of them are based on backends
-easily extendable and reusable.</p>
-<p>Each of those part are totaly unrelated. You can use any controllers
-with any datastore and any View</p>
-<div class="section" id="id1">
-<h3>Datastore<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
-<p>First of all you have to decide where the data you want to expose
-lies. It can be anything from a database, another API, even a list of
-dictonary living in memory.</p>
-<p>Depending on your data, you can reuse à datastore class or create a
-new one to fit your needs. The datastore hanle the communication
-between your API and the data</p>
-</div>
-<div class="section" id="controllers">
-<h3>Controllers<a class="headerlink" href="#controllers" title="Permalink to this headline">¶</a></h3>
-<p>The controller define your API. authorized verbs, pagination and
-authentication. You will also need to describe your ressource to allow
-validation on data.</p>
-<p>Finaly you will need to hook your Controller to a Datastore. Once this is
-done, your application is up and running.</p>
-</div>
+<p>To create as many endpoint as you need. Each endpoints defining a
+ressource, a controller and a view. Then add them to the
+<a class="reference internal" href="references.html#rest_api_framework.controllers.WSGIDispatcher" title="rest_api_framework.controllers.WSGIDispatcher"><tt class="xref py py-class docutils literal"><span class="pre">rest_api_framework.controllers.WSGIDispatcher</span></tt></a></p>
+<p>See <cite>QuickStart</cite> for an example or the <a class="reference internal" href="tutorial.html"><em>Tutorial: building an adressebook API</em></a> for the whole picture.</p>
 </div>
 <div class="section" id="quickstart">
 <h2>QuickStart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h2>
@@ -277,8 +215,8 @@ to build your own datastore depending on your needs.</p>
 </ul>
 </div></blockquote>
 </div>
-<div class="section" id="id2">
-<h4>Controller<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="id1">
+<h4>Controller<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
 <p>The controller define the way your data should be accessed. Should the
 results be paginated ? Authenticated ? Rate-limited ? Wich it the
 verbs you can use on the resource ? and so on.</p>
@@ -302,8 +240,8 @@ ressource, DELETE to delete a ressource.</p>
 </ul>
 </div></blockquote>
 </div>
-<div class="section" id="id3">
-<h4>View<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="id2">
+<h4>View<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
 <p>view define How your ressoources should be rendered to the
 user. It can be a Json format, XML, or whatever. It can also
 render pagination token, first page, last page, number of objects
@@ -342,7 +280,7 @@ dict with database name and table name. The rest of the configuration
 is the same as with the PythonListDataStore.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">if the database does not exist, REST API Framework create it for you</p>
+<p class="last">if the sqlite3 database does not exist, REST API Framework create it for you</p>
 </div>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">rest_api_framework.datastore</span> <span class="kn">import</span> <span class="n">SQLiteDataStore</span>
 <span class="kn">from</span> <span class="nn">rest_api_framework.controllers</span> <span class="kn">import</span> <span class="n">Controller</span>
@@ -382,6 +320,12 @@ is the same as with the PythonListDataStore.</p>
 </div>
 <div class="section" id="where-to-go-from-here">
 <h2>Where to go from here<a class="headerlink" href="#where-to-go-from-here" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="tutorial.html"><em>Tutorial: building an adressebook API</em></a></li>
+<li><a class="reference internal" href="references.html"><em>REST API Framework API references</em></a></li>
+</ul>
+</div></blockquote>
 </div>
 </div>
 
@@ -397,23 +341,15 @@ is the same as with the PythonListDataStore.</p>
 <li><a class="reference internal" href="#architecture">Architecture</a><ul>
 <li><a class="reference internal" href="#controller">Controller</a></li>
 <li><a class="reference internal" href="#datastore">DataStore</a></li>
-<li><a class="reference internal" href="#model">Model</a></li>
-<li><a class="reference internal" href="#field">Field</a></li>
-<li><a class="reference internal" href="#validator">Validator</a></li>
 <li><a class="reference internal" href="#view">View</a></li>
-<li><a class="reference internal" href="#authentication">Authentication</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#how-to-use-it">How To use it</a><ul>
-<li><a class="reference internal" href="#id1">Datastore</a></li>
-<li><a class="reference internal" href="#controllers">Controllers</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#how-to-use-it">How To use it</a></li>
 <li><a class="reference internal" href="#quickstart">QuickStart</a><ul>
 <li><a class="reference internal" href="#a-simple-api">A Simple API</a><ul>
 <li><a class="reference internal" href="#ressource">Ressource</a></li>
-<li><a class="reference internal" href="#id2">Controller</a></li>
-<li><a class="reference internal" href="#id3">View</a></li>
+<li><a class="reference internal" href="#id1">Controller</a></li>
+<li><a class="reference internal" href="#id2">View</a></li>
 <li><a class="reference internal" href="#options">Options</a></li>
 </ul>
 </li>

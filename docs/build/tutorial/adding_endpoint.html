@@ -1,0 +1,189 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Loading multiple endpoint &mdash; Python Rest Api Framework 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Python Rest Api Framework 0.1 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="loading-multiple-endpoint">
+<h1>Loading multiple endpoint<a class="headerlink" href="#loading-multiple-endpoint" title="Permalink to this headline">¶</a></h1>
+<p>Now that your fist endpoint work as expected, you will need to add an
+address field on the user model. But as some users can have the same
+address, and because you want to retreive some user using an address,
+you will need to create an new endpoint:</p>
+<div class="section" id="define-a-new-model">
+<h2>Define a new model<a class="headerlink" href="#define-a-new-model" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">AddressModel</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+
+    <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="n">models</span><span class="o">.</span><span class="n">StringField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;country&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+              <span class="n">models</span><span class="o">.</span><span class="n">StringField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;city&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+              <span class="n">models</span><span class="o">.</span><span class="n">StringField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;street&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+              <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;number&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+              <span class="n">models</span><span class="o">.</span><span class="n">PkField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;id&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+              <span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="inherite-from-previous-apps">
+<h2>Inherite from previous apps<a class="headerlink" href="#inherite-from-previous-apps" title="Permalink to this headline">¶</a></h2>
+<p>The only thing that change here in comparisson to the UserEndPoint you
+created earlier is the ressource dict. So instead of copy pasting a
+lot of lines, let&#8217;s heritate from your first app:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">AddressEndPoint</span><span class="p">(</span><span class="n">UserEndPoint</span><span class="p">):</span>
+    <span class="n">ressource</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&quot;ressource_name&quot;</span><span class="p">:</span> <span class="s">&quot;address&quot;</span><span class="p">,</span>
+        <span class="s">&quot;ressource&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="s">&quot;adress_book.db&quot;</span><span class="p">,</span> <span class="s">&quot;table&quot;</span><span class="p">:</span> <span class="s">&quot;address&quot;</span><span class="p">},</span>
+        <span class="s">&quot;model&quot;</span><span class="p">:</span> <span class="n">AddressModel</span><span class="p">,</span>
+        <span class="s">&quot;datastore&quot;</span><span class="p">:</span> <span class="n">SQLiteDataStore</span>
+        <span class="p">}</span>
+</pre></div>
+</div>
+<p>All the options already defined in the UserEndPoint will be available
+with this new one. Pagination, formater and so on.</p>
+<p>Of course, if you change the controller or the view of UserEndPoint,
+AddressEndPoint will change too. If it become a problem, you&#8217;ll have
+to create a base class with common options and configurations and each
+of your endpoints will inherit from this base class. Each endpoint
+will be able to change some specifics settings.</p>
+<p>The last thing to do to enable your new endpoint is to add it to the
+WSGIDispatcher</p>
+</div>
+<div class="section" id="add-the-app-to-the-dispatcher">
+<h2>Add the app to the dispatcher<a class="headerlink" href="#add-the-app-to-the-dispatcher" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">werkzeug.serving</span> <span class="kn">import</span> <span class="n">run_simple</span>
+    <span class="kn">from</span> <span class="nn">rest_api_framework.controllers</span> <span class="kn">import</span> <span class="n">WSGIDispatcher</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">WSGIDispatcher</span><span class="p">([</span><span class="n">AddressEndPoint</span><span class="p">,</span> <span class="n">UserEndPoint</span><span class="p">])</span>
+    <span class="n">run_simple</span><span class="p">(</span><span class="s">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="mi">5000</span><span class="p">,</span> <span class="n">app</span><span class="p">,</span> <span class="n">use_debugger</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">use_reloader</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">For now the order you register AddressEndPoint and UserEndPoint
+doesn&#8217;t make a difference. But we will add a reference from the
+user table to the address table. At this point, you will need to
+reference AddressEndPoint before UserEndPoint.</p>
+</div>
+</div>
+<div class="section" id="check-that-everything-work">
+<h2>Check that everything work<a class="headerlink" href="#check-that-everything-work" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">curl</span> <span class="o">-</span><span class="n">i</span> <span class="s">&quot;http://localhost:5000/address/&quot;</span>
+<span class="n">HTTP</span><span class="o">/</span><span class="mf">1.0</span> <span class="mi">200</span> <span class="n">OK</span>
+<span class="n">Content</span><span class="o">-</span><span class="n">Type</span><span class="p">:</span> <span class="n">application</span><span class="o">/</span><span class="n">json</span>
+<span class="n">Content</span><span class="o">-</span><span class="n">Length</span><span class="p">:</span> <span class="mi">124</span>
+<span class="n">Server</span><span class="p">:</span> <span class="n">Werkzeug</span><span class="o">/</span><span class="mf">0.8</span><span class="o">.</span><span class="mi">3</span> <span class="n">Python</span><span class="o">/</span><span class="mf">2.7</span><span class="o">.</span><span class="mi">2</span>
+<span class="n">Date</span><span class="p">:</span> <span class="n">Tue</span><span class="p">,</span> <span class="mi">15</span> <span class="n">Oct</span> <span class="mi">2013</span> <span class="mi">15</span><span class="p">:</span><span class="mi">45</span><span class="p">:</span><span class="mi">34</span> <span class="n">GMT</span>
+
+<span class="p">{</span>
+<span class="s">&quot;meta&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+    <span class="s">&quot;filters&quot;</span><span class="p">:</span> <span class="p">{},</span>
+    <span class="s">&quot;next&quot;</span><span class="p">:</span> <span class="s">&quot;null&quot;</span><span class="p">,</span>
+    <span class="s">&quot;offset&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s">&quot;previous&quot;</span><span class="p">:</span> <span class="s">&quot;null&quot;</span><span class="p">,</span>
+    <span class="s">&quot;total_count&quot;</span><span class="p">:</span> <span class="mi">0</span>
+<span class="p">},</span>
+<span class="s">&quot;object_list&quot;</span><span class="p">:</span> <span class="p">[]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>next: <a class="reference internal" href="related_ressources.html"><em>Linking ressource together</em></a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Loading multiple endpoint</a><ul>
+<li><a class="reference internal" href="#define-a-new-model">Define a new model</a></li>
+<li><a class="reference internal" href="#inherite-from-previous-apps">Inherite from previous apps</a></li>
+<li><a class="reference internal" href="#add-the-app-to-the-dispatcher">Add the app to the dispatcher</a></li>
+<li><a class="reference internal" href="#check-that-everything-work">Check that everything work</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/tutorial/adding_endpoint.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Yohann Gabory.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

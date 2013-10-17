@@ -59,6 +59,3 @@ Test the Partial
             }
         ]
     }
-
-
-next: :doc:`wole_application`

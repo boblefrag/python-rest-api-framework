@@ -52,7 +52,9 @@ class WSGIWrapper(object):
                 status=e.code)
 
 class AutoDocGenerator(WSGIWrapper):
-
+    """
+    Auto generate a documentation endpoint for each endpoints registered.
+    """
     def __init__(self, apps):
         from werkzeug.wrappers import Response
         self.apps = apps
@@ -63,6 +65,9 @@ class AutoDocGenerator(WSGIWrapper):
         self.view = Response
 
     def schema(self, request):
+        """
+        Generate the schema url of each endpoints
+        """
         response = {}
         for elem in self.apps:
             response[elem.ressource['ressource_name']] = {
@@ -77,6 +82,10 @@ class AutoDocGenerator(WSGIWrapper):
         return self.view(json.dumps(response), mimetype="application/json")
 
     def ressource_schema(self, request, ressource):
+        """
+        Generate the main endpoint of schema. Return the list of all
+            print app.datastore.modelendpoints available
+        """
         app = [elem for elem in self.apps \
                 if elem.ressource['ressource_name'] == ressource]
         if app:

@@ -276,6 +276,11 @@ class SQLiteDataStore(DataStore):
         the row does not exist)
 
         Return None
+
+        TDOD: if a fields is foreigned by another endpoint must
+        implement a delete strategy on childs.
+
+        Either delete on cascade or raise a meaningfull error
         """
         self.get(identifier)
         conn = self.get_connector()
@@ -285,6 +290,14 @@ class SQLiteDataStore(DataStore):
             self.ressource_config["table"],
             identifier,
             self.model.pk_field.name)
-        cursor.execute(query)
+        try:
+            cursor.execute(query)
+        except sqlite3.IntegrityError, e:
+            message = ""
+            if "foreign" in e.message:
+                message = """another ressource depends on this
+                object. Cloud not delete before all ressources
+                depending on it are also deleted"""
+            raise BadRequest(message)
         conn.commit()
         conn.close()

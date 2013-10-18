@@ -301,20 +301,20 @@ class SQLiteDataStoreTest(TestCase):
         self.assertEqual(store.create({"name": "bob", "age": 34}), 1)
 
         data = {"name": "test.db", "table": "user"}
-        store = SQLiteDataStore(
+        store2 = SQLiteDataStore(
             data,
             UserModel)
-        self.assertEqual(store.create({"last_name": "bob",
+        self.assertEqual(store2.create({"last_name": "bob",
                                        "first_name": "Dick",
                                        "address": 1}), 1)
 
         self.assertRaises(BadRequest,
-                          store.create,
+                          store2.create,
                           {"last_name": "moby",
                            "first_name": "Dick",
                            "address": 2}
                           )
-
+        self.assertRaises(BadRequest, store.delete, 1)
         os.remove("test.db")
 
     def test_update(self):

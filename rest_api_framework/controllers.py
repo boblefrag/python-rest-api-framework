@@ -8,7 +8,6 @@ from werkzeug.routing import Map, Rule
 from werkzeug.exceptions import HTTPException, NotFound
 from abc import ABCMeta
 from werkzeug.wsgi import DispatcherMiddleware
-from werkzeug.exceptions import NotFound
 
 
 class WSGIWrapper(object):
@@ -174,8 +173,8 @@ class ApiController(WSGIWrapper):
 
     def paginate(self, request):
         """
-        A pagination example. Feel free to implement your own
-
+        invoke the Pagination class if the optional pagination has been set.
+        return the objects from the datastore using datastore.get_list
         :param request:
         :type request: :class:`werkzeug.wrappers.Request`
         """
@@ -208,6 +207,8 @@ class ApiController(WSGIWrapper):
 
     def get_list(self, request):
         """
+        On the base implemetation only return self.paginate(request).
+        Placeholder for pre pagination stuff.
         :param request:
         :type request: :class:`werkzeug.wrappers.Request`
         """
@@ -246,10 +247,15 @@ class ApiController(WSGIWrapper):
 
     def create(self, request):
         """
-        Create a new object in the datastore
+        Try to load the data received from json to python, format each
+        field if a formater has been set and call the datastore for
+        saving operation. Validation will be done on the datastore side
 
-        :param request:
-        :type request: :class:`werkzeug.wrappers.Request`
+        If creation is successfull, add the location the the headers
+        of the response and render a 201 response with an empty body
+
+        :param request: :type request:
+        :class:`werkzeug.wrappers.Request`
         """
         try:
             data = json.loads(request.data)
@@ -265,7 +271,13 @@ class ApiController(WSGIWrapper):
 
     def update(self, request, identifier):
         """
-        Update an object in the datastore
+        Try to retreive the object identified by the identifier.
+        Try to load the incomming data from json to python.
+
+        Call the datastore for update.
+
+        If update is successfull, return the object updated with a
+        status of 200
 
         :param request:
         :type request: :class:`werkzeug.wrappers.Request`
@@ -288,16 +300,26 @@ class ApiController(WSGIWrapper):
 
     def delete(self, request, identifier):
         """
+        try to retreive the object from the datastore (will raise a
+        NotFound Error if object does not exist) call the delete
+
+        method on the datastore.
+
+        return a response with a status code of 204 (NO CONTENT)
+
         :param request:
         :type request: :class:`werkzeug.wrappers.Request`
         """
+        self.datastore.get(identifier=identifier)
         self.datastore.delete(identifier=identifier)
-        return self.view(status=200)
+        return self.view(status=204)
 
 
 class Controller(ApiController):
     """
-    The main views of the application
+    Controller configure the application.  Set all configuration
+    options and parameters on the Controller, the View and the
+    Ressource
     """
 
     controller = None
@@ -352,7 +374,7 @@ class Controller(ApiController):
     def make_options(self, options):
         """
         Make options enable Pagination, Authentication, Authorization,
-        RateLimit and so on.
+        RateLimit and all other options an application need.
         """
 
         if options.get("formaters", None):
@@ -363,7 +385,7 @@ class Controller(ApiController):
 
         if options.get("authentication", None):
             self.authentication = options["authentication"]
-            
+
         if options.get("ratelimit", None):
             if not hasattr(self, "authentication"):
                 raise ValueError(

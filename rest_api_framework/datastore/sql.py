@@ -159,7 +159,6 @@ class SQLiteDataStore(DataStore):
 
         if limit:
             data["query"] += " LIMIT {0}".format(limit)
-
         cursor.execute(data["query"].format(self.ressource_config['table']),
                        tuple(args)
                        )
@@ -171,6 +170,8 @@ class SQLiteDataStore(DataStore):
     def get_fields(self, **fields):
         if self.partial:
             fields, kwargs = self.partial.get_partials(**fields)
+            if not fields:
+                fields = self.model.get_fields_name()
             for field in fields:
                 if not field in self.model.get_fields_name():
                     raise BadRequest()

@@ -47,4 +47,4 @@ class TestApiView(TestCase):
         client = Client(WSGIDispatcher([ApiApp]),
                         response_wrapper=BaseResponse)
         resp = client.delete("/address/4/")
-        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 204)

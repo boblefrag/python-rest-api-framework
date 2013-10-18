@@ -61,6 +61,9 @@ class TestPartialResponse(TestCase):
         # we only want "age". get_list add id, JsonResponse add ressource_uri
         self.assertEqual(len(json.loads(resp.data)["object_list"][0].keys()), 3)
 
+        resp = client.get("/address/")
+        self.assertEqual(resp.status_code, 200)
+
     def test_get_partial_raise(self):
         client = Client(WSGIDispatcher([PartialApiApp]),
                         response_wrapper=BaseResponse)
@@ -79,6 +82,8 @@ class TestPartialSQLResponse(TestCase):
         resp = client.get("/address/?fields=age")
         # we only want "age". get_list add id, JsonResponse add ressource_uri
         self.assertEqual(len(json.loads(resp.data)["object_list"][0].keys()), 3)
+        resp = client.get("/address/")
+        self.assertEqual(resp.status_code, 200)
         os.remove("test.db")
 
     def test_get_partial_sql_raise(self):

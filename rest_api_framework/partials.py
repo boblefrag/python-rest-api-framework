@@ -24,5 +24,7 @@ class Partial(object):
         model. Datastore get_list will check for it and raise an error
         if needed.
         """
-        partial_fields = kwargs.pop(self.partial_keyword).split(',')
+        partial_fields = []
+        if kwargs.get(self.partial_keyword):
+            partial_fields = kwargs.pop(self.partial_keyword).split(',')
         return partial_fields, kwargs

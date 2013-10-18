@@ -19,6 +19,7 @@ class WSGIWrapper(object):
 
     __metaclass__ = ABCMeta
     url_map = None
+    view = None
 
     def __call__(self, environ, start_response):
         """
@@ -45,10 +46,11 @@ class WSGIWrapper(object):
         try:
             endpoint, values = adapter.match()
             return getattr(self, endpoint)(request, **values)
-        except HTTPException, e:
+        except HTTPException, error:
             return self.view(
-                {"error": e.description},
-                status=e.code)
+                {"error": error.description},
+                status=error.code)
+
 
 class AutoDocGenerator(WSGIWrapper):
     """
@@ -70,7 +72,7 @@ class AutoDocGenerator(WSGIWrapper):
         response = {}
         for elem in self.apps:
             response[elem.ressource['ressource_name']] = {
-                "list_endpoint" : "/{0}/".format(
+                "list_endpoint": "/{0}/".format(
                     elem.ressource['ressource_name']),
                 "allowed list_verbs": elem.controller["list_verbs"],
                 "allowed unique ressource": elem.controller["unique_verbs"],
@@ -85,14 +87,15 @@ class AutoDocGenerator(WSGIWrapper):
         Generate the main endpoint of schema. Return the list of all
             print app.datastore.modelendpoints available
         """
-        app = [elem for elem in self.apps \
-                if elem.ressource['ressource_name'] == ressource]
+        app = [elem for elem in self.apps
+               if elem.ressource['ressource_name'] == ressource]
         if app:
             app = app[0]
             response = app.ressource['model']().get_schema()
         else:
             raise NotFound
         return self.view(json.dumps(response), mimetype="application/json")
+
 
 class WSGIDispatcher(DispatcherMiddleware):
     """

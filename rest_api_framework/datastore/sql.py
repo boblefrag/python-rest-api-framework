@@ -272,15 +272,13 @@ class SQLiteDataStore(DataStore):
     def delete(self, identifier):
         """
         Retreive the object to be updated
+
         (:meth:`~.SQLiteDataStore.get` will raise a NotFound error if
         the row does not exist)
 
-        Return None
+        Return None on success, Raise a 400 error if foreign key
+        constrain prevent delete.
 
-        TDOD: if a fields is foreigned by another endpoint must
-        implement a delete strategy on childs.
-
-        Either delete on cascade or raise a meaningfull error
         """
         self.get(identifier)
         conn = self.get_connector()

@@ -13,7 +13,7 @@ class Validator(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def validate(self, field):
+    def validate(self, field, *args):
         """
         Method to validate that a field is formated as expected or is
         of correct type/class
@@ -27,6 +27,9 @@ class IntegerValidator(Validator):
     """
 
     def validate(self, field):
+        """
+        Check if field is an instance of type 'int'
+        """
         if isinstance(field, int):
             return True
         return False

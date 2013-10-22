@@ -19,8 +19,16 @@ class TestPagination(TestCase):
     def test_base_pagination_count(self):
         client = Client(WSGIDispatcher([ApiApp]),
                         response_wrapper=BaseResponse)
-        resp = client.get("/address/?count=2")
-        self.assertEqual(len(json.loads(resp.data)), 2)
+        resp = client.get("/address/?count=3")
+        self.assertEqual(len(json.loads(resp.data)["object_list"]), 3)
+
+    def test_max_pagination_count(self):
+        client = Client(WSGIDispatcher([ApiApp]),
+                        response_wrapper=BaseResponse)
+        resp = client.get("/address/?offset=82")
+        self.assertEqual(json.loads(resp.data)["meta"]['next'], "null")
+        self.assertEqual(len(json.loads(resp.data)["object_list"]), 19)
+
 
     def test_base_pagination_count_overflow(self):
         client = Client(WSGIDispatcher([ApiApp]),

@@ -60,6 +60,24 @@ class ApiKeyAuthentication(Authentication):
         return None
 
 
+class BasicAuthentication(Authentication):
+    """
+    Implement the Basic Auth authentication
+    http://fr.wikipedia.org/wiki/HTTP_Authentification
+    """
+    def __init__(self, datastore):
+        self.datastore = datastore
+
+    def get_user(self, request):
+        from base64 import b64decode
+        auth = request.headers.get('Authorization: Basic', None)
+        if auth:
+            login, password = b64decode(auth).split(':')
+            user = self.datastore.get_list(username=login, password=password)
+            if user:
+                return user[0]
+
+
 class ApiKeyAuthorization(Authorization):
     """
     This authentication backend use an api key to authenticate and

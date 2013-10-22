@@ -51,7 +51,6 @@ class SQLiteDataStore(DataStore):
 
         self.db = ressource_config["name"]
         conn = sqlite3.connect(ressource_config["name"])
-        conn = sqlite3.connect(ressource_config["name"])
         cursor = conn.cursor()
         table = ressource_config["table"]
         super(SQLiteDataStore, self).__init__({"conn": conn, "table": table},

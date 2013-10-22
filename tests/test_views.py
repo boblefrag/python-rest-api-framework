@@ -7,6 +7,19 @@ import datetime
 from rest_api_framework.controllers import WSGIDispatcher
 
 
+def remove_id(response, obj):
+    obj.pop(response.model.pk_field.name)
+    return obj
+
+
+class FormatedApp(ApiApp):
+    
+    def __init__(self, *args, **kwargs):
+        super(FormatedApp, self).__init__(*args, **kwargs)
+        self.view.formaters.append(remove_id)
+
+
+
 class TestApiView(TestCase):
 
     def test_get_list(self):
@@ -48,3 +61,12 @@ class TestApiView(TestCase):
                         response_wrapper=BaseResponse)
         resp = client.delete("/address/4/")
         self.assertEqual(resp.status_code, 204)
+
+    def test_get_formated_list(self):
+        client = Client(WSGIDispatcher([FormatedApp]),
+                        response_wrapper=BaseResponse)
+        resp = client.get("/address/")
+        self.assertNotIn("id", json.loads(resp.data)['object_list'][0])
+        self.assertIn("ressource_uri", json.loads(resp.data)['object_list'][0])
+        self.assertEqual(resp.status_code, 200)
+        self.assertIsInstance(json.loads(resp.data)["object_list"], list)

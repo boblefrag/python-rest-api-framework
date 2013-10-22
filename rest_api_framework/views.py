@@ -23,8 +23,6 @@ class JsonResponse(object):
         self.model = model
         self.ressource_name = ressource_name
         self.formaters = formaters
-        if options:
-            self.make_options(**options)
 
     def __call__(self, *args, **kwargs):
 
@@ -50,9 +48,6 @@ class JsonResponse(object):
             return Response(response,
                             mimetype="application/json",
                             **kwargs)
-
-    def make_options(self, **options):
-        pass
 
     def format(self, objs):
 

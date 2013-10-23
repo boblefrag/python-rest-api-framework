@@ -1,0 +1,240 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>The Whole Application &mdash; Python Rest Api Framework 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Python Rest Api Framework 0.1 documentation" href="../index.html" />
+    <link rel="up" title="Tutorial: building an adressebook API" href="../tutorial.html" />
+    <link rel="next" title="REST API Framework API references" href="../references.html" />
+    <link rel="prev" title="Implementing Partial Response" href="partial-response.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../references.html" title="REST API Framework API references"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="partial-response.html" title="Implementing Partial Response"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li>
+          <li><a href="../tutorial.html" accesskey="U">Tutorial: building an adressebook API</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="the-whole-application">
+<h1>The Whole Application<a class="headerlink" href="#the-whole-application" title="Permalink to this headline">¶</a></h1>
+<p>To let you have a look on the application you have build so far, here
+is the whole application you have build:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">rest_api_framework</span> <span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span> <span class="nn">rest_api_framework.models.fields</span> <span class="kn">import</span> <span class="n">ForeignKeyField</span>
+<span class="kn">from</span> <span class="nn">rest_api_framework.datastore</span> <span class="kn">import</span> <span class="n">SQLiteDataStore</span><span class="p">,</span> <span class="n">PythonListDataStore</span>
+<span class="kn">from</span> <span class="nn">rest_api_framework.datastore.validators</span> <span class="kn">import</span> <span class="n">UniqueTogether</span>
+<span class="kn">from</span> <span class="nn">rest_api_framework.controllers</span> <span class="kn">import</span> <span class="n">Controller</span>
+<span class="kn">from</span> <span class="nn">rest_api_framework.pagination</span> <span class="kn">import</span> <span class="n">Pagination</span>
+<span class="kn">from</span> <span class="nn">rest_api_framework.authentication</span> <span class="kn">import</span> <span class="p">(</span><span class="n">ApiKeyAuthentication</span><span class="p">,</span>
+                                               <span class="n">Authorization</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">rest_api_framework.ratelimit</span> <span class="kn">import</span> <span class="n">RateLimit</span>
+<span class="kn">from</span> <span class="nn">rest_api_framework.partials</span> <span class="kn">import</span> <span class="n">Partial</span>
+<span class="kn">from</span> <span class="nn">rest_api_framework.views</span> <span class="kn">import</span> <span class="n">JsonResponse</span>
+
+
+<span class="n">ressources</span> <span class="o">=</span> <span class="p">[{</span><span class="s">&quot;accesskey&quot;</span><span class="p">:</span> <span class="s">&quot;hackme&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s">&quot;accesskey&quot;</span><span class="p">:</span> <span class="s">&quot;nopassword&quot;</span><span class="p">}]</span>
+
+
+<span class="k">class</span> <span class="nc">KeyModel</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">models</span><span class="o">.</span><span class="n">StringPkField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;accesskey&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="p">]</span>
+
+
+<span class="k">class</span> <span class="nc">RateLimitModel</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="n">models</span><span class="o">.</span><span class="n">StringPkField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;access_key&quot;</span><span class="p">),</span>
+              <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;quota&quot;</span><span class="p">),</span>
+              <span class="n">models</span><span class="o">.</span><span class="n">TimestampField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;last_request&quot;</span><span class="p">)]</span>
+
+
+<span class="n">datastore</span> <span class="o">=</span> <span class="n">PythonListDataStore</span><span class="p">(</span><span class="n">ressources</span><span class="p">,</span> <span class="n">KeyModel</span><span class="p">)</span>
+<span class="n">authentication</span> <span class="o">=</span> <span class="n">ApiKeyAuthentication</span><span class="p">(</span><span class="n">datastore</span><span class="p">,</span> <span class="n">identifier</span><span class="o">=</span><span class="s">&quot;accesskey&quot;</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">UserModel</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+
+    <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="n">models</span><span class="o">.</span><span class="n">StringField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;first_name&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+              <span class="n">models</span><span class="o">.</span><span class="n">StringField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;last_name&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+              <span class="n">models</span><span class="o">.</span><span class="n">PkField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;id&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+              <span class="n">models</span><span class="o">.</span><span class="n">IntForeign</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;address&quot;</span><span class="p">,</span>
+                                <span class="n">foreign</span><span class="o">=</span><span class="p">{</span><span class="s">&quot;table&quot;</span><span class="p">:</span> <span class="s">&quot;address&quot;</span><span class="p">,</span>
+                                         <span class="s">&quot;column&quot;</span><span class="p">:</span> <span class="s">&quot;id&quot;</span><span class="p">,</span>
+                                         <span class="p">}</span>
+                                <span class="p">),</span>
+
+              <span class="p">]</span>
+
+
+<span class="k">class</span> <span class="nc">AddressModel</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+
+    <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="n">models</span><span class="o">.</span><span class="n">StringField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;country&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+              <span class="n">models</span><span class="o">.</span><span class="n">StringField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;city&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+              <span class="n">models</span><span class="o">.</span><span class="n">StringField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;street&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+              <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;number&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+              <span class="n">models</span><span class="o">.</span><span class="n">PkField</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;id&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+              <span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">remove_id</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+    <span class="n">obj</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">pk_field</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">obj</span>
+
+
+<span class="k">def</span> <span class="nf">format_foreign_key</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get_fields</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">ForeignKeyField</span><span class="p">):</span>
+            <span class="n">obj</span><span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;/{0}/{1}/&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s">&quot;foreign&quot;</span><span class="p">][</span><span class="s">&quot;table&quot;</span><span class="p">],</span>
+                                             <span class="n">obj</span><span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">obj</span>
+
+
+<span class="k">def</span> <span class="nf">foreign_keys_format</span><span class="p">(</span><span class="n">view</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">view</span><span class="o">.</span><span class="n">datastore</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get_fields</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">ForeignKeyField</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
+                <span class="n">obj</span><span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">obj</span>
+
+
+<span class="k">class</span> <span class="nc">UserEndPoint</span><span class="p">(</span><span class="n">Controller</span><span class="p">):</span>
+    <span class="n">ressource</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&quot;ressource_name&quot;</span><span class="p">:</span> <span class="s">&quot;users&quot;</span><span class="p">,</span>
+        <span class="s">&quot;ressource&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="s">&quot;adress_book.db&quot;</span><span class="p">,</span> <span class="s">&quot;table&quot;</span><span class="p">:</span> <span class="s">&quot;users&quot;</span><span class="p">},</span>
+        <span class="s">&quot;model&quot;</span><span class="p">:</span> <span class="n">UserModel</span><span class="p">,</span>
+        <span class="s">&quot;datastore&quot;</span><span class="p">:</span> <span class="n">SQLiteDataStore</span><span class="p">,</span>
+        <span class="s">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;validators&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">UniqueTogether</span><span class="p">(</span><span class="s">&quot;first_name&quot;</span><span class="p">,</span> <span class="s">&quot;last_name&quot;</span><span class="p">)],</span>
+                    <span class="p">}</span>
+        <span class="p">}</span>
+
+    <span class="n">controller</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&quot;list_verbs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;POST&quot;</span><span class="p">],</span>
+        <span class="s">&quot;unique_verbs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="s">&quot;PUT&quot;</span><span class="p">,</span> <span class="s">&quot;DElETE&quot;</span><span class="p">],</span>
+        <span class="s">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;pagination&quot;</span><span class="p">:</span> <span class="n">Pagination</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span>
+                    <span class="s">&quot;formaters&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">foreign_keys_format</span><span class="p">],</span>
+                    <span class="s">&quot;authentication&quot;</span><span class="p">:</span> <span class="n">authentication</span><span class="p">,</span>
+                    <span class="s">&quot;authorization&quot;</span><span class="p">:</span> <span class="n">Authorization</span><span class="p">,</span>
+                    <span class="s">&quot;ratelimit&quot;</span><span class="p">:</span> <span class="n">RateLimit</span><span class="p">(</span>
+                <span class="n">PythonListDataStore</span><span class="p">([],</span><span class="n">RateLimitModel</span><span class="p">),</span>
+                <span class="n">interval</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                <span class="n">quota</span><span class="o">=</span><span class="mi">200</span><span class="p">),</span>
+                    <span class="p">}</span>
+        <span class="p">}</span>
+
+    <span class="n">view</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;response_class&quot;</span><span class="p">:</span> <span class="n">JsonResponse</span><span class="p">,</span>
+            <span class="s">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;formaters&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;add_ressource_uri&quot;</span><span class="p">,</span>
+                                      <span class="n">remove_id</span><span class="p">,</span>
+                                      <span class="n">format_foreign_key</span>
+                                      <span class="p">]}}</span>
+
+
+<span class="k">class</span> <span class="nc">AddressEndPoint</span><span class="p">(</span><span class="n">UserEndPoint</span><span class="p">):</span>
+    <span class="n">ressource</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&quot;ressource_name&quot;</span><span class="p">:</span> <span class="s">&quot;address&quot;</span><span class="p">,</span>
+        <span class="s">&quot;ressource&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="s">&quot;adress_book.db&quot;</span><span class="p">,</span> <span class="s">&quot;table&quot;</span><span class="p">:</span> <span class="s">&quot;address&quot;</span><span class="p">},</span>
+        <span class="s">&quot;model&quot;</span><span class="p">:</span> <span class="n">AddressModel</span><span class="p">,</span>
+        <span class="s">&quot;datastore&quot;</span><span class="p">:</span> <span class="n">SQLiteDataStore</span><span class="p">,</span>
+        <span class="s">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;partial&quot;</span><span class="p">:</span> <span class="n">Partial</span><span class="p">()}</span>
+        <span class="p">}</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+
+    <span class="kn">from</span> <span class="nn">werkzeug.serving</span> <span class="kn">import</span> <span class="n">run_simple</span>
+    <span class="kn">from</span> <span class="nn">rest_api_framework.controllers</span> <span class="kn">import</span> <span class="n">WSGIDispatcher</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">WSGIDispatcher</span><span class="p">([</span><span class="n">AddressEndPoint</span><span class="p">,</span> <span class="n">UserEndPoint</span><span class="p">])</span>
+    <span class="n">run_simple</span><span class="p">(</span><span class="s">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="mi">5000</span><span class="p">,</span> <span class="n">app</span><span class="p">,</span> <span class="n">use_debugger</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">use_reloader</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="partial-response.html"
+                        title="previous chapter">Implementing Partial Response</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../references.html"
+                        title="next chapter">REST API Framework API references</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/tutorial/whole_application.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../references.html" title="REST API Framework API references"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="partial-response.html" title="Implementing Partial Response"
+             >previous</a> |</li>
+        <li><a href="../index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li>
+          <li><a href="../tutorial.html" >Tutorial: building an adressebook API</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Yohann Gabory.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

@@ -9,6 +9,7 @@ Tutorial: building an adressebook API
    tutorial/adding_validator_datastore
    tutorial/representing_data
    tutorial/work_with_pagination
+   tutorial/adding_endpoint
    tutorial/related_ressources
    tutorial/represent_related
    tutorial/protect_api

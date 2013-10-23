@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rest_api_framework.ratelimit &mdash; Python Rest Api Framework 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Python Rest Api Framework 0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for rest_api_framework.ratelimit</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Handle the rate limit option for a Controller.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">werkzeug.exceptions</span> <span class="kn">import</span> <span class="n">Unauthorized</span><span class="p">,</span> <span class="n">HTTPException</span><span class="p">,</span> <span class="n">NotFound</span>
+<span class="kn">from</span> <span class="nn">werkzeug._internal</span> <span class="kn">import</span> <span class="n">HTTP_STATUS_CODES</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="n">HTTP_STATUS_CODES</span><span class="p">[</span><span class="mi">429</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Too Many Requests&quot;</span>
+
+
+<div class="viewcode-block" id="TooManyRequest"><a class="viewcode-back" href="../../reference/rate-limit.html#rest_api_framework.ratelimit.TooManyRequest">[docs]</a><span class="k">class</span> <span class="nc">TooManyRequest</span><span class="p">(</span><span class="n">HTTPException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Implement the 429 status code (see</span>
+<span class="sd">    http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html for details)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">code</span> <span class="o">=</span> <span class="mi">429</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="p">(</span><span class="s">&quot;Rate Limit&quot;</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="RateLimit"><a class="viewcode-back" href="../../reference/rate-limit.html#rest_api_framework.ratelimit.RateLimit">[docs]</a><span class="k">class</span> <span class="nc">RateLimit</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Rate limit a user depending on the datetime of the request, the</span>
+<span class="sd">    number of previous requests and the rate-limit strategy</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">authentication</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datastore</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">6000</span><span class="p">,</span> <span class="n">quota</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">datastore</span> <span class="o">=</span> <span class="n">datastore</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interval</span> <span class="o">=</span> <span class="n">interval</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">quota</span> <span class="o">=</span> <span class="n">quota</span>
+
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">authentication</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">authentication</span> <span class="o">=</span> <span class="n">authentication</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+<div class="viewcode-block" id="RateLimit.check_limit"><a class="viewcode-back" href="../../reference/rate-limit.html#rest_api_framework.ratelimit.RateLimit.check_limit">[docs]</a>    <span class="k">def</span> <span class="nf">check_limit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implment the rate-limit method should first authenticate the</span>
+<span class="sd">        user, then check his rate-limit quota based on the request.</span>
+<span class="sd">        If request is not rate-limited, should increment the</span>
+<span class="sd">        rate-limit counter.</span>
+
+<span class="sd">        Return None if the request is not rate-limited. raise</span>
+<span class="sd">        HttpError with a 429 code otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">authentication</span><span class="o">.</span><span class="n">get_user</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">user</span><span class="p">:</span>
+            <span class="n">user_pk</span> <span class="o">=</span> <span class="n">user</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">authentication</span><span class="o">.</span><span class="n">datastore</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">pk_field</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">quota</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datastore</span><span class="o">.</span><span class="n">get_list</span><span class="p">(</span>
+                    <span class="o">**</span><span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">datastore</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">pk_field</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">user_pk</span><span class="p">})[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                <span class="n">dico</span> <span class="o">=</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">datastore</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">pk_field</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">user_pk</span><span class="p">,</span>
+                        <span class="s">&quot;quota&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">quota</span><span class="p">,</span>
+                        <span class="s">&quot;last_request&quot;</span><span class="p">:</span> <span class="mf">0.0</span>
+                        <span class="p">}</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">datastore</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                    <span class="n">dico</span>
+                    <span class="p">)</span>
+                <span class="n">quota</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datastore</span><span class="o">.</span><span class="n">get_list</span><span class="p">(</span>
+                    <span class="o">**</span><span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">datastore</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">pk_field</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">user_pk</span><span class="p">})[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">last_request</span> <span class="o">=</span> <span class="n">quota</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;last_request&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">last_request</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">last_request</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">interval</span><span class="p">:</span>
+                    <span class="n">new_quota</span> <span class="o">=</span> <span class="n">quota</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;quota&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">quota</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">new_quota</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">TooManyRequest</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">new_quota</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">quota</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">new_quota</span> <span class="o">=</span> <span class="n">quota</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;quota&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">quota</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">datastore</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">quota</span><span class="p">,</span>
+                                  <span class="p">{</span><span class="s">&#39;last_request&#39;</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
+                                   <span class="s">&#39;quota&#39;</span><span class="p">:</span> <span class="n">new_quota</span><span class="p">}</span>
+                                  <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">Unauthorized</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Yohann Gabory.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

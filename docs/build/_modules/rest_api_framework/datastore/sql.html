@@ -33,6 +33,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li><a href="../../../index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li>
           <li><a href="../datastore.html" accesskey="U">rest_api_framework.datastore</a> &raquo;</li> 
@@ -50,7 +53,7 @@
 <span class="kn">import</span> <span class="nn">sqlite3</span>
 
 
-<div class="viewcode-block" id="SQLiteDataStore"><a class="viewcode-back" href="../../../reference/controller.html#rest_api_framework.datastore.sql.SQLiteDataStore">[docs]</a><span class="k">class</span> <span class="nc">SQLiteDataStore</span><span class="p">(</span><span class="n">DataStore</span><span class="p">):</span>
+<div class="viewcode-block" id="SQLiteDataStore"><a class="viewcode-back" href="../../../reference/datastore.html#rest_api_framework.datastore.sql.SQLiteDataStore">[docs]</a><span class="k">class</span> <span class="nc">SQLiteDataStore</span><span class="p">(</span><span class="n">DataStore</span><span class="p">):</span>
 
     <span class="n">wrapper</span> <span class="o">=</span> <span class="p">{</span><span class="nb">int</span><span class="p">:</span> <span class="s">&quot;integer&quot;</span><span class="p">,</span>
                <span class="nb">float</span><span class="p">:</span> <span class="s">&quot;real&quot;</span><span class="p">,</span>
@@ -74,15 +77,15 @@
         <span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
         <span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-<div class="viewcode-block" id="SQLiteDataStore.get_connector"><a class="viewcode-back" href="../../../reference/controller.html#rest_api_framework.datastore.sql.SQLiteDataStore.get_connector">[docs]</a>    <span class="k">def</span> <span class="nf">get_connector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SQLiteDataStore.get_connector"><a class="viewcode-back" href="../../../reference/datastore.html#rest_api_framework.datastore.sql.SQLiteDataStore.get_connector">[docs]</a>    <span class="k">def</span> <span class="nf">get_connector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">conn</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">conn</span>
 </div>
-<div class="viewcode-block" id="SQLiteDataStore.filter"><a class="viewcode-back" href="../../../reference/controller.html#rest_api_framework.datastore.sql.SQLiteDataStore.filter">[docs]</a>    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="SQLiteDataStore.filter"><a class="viewcode-back" href="../../../reference/datastore.html#rest_api_framework.datastore.sql.SQLiteDataStore.filter">[docs]</a>    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;query&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="s">&#39; FROM {0}&#39;</span>
         <span class="k">return</span> <span class="n">kwargs</span>
 </div>
-<div class="viewcode-block" id="SQLiteDataStore.paginate"><a class="viewcode-back" href="../../../reference/controller.html#rest_api_framework.datastore.sql.SQLiteDataStore.paginate">[docs]</a>    <span class="k">def</span> <span class="nf">paginate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="SQLiteDataStore.paginate"><a class="viewcode-back" href="../../../reference/datastore.html#rest_api_framework.datastore.sql.SQLiteDataStore.paginate">[docs]</a>    <span class="k">def</span> <span class="nf">paginate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;paginate_by&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;start&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">):</span>
@@ -104,7 +107,7 @@
             <span class="n">objs</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">objs</span>
 </div>
-<div class="viewcode-block" id="SQLiteDataStore.get_list"><a class="viewcode-back" href="../../../reference/controller.html#rest_api_framework.datastore.sql.SQLiteDataStore.get_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="SQLiteDataStore.get_list"><a class="viewcode-back" href="../../../reference/datastore.html#rest_api_framework.datastore.sql.SQLiteDataStore.get_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        return all the objects, paginated if needed</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -115,7 +118,7 @@
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">paginate</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="SQLiteDataStore.get"><a class="viewcode-back" href="../../../reference/controller.html#rest_api_framework.datastore.sql.SQLiteDataStore.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">):</span>
+<div class="viewcode-block" id="SQLiteDataStore.get"><a class="viewcode-back" href="../../../reference/datastore.html#rest_api_framework.datastore.sql.SQLiteDataStore.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">):</span>
         <span class="n">fields</span> <span class="o">=</span> <span class="s">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">iterkeys</span><span class="p">()])</span>
         <span class="n">query</span> <span class="o">=</span> <span class="s">&quot;select {0} from {1} where id=?&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="n">fields</span><span class="p">,</span>
@@ -130,7 +133,7 @@
             <span class="k">raise</span> <span class="n">NotFound</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;conn&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
 </div>
-<div class="viewcode-block" id="SQLiteDataStore.create"><a class="viewcode-back" href="../../../reference/controller.html#rest_api_framework.datastore.sql.SQLiteDataStore.create">[docs]</a>    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<div class="viewcode-block" id="SQLiteDataStore.create"><a class="viewcode-back" href="../../../reference/datastore.html#rest_api_framework.datastore.sql.SQLiteDataStore.create">[docs]</a>    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="n">fields</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">values</span> <span class="o">=</span> <span class="p">[]</span>
@@ -152,7 +155,7 @@
         <span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">c</span><span class="o">.</span><span class="n">lastrowid</span>
 </div>
-<div class="viewcode-block" id="SQLiteDataStore.update"><a class="viewcode-back" href="../../../reference/controller.html#rest_api_framework.datastore.sql.SQLiteDataStore.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<div class="viewcode-block" id="SQLiteDataStore.update"><a class="viewcode-back" href="../../../reference/datastore.html#rest_api_framework.datastore.sql.SQLiteDataStore.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">validate_fields</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="n">fields</span> <span class="o">=</span> <span class="p">[]</span>
@@ -174,7 +177,7 @@
         <span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">])</span>
 </div>
-<div class="viewcode-block" id="SQLiteDataStore.delete"><a class="viewcode-back" href="../../../reference/controller.html#rest_api_framework.datastore.sql.SQLiteDataStore.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">):</span>
+<div class="viewcode-block" id="SQLiteDataStore.delete"><a class="viewcode-back" href="../../../reference/datastore.html#rest_api_framework.datastore.sql.SQLiteDataStore.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">identifier</span><span class="p">)</span>
         <span class="n">conn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_connector</span><span class="p">()</span>
         <span class="n">c</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
@@ -214,6 +217,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../../genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li><a href="../../../index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li>
           <li><a href="../datastore.html" >rest_api_framework.datastore</a> &raquo;</li> 

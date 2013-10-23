@@ -1,0 +1,316 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>DataStores &mdash; Python Rest Api Framework 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Python Rest Api Framework 0.1 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="datastores">
+<h1>DataStores<a class="headerlink" href="#datastores" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="rest_api_framework.datastore.base.DataStore">
+<em class="property">class </em><tt class="descclassname">rest_api_framework.datastore.base.</tt><tt class="descname">DataStore</tt><big>(</big><em>ressource_config</em>, <em>model</em>, <em>**options</em><big>)</big><a class="reference internal" href="../_modules/rest_api_framework/datastore/base.html#DataStore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rest_api_framework.datastore.base.DataStore" title="Permalink to this definition">¶</a></dt>
+<dd><p>define a source of data. Can be anything fron database to other
+api, files and so one</p>
+<dl class="method">
+<dt id="rest_api_framework.datastore.base.DataStore.get">
+<tt class="descname">get</tt><big>(</big><em>identifier</em><big>)</big><a class="headerlink" href="#rest_api_framework.datastore.base.DataStore.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Should return a dictionnary representing the ressource matching the
+identifier or raise a NotFound exception.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Not implemented by base DataStore class</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="rest_api_framework.datastore.base.DataStore.create">
+<tt class="descname">create</tt><big>(</big><em>data</em><big>)</big><a class="headerlink" href="#rest_api_framework.datastore.base.DataStore.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>data is a dict containing the representation of the
+ressource. This method should call
+<a class="reference internal" href="#rest_api_framework.datastore.base.DataStore.validate" title="rest_api_framework.datastore.base.DataStore.validate"><tt class="xref py py-meth docutils literal"><span class="pre">validate()</span></tt></a>,
+create the data in the datastore and return the ressource
+identifier</p>
+<p>Not implemented by base DataStore class</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rest_api_framework.datastore.base.DataStore.update">
+<tt class="descname">update</tt><big>(</big><em>obj</em>, <em>data</em><big>)</big><a class="headerlink" href="#rest_api_framework.datastore.base.DataStore.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>should be able to call <a class="reference internal" href="#rest_api_framework.datastore.base.DataStore.get" title="rest_api_framework.datastore.base.DataStore.get"><tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt></a> to retreive the
+object to be updated, <a class="reference internal" href="#rest_api_framework.datastore.base.DataStore.validate_fields" title="rest_api_framework.datastore.base.DataStore.validate_fields"><tt class="xref py py-meth docutils literal"><span class="pre">validate_fields()</span></tt></a> and
+return the updated object</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Not implemented by base DataStore class</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="rest_api_framework.datastore.base.DataStore.delete">
+<tt class="descname">delete</tt><big>(</big><em>identifier</em><big>)</big><a class="headerlink" href="#rest_api_framework.datastore.base.DataStore.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>should be able to validate the existence of the object in the
+ressource and remove it from the datastore</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Not implemented by base DataStore class</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="rest_api_framework.datastore.base.DataStore.get_list">
+<tt class="descname">get_list</tt><big>(</big><em>offset=None</em>, <em>count=None</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#rest_api_framework.datastore.base.DataStore.get_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called each time you want a set of data.
+Data could be paginated and filtered.
+Should call <a class="reference internal" href="#rest_api_framework.datastore.base.DataStore.filter" title="rest_api_framework.datastore.base.DataStore.filter"><tt class="xref py py-meth docutils literal"><span class="pre">filter()</span></tt></a>
+and return <a class="reference internal" href="#rest_api_framework.datastore.base.DataStore.paginate" title="rest_api_framework.datastore.base.DataStore.paginate"><tt class="xref py py-meth docutils literal"><span class="pre">paginate()</span></tt></a></p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Not implemented by base DataStore class</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="rest_api_framework.datastore.base.DataStore.filter">
+<tt class="descname">filter</tt><big>(</big><em>**kwargs</em><big>)</big><a class="headerlink" href="#rest_api_framework.datastore.base.DataStore.filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>should return a way to filter the ressource according to
+kwargs.  It is not mandatory to actualy retreive the
+ressources as they will be paginated just after the filter
+call. If you retreive the wole filtered ressources you loose
+the pagination advantage. The point here is to prepare the
+filtering. Look at SQLiteDataStore.filter for an example.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Not implemented by base DataStore class</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="rest_api_framework.datastore.base.DataStore.paginate">
+<tt class="descname">paginate</tt><big>(</big><em>data</em>, <em>offset</em>, <em>count</em><big>)</big><a class="reference internal" href="../_modules/rest_api_framework/datastore/base.html#DataStore.paginate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rest_api_framework.datastore.base.DataStore.paginate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Paginate sould return all the object if no pagination options
+have been set or only a subset of the ressources if pagination
+options exists.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rest_api_framework.datastore.base.DataStore.validate">
+<tt class="descname">validate</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="../_modules/rest_api_framework/datastore/base.html#DataStore.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rest_api_framework.datastore.base.DataStore.validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if data send are valid for object creation. Validate
+Chek that each required fields are in data and check for their
+type too.</p>
+<p>Used to create new ressources</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rest_api_framework.datastore.base.DataStore.validate_fields">
+<tt class="descname">validate_fields</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="../_modules/rest_api_framework/datastore/base.html#DataStore.validate_fields"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rest_api_framework.datastore.base.DataStore.validate_fields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate only some fields of the ressource.
+Used to update existing objects</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="rest_api_framework.datastore.simple.PythonListDataStore">
+<em class="property">class </em><tt class="descclassname">rest_api_framework.datastore.simple.</tt><tt class="descname">PythonListDataStore</tt><big>(</big><em>ressource_config</em>, <em>model</em>, <em>**options</em><big>)</big><a class="reference internal" href="../_modules/rest_api_framework/datastore/simple.html#PythonListDataStore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rest_api_framework.datastore.simple.PythonListDataStore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#rest_api_framework.datastore.base.DataStore" title="rest_api_framework.datastore.base.DataStore"><tt class="xref py py-class docutils literal"><span class="pre">rest_api_framework.datastore.base.DataStore</span></tt></a></p>
+<p>a datastore made of list of dicts</p>
+<dl class="method">
+<dt id="rest_api_framework.datastore.simple.PythonListDataStore.get">
+<tt class="descname">get</tt><big>(</big><em>identifier</em><big>)</big><a class="reference internal" href="../_modules/rest_api_framework/datastore/simple.html#PythonListDataStore.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rest_api_framework.datastore.simple.PythonListDataStore.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>return an object matching the uri or None</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rest_api_framework.datastore.simple.PythonListDataStore.get_list">
+<tt class="descname">get_list</tt><big>(</big><em>offset=0</em>, <em>count=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/rest_api_framework/datastore/simple.html#PythonListDataStore.get_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rest_api_framework.datastore.simple.PythonListDataStore.get_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>return all the objects. paginated if needed</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rest_api_framework.datastore.simple.PythonListDataStore.update">
+<tt class="descname">update</tt><big>(</big><em>obj</em>, <em>data</em><big>)</big><a class="reference internal" href="../_modules/rest_api_framework/datastore/simple.html#PythonListDataStore.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rest_api_framework.datastore.simple.PythonListDataStore.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update a single object</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="rest_api_framework.datastore.sql.SQLiteDataStore">
+<em class="property">class </em><tt class="descclassname">rest_api_framework.datastore.sql.</tt><tt class="descname">SQLiteDataStore</tt><big>(</big><em>ressource_config</em>, <em>model</em>, <em>**options</em><big>)</big><a class="reference internal" href="../_modules/rest_api_framework/datastore/sql.html#SQLiteDataStore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rest_api_framework.datastore.sql.SQLiteDataStore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#rest_api_framework.datastore.base.DataStore" title="rest_api_framework.datastore.base.DataStore"><tt class="xref py py-class docutils literal"><span class="pre">rest_api_framework.datastore.base.DataStore</span></tt></a></p>
+<p>Define a sqlite datastore for your ressource.  you have to give
+__init__ a data parameter containing the information to connect to
+the database and to the table.</p>
+<p>example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s">&quot;table&quot;</span><span class="p">:</span> <span class="s">&quot;tweets&quot;</span><span class="p">,</span>
+      <span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="s">&quot;test.db&quot;</span><span class="p">}</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">ApiModel</span>
+<span class="n">datastore</span> <span class="o">=</span> <span class="n">SQLiteDataStore</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>SQLiteDataStore implement a naive wrapper to convert Field
+types into database type.</p>
+<ul class="simple">
+<li>int will be saved in the database as INTEGER</li>
+<li>float will be saved in the database as REAL</li>
+<li>basestring will be saved in the database as TEXT</li>
+<li>if the Field type is PKField, is a will be saved as
+PRIMARY KEY AUTOINCREMENT</li>
+</ul>
+<p>As soon as the datastore is instanciated, the database is create
+if it does not exists and table is created too</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last simple">
+<li>It is not possible to use :memory database either.
+The connection is closed after each operations</li>
+</ul>
+</div>
+<dl class="method">
+<dt id="rest_api_framework.datastore.sql.SQLiteDataStore.get_connector">
+<tt class="descname">get_connector</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/rest_api_framework/datastore/sql.html#SQLiteDataStore.get_connector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rest_api_framework.datastore.sql.SQLiteDataStore.get_connector" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a sqlite3 connection to communicate with the table
+define in self.db</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rest_api_framework.datastore.sql.SQLiteDataStore.filter">
+<tt class="descname">filter</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/rest_api_framework/datastore/sql.html#SQLiteDataStore.filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rest_api_framework.datastore.sql.SQLiteDataStore.filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change kwargs[&#8220;query&#8221;] with &#8220;WHERE X=Y statements&#8221;.  The
+filtering will be done with the actual evaluation of the query
+in <a class="reference internal" href="#rest_api_framework.datastore.sql.SQLiteDataStore.paginate" title="rest_api_framework.datastore.sql.SQLiteDataStore.paginate"><tt class="xref py py-meth docutils literal"><span class="pre">paginate()</span></tt></a> the sql can then be lazy</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rest_api_framework.datastore.sql.SQLiteDataStore.paginate">
+<tt class="descname">paginate</tt><big>(</big><em>data</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/rest_api_framework/datastore/sql.html#SQLiteDataStore.paginate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rest_api_framework.datastore.sql.SQLiteDataStore.paginate" title="Permalink to this definition">¶</a></dt>
+<dd><p>paginate the result of filter using ids limits.  Obviously, to
+work properly, you have to set the start to the last ids you
+receive from the last call on this method. The max number of
+row this method can give back depend on the paginate_by option.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rest_api_framework.datastore.sql.SQLiteDataStore.get_list">
+<tt class="descname">get_list</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/rest_api_framework/datastore/sql.html#SQLiteDataStore.get_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rest_api_framework.datastore.sql.SQLiteDataStore.get_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>return all the objects, paginated if needed, fitered if
+filters have been set.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rest_api_framework.datastore.sql.SQLiteDataStore.get">
+<tt class="descname">get</tt><big>(</big><em>identifier</em><big>)</big><a class="reference internal" href="../_modules/rest_api_framework/datastore/sql.html#SQLiteDataStore.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rest_api_framework.datastore.sql.SQLiteDataStore.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a single row or raise NotFound</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rest_api_framework.datastore.sql.SQLiteDataStore.create">
+<tt class="descname">create</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="../_modules/rest_api_framework/datastore/sql.html#SQLiteDataStore.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rest_api_framework.datastore.sql.SQLiteDataStore.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate the data with <a class="reference internal" href="#rest_api_framework.datastore.base.DataStore.validate" title="rest_api_framework.datastore.base.DataStore.validate"><tt class="xref py py-meth docutils literal"><span class="pre">base.DataStore.validate()</span></tt></a>
+And, if data is valid, create the row in database and return it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rest_api_framework.datastore.sql.SQLiteDataStore.update">
+<tt class="descname">update</tt><big>(</big><em>obj</em>, <em>data</em><big>)</big><a class="reference internal" href="../_modules/rest_api_framework/datastore/sql.html#SQLiteDataStore.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rest_api_framework.datastore.sql.SQLiteDataStore.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retreive the object to be updated
+(<a class="reference internal" href="#rest_api_framework.datastore.sql.SQLiteDataStore.get" title="rest_api_framework.datastore.sql.SQLiteDataStore.get"><tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt></a> will raise a NotFound error if
+the row does not exist)</p>
+<p>Validate the fields to be updated and return the updated row</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rest_api_framework.datastore.sql.SQLiteDataStore.delete">
+<tt class="descname">delete</tt><big>(</big><em>identifier</em><big>)</big><a class="reference internal" href="../_modules/rest_api_framework/datastore/sql.html#SQLiteDataStore.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rest_api_framework.datastore.sql.SQLiteDataStore.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retreive the object to be updated</p>
+<p>(<a class="reference internal" href="#rest_api_framework.datastore.sql.SQLiteDataStore.get" title="rest_api_framework.datastore.sql.SQLiteDataStore.get"><tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt></a> will raise a NotFound error if
+the row does not exist)</p>
+<p>Return None on success, Raise a 400 error if foreign key
+constrain prevent delete.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/reference/datastore.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Yohann Gabory.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

@@ -32,9 +32,6 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
         <li><a href="index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
@@ -149,10 +146,11 @@ And, if data is valid, create the row in database and return it.</p>
 <dl class="method">
 <dt id="rest_api_framework.datastore.sql.SQLiteDataStore.delete">
 <tt class="descname">delete</tt><big>(</big><em>identifier</em><big>)</big><a class="reference internal" href="_modules/rest_api_framework/datastore/sql.html#SQLiteDataStore.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rest_api_framework.datastore.sql.SQLiteDataStore.delete" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retreive the object to be updated
-(<a class="reference internal" href="#rest_api_framework.datastore.sql.SQLiteDataStore.get" title="rest_api_framework.datastore.sql.SQLiteDataStore.get"><tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt></a> will raise a NotFound error if
+<dd><p>Retreive the object to be updated</p>
+<p>(<a class="reference internal" href="#rest_api_framework.datastore.sql.SQLiteDataStore.get" title="rest_api_framework.datastore.sql.SQLiteDataStore.get"><tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt></a> will raise a NotFound error if
 the row does not exist)</p>
-<p>Return None</p>
+<p>Return None on success, Raise a 400 error if foreign key
+constrain prevent delete.</p>
 </dd></dl>
 
 <dl class="method">
@@ -363,9 +361,6 @@ Used to update existing objects</p>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
         <li><a href="index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li> 
       </ul>
     </div>

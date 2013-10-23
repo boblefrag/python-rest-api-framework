@@ -152,8 +152,8 @@ class ApiController(WSGIWrapper):
         if self.auth is set call
         :meth:`.authentication.Authentication.check_auth`
 
-        :return: :meth:`.get_list` if request.method is GET,
-                 :meth:`.create` if request.method is POST
+        :return: :meth:`.ApiController.get_list` if request.method is GET,
+                 :meth:`.ApiController.create` if request.method is POST
         """
         if request.method == "HEAD":
             verbs = list(
@@ -212,6 +212,7 @@ class ApiController(WSGIWrapper):
         """
         On the base implemetation only return self.paginate(request).
         Placeholder for pre pagination stuff.
+
         :param request:
         :type request: :class:`werkzeug.wrappers.Request`
         """
@@ -257,8 +258,8 @@ class ApiController(WSGIWrapper):
         If creation is successfull, add the location the the headers
         of the response and render a 201 response with an empty body
 
-        :param request: :type request:
-        :class:`werkzeug.wrappers.Request`
+        :param request:
+        :type request: :class:`werkzeug.wrappers.Request`
         """
         try:
             data = json.loads(request.data)

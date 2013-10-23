@@ -37,7 +37,6 @@ class SQLiteDataStore(DataStore):
 
     .. note::
 
-       - Constrains are not supported for now
        - It is not possible to use :memory database either.
          The connection is closed after each operations
     """

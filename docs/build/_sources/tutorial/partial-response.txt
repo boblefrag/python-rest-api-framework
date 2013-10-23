@@ -59,3 +59,5 @@ Test the Partial
             }
         ]
     }
+
+next: :doc:`whole_application`

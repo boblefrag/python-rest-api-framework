@@ -16,7 +16,14 @@ def add_ressource_uri(response, obj):
 
 class JsonResponse(object):
     """
-    Just like a classic Response but render json everytime
+    A werkzeug Response rendering a json representation of the object(s)
+    This class is callable. you should do :
+
+    .. code-block:: python:
+
+        view = JsonResponse(model, ressource_name, formaters=formaters,
+                            **options)
+        return view(objects)
     """
     def __init__(self, model, ressource_name,
                  formaters=["add_ressource_uri"], **options):
@@ -25,7 +32,9 @@ class JsonResponse(object):
         self.formaters = formaters
 
     def __call__(self, *args, **kwargs):
-
+        """
+        Return a response object
+        """
         meta = None
 
         if "meta" in kwargs:
@@ -50,7 +59,9 @@ class JsonResponse(object):
                             **kwargs)
 
     def format(self, objs):
-
+        """
+        Format the output using formaters listed in self.formaters
+        """
         if isinstance(objs, list):
             for elem in objs:
                 for formater in self.formaters:

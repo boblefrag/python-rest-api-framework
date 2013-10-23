@@ -33,6 +33,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li><a href="../../index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li>
           <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
@@ -50,27 +53,27 @@
 <span class="kn">from</span> <span class="nn">werkzeug.exceptions</span> <span class="kn">import</span> <span class="n">Unauthorized</span><span class="p">,</span> <span class="n">NotFound</span>
 
 
-<span class="k">class</span> <span class="nc">Authorization</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">pass</span>
-
-
-<div class="viewcode-block" id="Authentication"><a class="viewcode-back" href="../../reference/controller.html#rest_api_framework.authentication.Authentication">[docs]</a><span class="k">class</span> <span class="nc">Authentication</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Authorization"><a class="viewcode-back" href="../../reference/authorization.html#rest_api_framework.authentication.Authorization">[docs]</a><span class="k">class</span> <span class="nc">Authorization</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">pass</span>
 
 </div>
-<span class="k">class</span> <span class="nc">ApiKeyAuthentication</span><span class="p">(</span><span class="n">Authentication</span><span class="p">):</span>
+<div class="viewcode-block" id="Authentication"><a class="viewcode-back" href="../../reference/authentication.html#rest_api_framework.authentication.Authentication">[docs]</a><span class="k">class</span> <span class="nc">Authentication</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+</div>
+<div class="viewcode-block" id="ApiKeyAuthentication"><a class="viewcode-back" href="../../reference/authentication.html#rest_api_framework.authentication.ApiKeyAuthentication">[docs]</a><span class="k">class</span> <span class="nc">ApiKeyAuthentication</span><span class="p">(</span><span class="n">Authentication</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datastore</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">datastore</span> <span class="o">=</span> <span class="n">datastore</span>
 
-    <span class="k">def</span> <span class="nf">get_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">):</span>
+<div class="viewcode-block" id="ApiKeyAuthentication.get_user"><a class="viewcode-back" href="../../reference/authentication.html#rest_api_framework.authentication.ApiKeyAuthentication.get_user">[docs]</a>    <span class="k">def</span> <span class="nf">get_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">user</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datastore</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">identifier</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">user</span>
         <span class="k">except</span> <span class="n">NotFound</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">None</span>
 
-
+</div></div>
 <div class="viewcode-block" id="ApiKeyAuthorization"><a class="viewcode-back" href="../../references.html#rest_api_framework.authentication.ApiKeyAuthorization">[docs]</a><span class="k">class</span> <span class="nc">ApiKeyAuthorization</span><span class="p">(</span><span class="n">Authorization</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This authentication backend use an api key to authenticate and</span>
@@ -128,6 +131,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li><a href="../../index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li>
           <li><a href="../index.html" >Module code</a> &raquo;</li> 
       </ul>

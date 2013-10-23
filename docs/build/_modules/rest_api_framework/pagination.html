@@ -33,6 +33,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li><a href="../../index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li>
           <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
@@ -49,7 +52,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 
-<div class="viewcode-block" id="Pagination"><a class="viewcode-back" href="../../reference/controller.html#rest_api_framework.pagination.Pagination">[docs]</a><span class="k">class</span> <span class="nc">Pagination</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Pagination"><a class="viewcode-back" href="../../reference/pagination.html#rest_api_framework.pagination.Pagination">[docs]</a><span class="k">class</span> <span class="nc">Pagination</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The base implementation of Pagination.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -61,7 +64,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">offset_key</span> <span class="o">=</span> <span class="n">offset_key</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">count_key</span> <span class="o">=</span> <span class="n">count_key</span>
 
-<div class="viewcode-block" id="Pagination.paginate"><a class="viewcode-back" href="../../reference/controller.html#rest_api_framework.pagination.Pagination.paginate">[docs]</a>    <span class="k">def</span> <span class="nf">paginate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+<div class="viewcode-block" id="Pagination.paginate"><a class="viewcode-back" href="../../reference/pagination.html#rest_api_framework.pagination.Pagination.paginate">[docs]</a>    <span class="k">def</span> <span class="nf">paginate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
         <span class="n">request_kwargs</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
         <span class="n">offset</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offset_key</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
         <span class="n">count</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">count_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max</span><span class="p">))</span>
@@ -98,6 +101,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li><a href="../../index.html">Python Rest Api Framework 0.1 documentation</a> &raquo;</li>
           <li><a href="../index.html" >Module code</a> &raquo;</li> 
       </ul>

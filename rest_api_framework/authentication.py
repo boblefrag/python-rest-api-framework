@@ -32,7 +32,7 @@ class Authentication(object):
     """
     def get_user(self, identifier):
         """
-        Must return a user if authentication pass, None otherwise
+        Must return a user if authentication is successfull, None otherwise
         """
         raise NotImplementedError
 
@@ -48,7 +48,8 @@ class ApiKeyAuthentication(Authentication):
 
     def get_user(self, request):
         """
-        return a user or None.
+        return a user or None based on the identifier found in the
+        request query parameters.
         """
         data = request.values.to_dict()
         if self.identifier in data:
@@ -69,6 +70,11 @@ class BasicAuthentication(Authentication):
         self.datastore = datastore
 
     def get_user(self, request):
+        """
+        return a user or None based on the Authorization: Basic header
+        found in the request. login and password are Base64 encoded
+        string : "login:password"
+        """
         from base64 import b64decode
         auth = request.headers.get('Authorization: Basic', None)
         if auth:

@@ -286,7 +286,8 @@ class ApiController(WSGIWrapper):
         """
         Try to mass update the data.
         """
-        return self.view(self.datastore.update_list(request), status=202)
+        response = self.datastore.update_list(request)
+        return self.view(response, status=202)
 
     def update(self, request, identifier):
         """

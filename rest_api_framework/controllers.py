@@ -169,14 +169,13 @@ class ApiController(WSGIWrapper):
         if self.ratelimit:
             self.ratelimit.check_limit(request)
 
-        if request.method == "GET":
-            return self.get_list(request)
-
-        elif request.method == "POST":
-            return self.create(request)
-
-        elif request.method == "PUT":
-            return self.update_list(request)
+        verb_available = {
+            'GET': self.get_list,
+            'POST': self.create,
+            'PUT': self.update_list
+        }
+        if request.method in verb_available:
+            return verb_available[request.method](request)
         else:
             raise NotImplemented()
 
@@ -237,12 +236,13 @@ class ApiController(WSGIWrapper):
         if self.ratelimit:
             self.ratelimit.check_limit(request)
 
-        if request.method == "GET":
-            return self.get(request, identifier)
-        elif request.method == "PUT":
-            return self.update(request, identifier)
-        elif request.method == "DELETE":
-            return self.delete(request, identifier)
+        verb_available = {
+            'GET': self.get_list,
+            'PUT': self.create,
+            'DELETE': self.update_list
+        }
+        if request.method in verb_available:
+            return verb_available[request.method](request, identifier)
         else:
             raise NotImplemented()
 

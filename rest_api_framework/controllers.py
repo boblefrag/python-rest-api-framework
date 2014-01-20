@@ -174,9 +174,9 @@ class ApiController(WSGIWrapper):
             'POST': self.create,
             'PUT': self.update_list
         }
-        if request.method in verb_available:
+        try:
             return verb_available[request.method](request)
-        else:
+        except KeyError:
             raise NotImplemented()
 
     def paginate(self, request):
@@ -241,9 +241,9 @@ class ApiController(WSGIWrapper):
             'PUT': self.create,
             'DELETE': self.update_list
         }
-        if request.method in verb_available:
+        try:
             return verb_available[request.method](request, identifier)
-        else:
+        except KeyError:
             raise NotImplemented()
 
     def get(self, request, identifier):

@@ -168,11 +168,16 @@ class ApiController(WSGIWrapper):
             self.authorization.check_auth(request)
         if self.ratelimit:
             self.ratelimit.check_limit(request)
+
         if request.method == "GET":
             return self.get_list(request)
 
-        if request.method == "POST":
+        elif request.method == "POST":
             return self.create(request)
+
+        elif request.method == "PUT":
+            return self.update_list(request)
+
 
     def paginate(self, request):
         """

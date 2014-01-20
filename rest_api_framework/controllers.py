@@ -2,7 +2,7 @@
 Define base controller for your API.
 """
 import json
-from werkzeug.exceptions import BadRequest
+from werkzeug.exceptions import BadRequest, NotImplemented
 from werkzeug.wrappers import Request
 from werkzeug.routing import Map, Rule
 from werkzeug.exceptions import HTTPException, NotFound
@@ -177,7 +177,8 @@ class ApiController(WSGIWrapper):
 
         elif request.method == "PUT":
             return self.update_list(request)
-
+        else:
+            raise NotImplemented()
 
     def paginate(self, request):
         """
@@ -195,7 +196,7 @@ class ApiController(WSGIWrapper):
         filters = request_kwargs
         if self.formaters:
             for formater in self.formaters:
-                filters  = formater(self, filters)
+                filters = formater(self, filters)
 
         objs = self.datastore.get_list(offset=offset,
                                        count=count,
@@ -203,9 +204,9 @@ class ApiController(WSGIWrapper):
         if self.pagination:
             total = self.datastore.count(**filters)
             meta = self.pagination.get_metadata(count=count,
-                                                     offset=offset,
-                                                     total=total,
-                                                     **filters)
+                                                offset=offset,
+                                                total=total,
+                                                **filters)
         else:
             meta = {"filters": {}}
             for k, v in filters.iteritems():
@@ -235,12 +236,15 @@ class ApiController(WSGIWrapper):
             self.authorization.check_auth(request)
         if self.ratelimit:
             self.ratelimit.check_limit(request)
+
         if request.method == "GET":
             return self.get(request, identifier)
-        if request.method == "PUT":
+        elif request.method == "PUT":
             return self.update(request, identifier)
-        if request.method == "DELETE":
+        elif request.method == "DELETE":
             return self.delete(request, identifier)
+        else:
+            raise NotImplemented()
 
     def get(self, request, identifier):
         """
@@ -277,6 +281,12 @@ class ApiController(WSGIWrapper):
 
         return self.view(
             headers={"location": "{0}/".format(str(response))}, status=201)
+
+    def update_list(self, request):
+        """
+        Try to mass update the data.
+        """
+        return self.view(self.datastore.update_list(request), status=202)
 
     def update(self, request, identifier):
         """

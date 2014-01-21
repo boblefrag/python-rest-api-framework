@@ -170,12 +170,12 @@ class ApiController(WSGIWrapper):
             self.ratelimit.check_limit(request)
 
         verb_available = {
-            'GET': self.get_list,
-            'POST': self.create,
-            'PUT': self.update_list
+            'GET': 'get_list',
+            'POST': 'create',
+            'PUT': 'update_list'
         }
         try:
-            return verb_available[request.method](request)
+            return getattr(self, verb_available[request.method])(request)
         except KeyError:
             raise NotImplemented()
 
@@ -237,12 +237,13 @@ class ApiController(WSGIWrapper):
             self.ratelimit.check_limit(request)
 
         verb_available = {
-            'GET': self.get_list,
-            'PUT': self.create,
-            'DELETE': self.update_list
+            'GET': 'get',
+            'PUT': 'update',
+            'DELETE': 'delete'
         }
         try:
-            return verb_available[request.method](request, identifier)
+            return getattr(self,
+                           verb_available[request.method])(request, identifier)
         except KeyError:
             raise NotImplemented()
 

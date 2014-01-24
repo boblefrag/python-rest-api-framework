@@ -25,6 +25,8 @@ class Partial(object):
         if needed.
         """
         partial_fields = []
+
         if kwargs.get(self.partial_keyword):
             partial_fields = kwargs.pop(self.partial_keyword).split(',')
+
         return partial_fields, kwargs

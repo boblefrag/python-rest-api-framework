@@ -1,9 +1,10 @@
 """
 Handle the rate limit option for a Controller.
 """
-from werkzeug.exceptions import Unauthorized, HTTPException, NotFound
-from werkzeug._internal import HTTP_STATUS_CODES
 import time
+
+from werkzeug.exceptions import Unauthorized, HTTPException
+from werkzeug._internal import HTTP_STATUS_CODES
 
 HTTP_STATUS_CODES[429] = "Too Many Requests"
 
@@ -30,7 +31,6 @@ class RateLimit(object):
         self.interval = interval
         self.quota = quota
 
-
     def __call__(self, authentication):
         self.authentication = authentication
         return self
@@ -46,8 +46,10 @@ class RateLimit(object):
         HttpError with a 429 code otherwise
         """
         user = self.authentication.get_user(request)
+
         if user:
             user_pk = user[self.authentication.datastore.model.pk_field.name]
+
             try:
                 quota = self.datastore.get_list(
                     **{self.datastore.model.pk_field.name: user_pk})[0]
@@ -56,15 +58,15 @@ class RateLimit(object):
                         "quota": self.quota,
                         "last_request": 0.0
                         }
-                self.datastore.create(
-                    dico
-                    )
+                self.datastore.create(dico)
                 quota = self.datastore.get_list(
                     **{self.datastore.model.pk_field.name: user_pk})[0]
+
             last_request = quota.get("last_request", None)
             if last_request:
                 if time.time() < last_request + self.interval:
                     new_quota = quota.get('quota', self.quota) - 1
+
                     if new_quota == 0:
                         raise TooManyRequest()
                 else:
@@ -74,7 +76,6 @@ class RateLimit(object):
 
             self.datastore.update(quota,
                                   {'last_request': time.time(),
-                                   'quota': new_quota}
-                                  )
+                                   'quota': new_quota})
         else:
             raise Unauthorized

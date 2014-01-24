@@ -1,11 +1,11 @@
 """
 Implement some datastore based on SQL databases
 """
+import sqlite3
+from werkzeug.exceptions import NotFound, BadRequest
 
 from .base import DataStore
 from rest_api_framework.models import PkField
-from werkzeug.exceptions import NotFound, BadRequest
-import sqlite3
 
 
 class SQLiteDataStore(DataStore):
@@ -62,13 +62,18 @@ class SQLiteDataStore(DataStore):
 
     def create_database(self, cursor, table):
         statement = []
+
         for field in self.model.get_fields():
             query = "{0} {1}".format(field.name, self.wrapper[field.base_type])
+
             if isinstance(field, PkField):
                 query += " primary key autoincrement"
             statement.append(query)
-            if "required" in field.options and field.options['required'] is True:
+
+            if "required" in field.options\
+                    and field.options['required'] is True:
                 query += " NOT NULL"
+
         fields = ", ".join(statement)
         for field in self.model.get_fields():
 
@@ -88,6 +93,7 @@ class SQLiteDataStore(DataStore):
         """
         conn = sqlite3.connect(self.db)
         conn.execute('pragma foreign_keys=on')
+
         return conn
 
     def filter(self, **kwargs):
@@ -101,6 +107,7 @@ class SQLiteDataStore(DataStore):
 
     def count(self, **data):
         cdt = self.build_conditions(data)
+
         if len(cdt) == 0:
             query = "SELECT COUNT (*) FROM {0}".format(
                 self.ressource_config['table'])
@@ -110,24 +117,29 @@ class SQLiteDataStore(DataStore):
                 self.ressource_config['table'],
                 cdt
                 )
+
         cursor = self.get_connector().cursor()
         cursor.execute(query)
+
         return cursor.fetchone()[0]
 
     def build_conditions(self, data):
         return [
             ["{0}='{1}'".format(
-                    e[0], e[1]) for e in condition.iteritems()
+                e[0], e[1]) for e in condition.iteritems()
              ][0] for condition in self.get_conditions(data)]
 
     def get_conditions(self, data):
         rm = []
+
         for elem in data:
             if elem not in ['query', 'fields']:
                 if elem not in self.model.get_fields_name():
                     rm.append(elem)
+
         for elem in rm:
             data.pop(elem)
+
         return [
             {k: v} for k, v in data.iteritems() if k not in ["query", "fields"]
             ]
@@ -143,6 +155,7 @@ class SQLiteDataStore(DataStore):
         where_query = self.build_conditions(data)
         args = []
         limit = kwargs.pop("end", None)
+
         if kwargs.get("start", None):
             where_query.append(" id >=?")
             args.append(kwargs.pop('start'))
@@ -157,26 +170,33 @@ class SQLiteDataStore(DataStore):
 
         if limit:
             data["query"] += " LIMIT {0}".format(limit)
+
         cursor.execute(data["query"].format(self.ressource_config['table']),
                        tuple(args)
                        )
+
         objs = []
         for elem in cursor.fetchall():
             objs.append(dict(zip(self.fields, elem)))
+
         return objs
 
     def get_fields(self, **fields):
         if self.partial:
             fields, kwargs = self.partial.get_partials(**fields)
+
             if not fields:
                 fields = self.model.get_fields_name()
+
             for field in fields:
                 if not field in self.model.get_fields_name():
                     raise BadRequest()
+
                 if not self.model.pk_field.name in fields:
                     fields.append(self.model.pk_field.name)
         else:
             fields = self.model.get_fields_name()
+
         return fields
 
     def get_list(self, **kwargs):
@@ -190,6 +210,7 @@ class SQLiteDataStore(DataStore):
         start = kwargs.pop("offset", None)
         end = kwargs.pop("count", None)
         data = self.filter(**kwargs)
+
         return self.paginate(data, start=start, end=end)
 
     def get(self, identifier):
@@ -204,6 +225,7 @@ class SQLiteDataStore(DataStore):
         cursor = self.get_connector().cursor()
         cursor.execute(query, (identifier,))
         obj = cursor.fetchone()
+
         if obj:
             fields = self.model.get_fields_name()
             return dict(zip(fields, obj))
@@ -218,6 +240,7 @@ class SQLiteDataStore(DataStore):
         self.validate(data)
         fields = []
         values = []
+
         for k, v in data.iteritems():
             if k in self.model.get_fields_name():
                 fields.append(str(k))
@@ -231,40 +254,47 @@ class SQLiteDataStore(DataStore):
             tuple(fields),
             ",".join(["?" for step in range(len(fields))])
             )
+
         cursor.execute(query, tuple(values))
         conn.commit()
         conn.close()
+
         return cursor.lastrowid
 
     def update(self, obj, data):
         """
         Retreive the object to be updated
-        (:meth:`~.SQLiteDataStore.get` will raise a NotFound error if
-        the row does not exist)
+        (:meth:`~.SQLiteDataStore.get` will raise a NotFound error if the row
+        does not exist)
 
         Validate the fields to be updated and return the updated row
         """
         self.get(obj[self.model.pk_field.name])
         self.validate_fields(data)
+
         fields = []
         values = []
+
         for k, v in data.iteritems():
             if k in self.model.get_fields_name():
                 fields.append(k)
                 values.append(v)
+
         conn = self.get_connector()
         cursor = conn.cursor()
         update = " ,".join(["{0}='{1}'".format(f, v) for f, v in zip(fields,
-                                                                    values)])
+                           values)])
         query = "update {0} set {1} WHERE {2}={3}".format(
             self.ressource_config["table"],
             update,
             self.model.pk_field.name,
             obj[self.model.pk_field.name]
             )
+
         cursor.execute(query)
         conn.commit()
         conn.close()
+
         return self.get(obj[self.model.pk_field.name])
 
     def delete(self, identifier):
@@ -294,6 +324,8 @@ class SQLiteDataStore(DataStore):
                 message = """another ressource depends on this
                 object. Cloud not delete before all ressources
                 depending on it are also deleted"""
+
             raise BadRequest(message)
+
         conn.commit()
         conn.close()

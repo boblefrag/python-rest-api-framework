@@ -3,8 +3,8 @@ The minimum needed to take a response and render a response
 - url mapper utility
 - wsgiwrapper
 """
-from werkzeug.wrappers import Response
 import json
+from werkzeug.wrappers import Response
 
 
 def add_ressource_uri(response, obj):
@@ -47,6 +47,7 @@ class JsonResponse(object):
                             "object_list": objs}
             else:
                 response = objs
+
             return Response(json.dumps(response),
                             mimetype="application/json",
                             **kwargs)
@@ -54,6 +55,7 @@ class JsonResponse(object):
             response = ""
             if args:
                 response = json.dumps(*args)
+
             return Response(response,
                             mimetype="application/json",
                             **kwargs)

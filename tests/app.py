@@ -19,6 +19,7 @@ How it should work:
 """
 import sys
 sys.path.append("..")
+
 from rest_api_framework.datastore import PythonListDataStore, SQLiteDataStore
 from rest_api_framework import models
 from rest_api_framework.pagination import Pagination
@@ -40,7 +41,6 @@ api_keys = [
 
 
 class ApiModel(models.Model):
-
     fields = [models.IntegerField(name="age", required=True),
               models.StringField(name="name", required=True),
               models.PkField(name="id")

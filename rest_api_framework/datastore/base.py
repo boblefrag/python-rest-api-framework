@@ -26,6 +26,7 @@ class DataStore(object):
 
         if options.get("validators", None):
             self.validators = []
+
             for elem in options["validators"]:
                 self.validators.append(elem)
         else:
@@ -146,13 +147,11 @@ class DataStore(object):
                 if hasattr(validator, "need_datastore"):
                     if not validator.validate(data[field.name], self):
                         raise BadRequest("{0} does not validate".format(
-                                field.name)
-                                         )
+                            field.name))
                 else:
                     if not validator.validate(data[field.name]):
                         raise BadRequest("{0} does not validate".format(
-                                field.name)
-                                         )
+                            field.name))
 
         if self.validators:
             for elem in self.validators:
@@ -165,9 +164,11 @@ class DataStore(object):
         """
         if not isinstance(data, dict):
             raise BadRequest()
+
         for k, v in data.iteritems():
             if k not in self.model.get_fields_name():
                 raise BadRequest()
+
             field = self.model.get_field(k)
             for validator in field.validators:
                 if not validator.validate(v):

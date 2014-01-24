@@ -76,6 +76,8 @@ class SQLiteForeign(Validator):
             field
             )
         cursor.execute(query)
+
         if cursor.fetchone():
             return True
+
         return False

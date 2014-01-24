@@ -1,14 +1,16 @@
 from unittest import TestCase
+import json
+import time
+
 from werkzeug.wrappers import BaseResponse
 from werkzeug.test import Client
+
 from app import ApiApp
-import json
 from rest_api_framework.authentication import ApiKeyAuthentication
 from rest_api_framework.datastore import PythonListDataStore
 from rest_api_framework import models
 from rest_api_framework.controllers import WSGIDispatcher
 from rest_api_framework.ratelimit import RateLimit
-import time
 
 
 class ApiModel(models.Model):
@@ -18,7 +20,6 @@ class ApiModel(models.Model):
 
 
 class SQLModel(models.Model):
-
     fields = [models.IntegerField(name="age", required=True),
               models.StringField(name="name", required=True),
               models.PkField(name="id")
@@ -52,10 +53,11 @@ class RateLimitApiApp(ApiApp):
         "list_verbs": ["GET", "POST"],
         "unique_verbs": ["GET", "PUT", "DElETE"],
         "options": {"authentication": authentication,
-                    "ratelimit": RateLimit(PythonListDataStore(
-                    ratelimit_ressources, RateLimitModel),
-                                           interval=1,
-                                           quota=2)
+                    "ratelimit":
+                    RateLimit(
+                        PythonListDataStore(ratelimit_ressources,
+                                            RateLimitModel),
+                        interval=1, quota=2)
                     }
         }
 
@@ -76,12 +78,11 @@ class FormatedApp(ApiApp):
 
 
 class TestRateLimit(TestCase):
-
     def test_ratelimit(self):
-
         client = Client(
             WSGIDispatcher([RateLimitApiApp]),
             response_wrapper=BaseResponse)
+
         resp = client.get("/address/")
         self.assertEqual(resp.status_code, 401)
         resp = client.get("/address/?apikey=azerty")
@@ -97,11 +98,9 @@ class TestRateLimit(TestCase):
             controller = {
                 "list_verbs": ["GET", "POST"],
                 "unique_verbs": ["GET", "PUT", "DElETE"],
-                "options": {"ratelimit": RateLimit(PythonListDataStore(
-                            ratelimit_ressources, RateLimitModel),
-                                                   interval=1,
-                                                   quota=2)
-                            }
+                "options": {"ratelimit": RateLimit(
+                    PythonListDataStore(ratelimit_ressources, RateLimitModel),
+                    interval=1, quota=2)}
                 }
 
         self.assertRaises(ValueError,
@@ -117,4 +116,5 @@ class TestControllerFormaters(TestCase):
                         response_wrapper=BaseResponse)
         resp = client.post("/address/",
                            data=json.dumps({'name': 'bob', 'age': "34"}))
+
         self.assertEqual(resp.status_code, 201)

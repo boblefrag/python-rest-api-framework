@@ -1,13 +1,15 @@
 from unittest import TestCase
+import json
+import os
+
 from werkzeug.wrappers import BaseResponse
 from werkzeug.test import Client
-import json
+
 from rest_api_framework.controllers import WSGIDispatcher
 from rest_api_framework.datastore import PythonListDataStore, SQLiteDataStore
 from rest_api_framework.partials import Partial
 from rest_api_framework import models
 from app import ApiApp, SQLiteApp
-import os
 
 ressources = [
     {"name": "bob",
@@ -24,7 +26,6 @@ class ApiModel(models.Model):
 
 
 class SQLModel(models.Model):
-
     fields = [models.IntegerField(name="age", required=True),
               models.StringField(name="name", required=True),
               models.PkField(name="id")
@@ -32,7 +33,6 @@ class SQLModel(models.Model):
 
 
 class PartialApiApp(ApiApp):
-
     ressource = {
         "ressource_name": "address",
         "ressource": ressources,
@@ -53,13 +53,13 @@ class PartialSQLApp(SQLiteApp):
 
 
 class TestPartialResponse(TestCase):
-
     def test_get_partial_list(self):
         client = Client(WSGIDispatcher([PartialApiApp]),
                         response_wrapper=BaseResponse)
         resp = client.get("/address/?fields=age")
         # we only want "age". get_list add id, JsonResponse add ressource_uri
-        self.assertEqual(len(json.loads(resp.data)["object_list"][0].keys()), 3)
+        self.assertEqual(len(
+            json.loads(resp.data)["object_list"][0].keys()), 3)
 
         resp = client.get("/address/")
         self.assertEqual(resp.status_code, 200)
@@ -81,17 +81,22 @@ class TestPartialSQLResponse(TestCase):
 
         resp = client.get("/address/?fields=age")
         # we only want "age". get_list add id, JsonResponse add ressource_uri
-        self.assertEqual(len(json.loads(resp.data)["object_list"][0].keys()), 3)
+        self.assertEqual(
+            len(json.loads(resp.data)["object_list"][0].keys()), 3)
         resp = client.get("/address/")
+
         self.assertEqual(resp.status_code, 200)
         os.remove("test.db")
 
     def test_get_partial_sql_raise(self):
         client = Client(WSGIDispatcher([PartialSQLApp]),
                         response_wrapper=BaseResponse)
+
         for i in range(100):
             client.post("/address/",
                         data=json.dumps({"name": "bob", "age": 34}))
+
         response = client.get("/address/?fields=wrongkey")
+
         self.assertEqual(response.status_code, 400)
         os.remove("test.db")

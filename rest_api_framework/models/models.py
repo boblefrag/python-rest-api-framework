@@ -19,22 +19,27 @@ class Model(object):
         pk_field = [
             field for field in self.fields if isinstance(
                 field, fields.PkField)]
+
         if len(pk_field) != 1:
             raise ValueError
+
         self.pk_field = pk_field[0]
 
     def get_schema(self):
         fields = self.get_fields()
         response = {}
+
         for field in fields:
             if field == self.pk_field:
                 continue
+
             response[field.name] = {"type": str(field.base_type),
                                     "example": field.example
                                     }
             if field.options.get("required") and\
                     field.options["required"] is True:
                 response[field.name]['required'] = "true"
+
         return response
 
     def get_fields_name(self):
@@ -57,4 +62,5 @@ class Model(object):
         for field in self.fields:
             if field.name == field_name:
                 return field
+
         return None

@@ -1,12 +1,13 @@
 """
 Define base controller for your API.
 """
+from abc import ABCMeta
 import json
+
 from werkzeug.exceptions import BadRequest, NotImplemented
 from werkzeug.wrappers import Request
 from werkzeug.routing import Map, Rule
 from werkzeug.exceptions import HTTPException, NotFound
-from abc import ABCMeta
 from werkzeug.wsgi import DispatcherMiddleware
 
 
@@ -60,9 +61,9 @@ class AutoDocGenerator(WSGIWrapper):
         from werkzeug.wrappers import Response
         self.apps = apps
         self.url_map = Map([
-                Rule('/', endpoint='schema'),
-                Rule('/<ressource>/', endpoint='ressource_schema')
-                ])
+            Rule('/', endpoint='schema'),
+            Rule('/<ressource>/', endpoint='ressource_schema')
+        ])
         self.view = Response
 
     def schema(self, request):

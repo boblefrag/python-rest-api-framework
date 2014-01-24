@@ -20,7 +20,6 @@ class Field(object):
         self.options = options
 
 
-
 class IntegerField(Field):
     """
     An integer field. python type int, with IntegerValidator
@@ -28,6 +27,7 @@ class IntegerField(Field):
     base_type = "integer"
     validators = [IntegerValidator()]
     example = 42
+
 
 class StringField(Field):
     """
@@ -37,6 +37,7 @@ class StringField(Field):
     base_type = "string"
     validators = [StringValidator()]
     example = "Hello World"
+
 
 class PkField(Field):
     """
@@ -49,6 +50,7 @@ class PkField(Field):
     validators = []
     example = 42
 
+
 class ForeignKeyField(Field):
 
     def __init__(self, name, **options):
@@ -57,13 +59,12 @@ class ForeignKeyField(Field):
 
 
 class IntForeign(ForeignKeyField):
-
     """
     A type of integer and a Foreign key to check
     """
-
     base_type = "integer"
     example = 42
+
 
 class StringPkField(PkField):
     """
@@ -72,6 +73,7 @@ class StringPkField(PkField):
     base_type = "string"
     validators = []
     example = "i6HOCjvZMQ4"
+
 
 class TimestampField(Field):
     """

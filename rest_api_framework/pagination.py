@@ -24,8 +24,10 @@ class Pagination(object):
         request_kwargs = request.values.to_dict()
         offset = int(request_kwargs.pop(self.offset_key, 0))
         count = int(request_kwargs.pop(self.count_key, self.max))
+
         if count > self.max:
             count = self.max
+
         return offset, count, request_kwargs
 
     def get_metadata(self, total=0, offset=0, count=0, **filters):
@@ -34,12 +36,15 @@ class Pagination(object):
                 "total_count": total,
                 "filters": {}
                 }
+
         for k, v in filters.iteritems():
             meta["filters"][k] = v
+
         if offset == 0:
             meta['previous'] = "null"
         else:
             meta["previous"] = offset - count
+
         if meta["previous"] < 0:
             meta["previous"] = 0
         if meta['previous'] != "null":
@@ -51,5 +56,5 @@ class Pagination(object):
             meta["next"] = "null"
         if meta['next'] != "null":
             meta["next"] = "?{0}={1}".format(self.offset_key,
-                                                 meta["next"])
+                                             meta["next"])
         return meta

@@ -1,8 +1,11 @@
 from unittest import TestCase
+import json
+
 from werkzeug.wrappers import BaseResponse
 from werkzeug.test import Client
+from werkzeug import Headers
+
 from app import ApiApp
-import json
 from rest_api_framework.authentication import (ApiKeyAuthorization,
                                                Authorization,
                                                ApiKeyAuthentication,
@@ -10,7 +13,6 @@ from rest_api_framework.authentication import (ApiKeyAuthorization,
 from rest_api_framework.datastore import PythonListDataStore
 from rest_api_framework import models
 from rest_api_framework.controllers import WSGIDispatcher
-from werkzeug import Headers
 
 
 class ApiModel(models.Model):
@@ -20,9 +22,9 @@ class ApiModel(models.Model):
 
 
 class TestAuthentication(TestCase):
-
     def test_unauth_get_list(self):
         from rest_api_framework.pagination import Pagination
+
         ressources = [{"id": "azerty"}]
         authentication = ApiKeyAuthentication(
             PythonListDataStore(ressources,
@@ -42,11 +44,13 @@ class TestAuthentication(TestCase):
         client = Client(
             WSGIDispatcher([ApiAppAuth]),
             response_wrapper=BaseResponse)
+
         resp = client.get("/address/")
         self.assertEqual(resp.status_code, 401)
 
     def test_auth_get_list(self):
         from rest_api_framework.pagination import Pagination
+
         ressources = [{"id": "azerty"}]
         authentication = ApiKeyAuthentication(
             PythonListDataStore(ressources,
@@ -66,6 +70,7 @@ class TestAuthentication(TestCase):
         client = Client(
             WSGIDispatcher([ApiAppAuth]),
             response_wrapper=BaseResponse)
+
         resp = client.get("/address/?apikey=azerty")
         self.assertEqual(resp.status_code, 200)
         resp = client.get("/address/?apikey=querty")
@@ -73,6 +78,7 @@ class TestAuthentication(TestCase):
 
     def test_auth_unique_uri(self):
         from rest_api_framework.pagination import Pagination
+
         ressources = [{"id": "azerty"}]
         authentication = ApiKeyAuthentication(
             PythonListDataStore(ressources,
@@ -103,8 +109,8 @@ class TestAuthentication(TestCase):
         Test a read only api.
         GET should be ok, POST and PUT should not
         """
-
         from rest_api_framework.pagination import Pagination
+
         ressources = [{"id": "azerty"}]
         authentication = ApiKeyAuthentication(
             PythonListDataStore(ressources,
@@ -142,7 +148,6 @@ class TestAuthentication(TestCase):
 
 
 class TestBasicAuth(TestCase):
-
     def test_basic_auth(self):
         from base64 import b64encode
 
@@ -171,11 +176,14 @@ class TestBasicAuth(TestCase):
             response_wrapper=BaseResponse)
         credentials = b64encode("login:pass")
         headers = Headers([('Authorization: Basic', credentials)])
+
         resp = client.get("/address/1/", headers=headers)
         self.assertEqual(resp.status_code, 200)
+
         credentials = b64encode("login:hackme")
         headers = Headers([('Authorization: Basic', credentials)])
         resp = client.get("/address/1/", headers=headers)
         self.assertEqual(resp.status_code, 401)
+
         resp = client.get("/address/1/")
         self.assertEqual(resp.status_code, 401)

@@ -1,15 +1,14 @@
 from unittest import TestCase
-from rest_api_framework.datastore import (PythonListDataStore,
-                                          SQLiteDataStore)
-
-from rest_api_framework import models
+import os
 
 from werkzeug.exceptions import BadRequest, NotFound
-import os
+
+from rest_api_framework.datastore import (PythonListDataStore,
+                                          SQLiteDataStore)
+from rest_api_framework import models
 
 
 class ApiModel(models.Model):
-
     fields = [models.IntegerField(name="age", required=True),
               models.StringField(name="name", required=True),
               models.PkField(name="id")
@@ -21,21 +20,18 @@ class UserModel(models.Model):
               models.StringField(name="last_name", required=True),
               models.PkField(name="id"),
               models.IntForeign(name="address",
-                                 foreign={"table": "address",
-                                          "column": "id",
-                                          }
-                                 )
+                                foreign={"table": "address",
+                                         "column": "id"})
               ]
 
 
 class ModelTest(TestCase):
-
     def test_badlyconfigured_model(self):
         class BadModel(models.Model):
-
             fields = [models.IntegerField(name="age", required=True),
                       models.StringField(name="name", required=True),
                       ]
+
         self.assertRaises(ValueError, BadModel)
 
     def test_unfound_field(self):
@@ -44,9 +40,9 @@ class ModelTest(TestCase):
 
 
 class PythonListDataStoreTest(TestCase):
-
     def test_validator(self):
         from rest_api_framework.datastore.validators import UniqueTogether
+
         data_list = [
             {"name": "bob",
              "age": a,
@@ -87,7 +83,6 @@ class PythonListDataStoreTest(TestCase):
         os.remove("test.db")
 
     def test_validation(self):
-
         data_list = [
             {"name": "bob",
              "age": a,
@@ -96,6 +91,7 @@ class PythonListDataStoreTest(TestCase):
             ]
 
         store = PythonListDataStore(data_list, ApiModel)
+
         self.assertEqual(store.validate({"name": "bob", "age": 34}), None)
         self.assertRaises(BadRequest, store.validate, "a test")
         self.assertRaises(BadRequest,
@@ -110,11 +106,11 @@ class PythonListDataStoreTest(TestCase):
         data_list = []
 
         class OtherModel(models.Model):
-
             fields = [models.TimestampField(name="timestamp",
                                                  required=True),
                       models.PkField(name="id")
                       ]
+
         store = PythonListDataStore(data_list, OtherModel)
         self.assertRaises(BadRequest,
                           store.validate_fields,
@@ -180,7 +176,7 @@ class PythonListDataStoreTest(TestCase):
             store.update(
                 {"name": "bob", "age": "34", "id": 34},
                 {"name": "boby mc gee"}
-                ),{"name": "boby mc gee", "age": "34", "id": 34})
+                ), {"name": "boby mc gee", "age": "34", "id": 34})
         # adress is not part of the ressource description, it should
         # raise
         self.assertRaises(BadRequest,
@@ -229,11 +225,11 @@ class PythonListDataStoreTest(TestCase):
 
 
 class SQLiteDataStoreTest(TestCase):
-
     def test_validation(self):
         store = SQLiteDataStore(
             {"name": "test.db", "table": "address"},
             ApiModel)
+
         self.assertEqual(store.validate({"name": "bob", "age": 34}), None)
         self.assertRaises(BadRequest, store.validate, "a test")
         self.assertRaises(BadRequest,
@@ -248,24 +244,29 @@ class SQLiteDataStoreTest(TestCase):
         self.assertRaises(BadRequest,
                           store.validate_fields,
                           "age")
+
         os.remove("test.db")
 
     def test_pagination(self):
         store = SQLiteDataStore(
             {"name": "test.db", "table": "address"},
             ApiModel)
+
         for i in range(100):
             store.create({"name": "bob", "age": 34})
+
         self.assertEqual(len(store.get_list(count=10)), 10)
         self.assertEqual(store.get_list(count=10)[-1]["id"], 10)
         self.assertEqual(store.get_list(offset=15)[0]["id"], 15)
+
         req = store.get_list(offset=15, count=2)
+
         self.assertEqual(len(req), 2)
         self.assertEqual(req[0]['id'], 15)
+
         os.remove("test.db")
 
     def test_get(self):
-
         store = SQLiteDataStore(
             {"name": "test.db", "table": "address"}, ApiModel)
 
@@ -291,6 +292,7 @@ class SQLiteDataStoreTest(TestCase):
         self.assertEqual(store.create({"name": "bob", "age": 35}), 2)
         self.assertEqual(store.create({"name": "bob", "age": 34}), 3)
         self.assertEqual(store.get(3)["id"], 3)
+
         os.remove("test.db")
 
     def test_foreign_keys(self):
@@ -315,6 +317,7 @@ class SQLiteDataStoreTest(TestCase):
                            "address": 2}
                           )
         self.assertRaises(BadRequest, store.delete, 1)
+
         os.remove("test.db")
 
     def test_update(self):
@@ -329,14 +332,13 @@ class SQLiteDataStoreTest(TestCase):
             store.update(
                 {"name": "bob", "age": 34, "id": 34},
                 {"name": "boby mc gee"}
-                ),{"name": "boby mc gee", "age": 34, "id": 34})
+                ), {"name": "boby mc gee", "age": 34, "id": 34})
 
         self.assertEqual(
             store.update(
                 {"name": "bob", "age": 35, "id": 35},
                 {"name": "boby mc gee", "age": 67}
-                ),{"name": "boby mc gee", "age": 67, "id": 35})
-
+                ), {"name": "boby mc gee", "age": 67, "id": 35})
 
         # adress is not part of the ressource description, it should
         # raise
@@ -359,12 +361,16 @@ class SQLiteDataStoreTest(TestCase):
 
         for i in range(100):
             store.create({"name": "bob", "age": 34})
+
         # the object exists
         self.assertEqual(store.get(10)["id"], 10)
+
         # is delete
         self.assertEqual(store.delete(10), None)
+
         # does not exist anymore
         self.assertRaises(NotFound,
                           store.get,
                           10)
+
         os.remove("test.db")

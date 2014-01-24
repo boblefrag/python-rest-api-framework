@@ -24,10 +24,12 @@ class UniqueTogether(Validator):
         """
         self.datastore = datastore
         query_dict = {}
+
         for k, v in data.iteritems():
             if k in self.fields:
                 query_dict[k] = v
+
         resp = datastore.get_list(**query_dict)
         if len(resp) > 0:
-            raise BadRequest("{0} must be unique together".format(
-                    ",".join(self.fields)))
+            raise BadRequest(
+                "{0} must be unique together".format(",".join(self.fields)))

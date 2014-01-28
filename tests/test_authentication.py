@@ -34,7 +34,7 @@ class TestAuthentication(TestCase):
         class ApiAppAuth(ApiApp):
             controller = {
                 "list_verbs": ["GET", "POST"],
-                "unique_verbs": ["GET", "PUT", "DElETE"],
+                "unique_verbs": ["GET", "PUT", "DELETE"],
                 "options": {"pagination": Pagination(20),
                             "authentication": authentication,
                             "authorization": ApiKeyAuthorization
@@ -60,7 +60,7 @@ class TestAuthentication(TestCase):
         class ApiAppAuth(ApiApp):
             controller = {
                 "list_verbs": ["GET", "POST"],
-                "unique_verbs": ["GET", "PUT", "DElETE"],
+                "unique_verbs": ["GET", "PUT", "DELETE"],
                 "options": {"pagination": Pagination(20),
                             "authentication": authentication,
                             "authorization": ApiKeyAuthorization
@@ -88,7 +88,7 @@ class TestAuthentication(TestCase):
         class ApiAppAuth(ApiApp):
             controller = {
                 "list_verbs": ["GET", "POST"],
-                "unique_verbs": ["GET", "PUT", "DElETE"],
+                "unique_verbs": ["GET", "PUT", "DELETE"],
                 "options": {"pagination": Pagination(20),
                             "authentication": authentication,
                             "authorization": ApiKeyAuthorization

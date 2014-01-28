@@ -54,6 +54,7 @@ class WSGIWrapper(object):
                 {"error": error.description},
                 status=error.code)
 
+
 class AutoSporeGenerator(WSGIWrapper):
     def __init__(self, apps, name, base_url, version, formats):
         from werkzeug.wrappers import Response
@@ -69,6 +70,12 @@ class AutoSporeGenerator(WSGIWrapper):
         self.view = Response
 
     def spore(self, request):
+        method_trad = {"GET": {"index": "list",
+                               "unique_uri": "get"},
+                       "POST": {"index": "create"},
+                       "PUT": {"unique_uri": "update"},
+                       "DELETE": {"unique_uri": "delete"}
+                       }
         URL_PLACEHOLDER = re.compile(r'<[a-zA-Z]*:?([a-zA-Z0-9_-]*)>')
 
         spore_doc = OrderedDict()
@@ -99,12 +106,10 @@ class AutoSporeGenerator(WSGIWrapper):
                         view_info['description'] = service.ressource[
                             'ressource_description']
 
-                    method_name = '{method}_{service}_{url_name}'.format(
-                        method=method.lower(),
-                        service=service.ressource['ressource_name'].lower(),
-                        url_name=url[1].lower())
+                    method_name = '{method}_{service}'.format(
+                        method=method_trad[method][url[1]],
+                        service=service.ressource['ressource_name'].lower())
                     spore_doc['methods'][method_name] = view_info
-
         return self.view(json.dumps(spore_doc), mimetype="application/json")
 
 
@@ -166,16 +171,21 @@ class WSGIDispatcher(DispatcherMiddleware):
        app = WSGIDispatcher([FirstApp, SecondApp])
     """
 
-    def __init__(self, apps, name='PRAF', version='devel', 
-                 base_url=None, formats=None):
+    def __init__(self, apps, name='PRAF', version='devel',
+                 base_url=None, formats=None, autodoc=True, autospore=True):
         if formats is None:
-            formats = ['json']
-
-        endpoints = {"/schema": self.make_schema(apps),
-                     "/spore": self.make_spore(apps, name, base_url,
-                                                 version, formats),}
+            formats = []
+        endpoints = {}
         for elem in apps:
+            formats.append(elem.view['response_class'].render_format)
             endpoints["/{0}".format(elem.ressource["ressource_name"])] = elem()
+        if not formats:
+            formats = ["json"]
+        if autodoc:
+            endpoints["/schema"] = self.make_schema(apps)
+        if autospore:
+            endpoints["/spore"] = self.make_spore(apps, name, base_url,
+                                                  version, formats)
         app = NotFound()
         mounts = endpoints
         super(WSGIDispatcher, self).__init__(app, mounts=mounts)

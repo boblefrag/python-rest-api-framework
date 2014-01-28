@@ -27,7 +27,7 @@ Change your UserEndPoint to get:
 
         controller = {
             "list_verbs": ["GET", "POST"],
-            "unique_verbs": ["GET", "PUT", "DElETE"]
+            "unique_verbs": ["GET", "PUT", "DELETE"]
             }
 
         view = {"response_class": JsonResponse}

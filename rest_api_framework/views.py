@@ -25,6 +25,9 @@ class JsonResponse(object):
                             **options)
         return view(objects)
     """
+
+    render_format = "json"
+
     def __init__(self, model, ressource_name,
                  formaters=["add_ressource_uri"], **options):
         self.model = model

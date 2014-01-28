@@ -29,12 +29,12 @@ class TestSpore(TestCase):
         self.assertEqual(spore['version'], '1.0')
 
         # methods
-        self.assertIn('get_address_unique_uri', spore['methods'])
+        self.assertIn('list_address', spore['methods'])
         self.assertEqual('/address/:identifier/',
-                         spore['methods']['get_address_unique_uri']['path'])
+                         spore['methods']['get_address']['path'])
         self.assertIn(
             'identifier',
-            spore['methods']['get_address_unique_uri']['required_params'])
+            spore['methods']['get_address']['required_params'])
 
     def test_rxjson_spore(self):
         rx = Rx.Factory({'register_core_types': True})

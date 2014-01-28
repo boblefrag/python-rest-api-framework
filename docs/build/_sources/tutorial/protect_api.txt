@@ -65,7 +65,7 @@ Then you can plug this authentication backend to your endpoint:
 
     controller = {
         "list_verbs": ["GET", "POST"],
-        "unique_verbs": ["GET", "PUT", "DElETE"],
+        "unique_verbs": ["GET", "PUT", "DELETE"],
         "options": {"pagination": Pagination(20),
                     "formaters": [foreign_keys_format],
                     "authentication": authentication}
@@ -89,7 +89,7 @@ from rest_api_framework.authentication import Authorization
 
     controller = {
         "list_verbs": ["GET", "POST"],
-        "unique_verbs": ["GET", "PUT", "DElETE"],
+        "unique_verbs": ["GET", "PUT", "DELETE"],
         "options": {"pagination": Pagination(20),
                     "formaters": [foreign_keys_format],
                     "authentication": authentication,

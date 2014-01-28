@@ -51,7 +51,7 @@ authentication = ApiKeyAuthentication(
 class RateLimitApiApp(ApiApp):
     controller = {
         "list_verbs": ["GET", "POST"],
-        "unique_verbs": ["GET", "PUT", "DElETE"],
+        "unique_verbs": ["GET", "PUT", "DELETE"],
         "options": {"authentication": authentication,
                     "ratelimit":
                     RateLimit(
@@ -70,7 +70,7 @@ def controller_formater(view, data):
 class FormatedApp(ApiApp):
     controller = {
         "list_verbs": ["GET", "POST"],
-        "unique_verbs": ["GET", "PUT", "DElETE"],
+        "unique_verbs": ["GET", "PUT", "DELETE"],
         "options": {"formaters": [controller_formater,
                                   ]
                     }
@@ -97,7 +97,7 @@ class TestRateLimit(TestCase):
         class BadConfRateLimitApiApp(ApiApp):
             controller = {
                 "list_verbs": ["GET", "POST"],
-                "unique_verbs": ["GET", "PUT", "DElETE"],
+                "unique_verbs": ["GET", "PUT", "DELETE"],
                 "options": {"ratelimit": RateLimit(
                     PythonListDataStore(ratelimit_ressources, RateLimitModel),
                     interval=1, quota=2)}

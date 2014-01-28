@@ -30,7 +30,7 @@ instanciated. For example:
 
    controller = {
         "list_verbs": ["GET", "POST"],
-        "unique_verbs": ["GET", "PUT", "DElETE"],
+        "unique_verbs": ["GET", "PUT", "DELETE"],
         "options": {"pagination": Pagination(20,
                                              offset_key="start",
                                              count_key="limit")}

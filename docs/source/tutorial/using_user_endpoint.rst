@@ -315,7 +315,7 @@ Your API is autodocumented by Python REST API Framework.
             "allowed unique ressource": [
                 "GET", 
                 "PUT", 
-                "DElETE"
+                "DELETE"
             ], 
             "list_endpoint": "/users/", 
             "schema_endpoint": "/schema/users/"

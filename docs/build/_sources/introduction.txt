@@ -149,7 +149,7 @@ and a view to render our data
 
         controller = {
             "list_verbs": ["GET", "POST"],
-            "unique_verbs": ["GET", "PUT", "DElETE"],
+            "unique_verbs": ["GET", "PUT", "DELETE"],
             }
 
         view = {"response_class": JsonResponse}
@@ -264,7 +264,7 @@ is the same as with the PythonListDataStore.
         }
         controller = {
            "list_verbs": ["GET", "POST"],
-           "unique_verbs": ["GET", "PUT", "DElETE"]
+           "unique_verbs": ["GET", "PUT", "DELETE"]
            "options": {"pagination": Pagination(20)}
         }
         view = {"response_class": JsonResponse}

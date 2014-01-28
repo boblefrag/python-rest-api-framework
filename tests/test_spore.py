@@ -18,7 +18,7 @@ class TestSpore(TestCase):
         client = Client(WSGIDispatcher([ApiApp], name='ApiApp', version='1.0',
                                        base_url='http://apiapp.com'),
                         response_wrapper=BaseResponse)
-        resp = client.get("/schema/spore/")
+        resp = client.get("/spore/")
 
         self.assertEqual(resp.status_code, 200)
         spore = json.loads(resp.data)
@@ -41,7 +41,7 @@ class TestSpore(TestCase):
         client = Client(WSGIDispatcher([ApiApp], name='ApiApp', version='1.0',
                                        base_url='http://apiapp.com'),
                         response_wrapper=BaseResponse)
-        resp = client.get("/schema/spore/")
+        resp = client.get("/spore/")
 
         with open(os.path.join(HERE, 'spore_validation.rx')) as f:
             spore_json_schema = json.loads(f.read())

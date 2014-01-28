@@ -54,11 +54,7 @@ class WSGIWrapper(object):
                 {"error": error.description},
                 status=error.code)
 
-
-class AutoDocGenerator(WSGIWrapper):
-    """
-    Auto generate a documentation endpoint for each endpoints registered.
-    """
+class AutoSporeGenerator(WSGIWrapper):
     def __init__(self, apps, name, base_url, version, formats):
         from werkzeug.wrappers import Response
         self.apps = apps
@@ -68,43 +64,9 @@ class AutoDocGenerator(WSGIWrapper):
         self.formats = formats
 
         self.url_map = Map([
-            Rule('/', endpoint='schema'),
-            Rule('/<ressource>/', endpoint='ressource_schema'),
-            Rule('/spore/', endpoint='spore')
+            Rule('/', endpoint='spore'),
         ])
         self.view = Response
-
-    def schema(self, request):
-        """
-        Generate the schema url of each endpoints
-        """
-        response = {}
-        for elem in self.apps:
-            response[elem.ressource['ressource_name']] = {
-                "list_endpoint": "/{0}/".format(
-                    elem.ressource['ressource_name']),
-                "allowed list_verbs": elem.controller["list_verbs"],
-                "allowed unique ressource": elem.controller["unique_verbs"],
-                "schema_endpoint": "/schema/{0}/".format(
-                    elem.ressource["ressource_name"]
-                )
-            }
-
-        return self.view(json.dumps(response), mimetype="application/json")
-
-    def ressource_schema(self, request, ressource):
-        """
-        Generate the main endpoint of schema. Return the list of all
-            print app.datastore.modelendpoints available
-        """
-        app = [elem for elem in self.apps
-               if elem.ressource['ressource_name'] == ressource]
-        if app:
-            app = app[0]
-            response = app.ressource['model']().get_schema()
-        else:
-            raise NotFound
-        return self.view(json.dumps(response), mimetype="application/json")
 
     def spore(self, request):
         URL_PLACEHOLDER = re.compile(r'<[a-zA-Z]*:?([a-zA-Z0-9_-]*)>')
@@ -146,6 +108,53 @@ class AutoDocGenerator(WSGIWrapper):
         return self.view(json.dumps(spore_doc), mimetype="application/json")
 
 
+class AutoDocGenerator(WSGIWrapper):
+    """
+    Auto generate a documentation endpoint for each endpoints registered.
+    """
+    def __init__(self, apps):
+        from werkzeug.wrappers import Response
+        self.apps = apps
+
+        self.url_map = Map([
+            Rule('/', endpoint='schema'),
+            Rule('/<ressource>/', endpoint='ressource_schema'),
+        ])
+        self.view = Response
+
+    def schema(self, request):
+        """
+        Generate the schema url of each endpoints
+        """
+        response = {}
+        for elem in self.apps:
+            response[elem.ressource['ressource_name']] = {
+                "list_endpoint": "/{0}/".format(
+                    elem.ressource['ressource_name']),
+                "allowed list_verbs": elem.controller["list_verbs"],
+                "allowed unique ressource": elem.controller["unique_verbs"],
+                "schema_endpoint": "/schema/{0}/".format(
+                    elem.ressource["ressource_name"]
+                )
+            }
+
+        return self.view(json.dumps(response), mimetype="application/json")
+
+    def ressource_schema(self, request, ressource):
+        """
+        Generate the main endpoint of schema. Return the list of all
+            print app.datastore.modelendpoints available
+        """
+        app = [elem for elem in self.apps
+               if elem.ressource['ressource_name'] == ressource]
+        if app:
+            app = app[0]
+            response = app.ressource['model']().get_schema()
+        else:
+            raise NotFound
+        return self.view(json.dumps(response), mimetype="application/json")
+
+
 class WSGIDispatcher(DispatcherMiddleware):
     """
     WSGIDispatcher take a list of :class:`.Controller` and mount them
@@ -162,16 +171,20 @@ class WSGIDispatcher(DispatcherMiddleware):
         if formats is None:
             formats = ['json']
 
-        endpoints = {"/schema": self.make_schema(apps, name, base_url,
-                                                 version, formats)}
+        endpoints = {"/schema": self.make_schema(apps),
+                     "/spore": self.make_spore(apps, name, base_url,
+                                                 version, formats),}
         for elem in apps:
             endpoints["/{0}".format(elem.ressource["ressource_name"])] = elem()
         app = NotFound()
         mounts = endpoints
         super(WSGIDispatcher, self).__init__(app, mounts=mounts)
 
-    def make_schema(self, apps, name, base_url, version, formats):
-        return AutoDocGenerator(apps, name, base_url, version, formats)
+    def make_schema(self, apps):
+        return AutoDocGenerator(apps)
+
+    def make_spore(self, apps, name, base_url, version, formats):
+        return AutoSporeGenerator(apps, name, base_url, version, formats)
 
 
 class ApiController(WSGIWrapper):

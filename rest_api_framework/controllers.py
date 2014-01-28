@@ -3,6 +3,8 @@ Define base controller for your API.
 """
 from abc import ABCMeta
 import json
+import re
+from collections import OrderedDict
 
 from werkzeug.exceptions import BadRequest, NotImplemented
 from werkzeug.wrappers import Request
@@ -57,12 +59,18 @@ class AutoDocGenerator(WSGIWrapper):
     """
     Auto generate a documentation endpoint for each endpoints registered.
     """
-    def __init__(self, apps):
+    def __init__(self, apps, name, base_url, version, formats):
         from werkzeug.wrappers import Response
         self.apps = apps
+        self.name = name
+        self.base_url = base_url
+        self.version = version
+        self.formats = formats
+
         self.url_map = Map([
             Rule('/', endpoint='schema'),
-            Rule('/<ressource>/', endpoint='ressource_schema')
+            Rule('/<ressource>/', endpoint='ressource_schema'),
+            Rule('/spore/', endpoint='spore')
         ])
         self.view = Response
 
@@ -78,8 +86,9 @@ class AutoDocGenerator(WSGIWrapper):
                 "allowed list_verbs": elem.controller["list_verbs"],
                 "allowed unique ressource": elem.controller["unique_verbs"],
                 "schema_endpoint": "/schema/{0}/".format(
-                    elem.ressource["ressource_name"])
-                }
+                    elem.ressource["ressource_name"]
+                )
+            }
 
         return self.view(json.dumps(response), mimetype="application/json")
 
@@ -97,6 +106,45 @@ class AutoDocGenerator(WSGIWrapper):
             raise NotFound
         return self.view(json.dumps(response), mimetype="application/json")
 
+    def spore(self, request):
+        URL_PLACEHOLDER = re.compile(r'<([a-zA-Z0-9_-]*)>')
+
+        spore_doc = OrderedDict()
+        spore_doc['name'] = self.name
+        spore_doc['base_url'] = self.base_url
+        spore_doc['version'] = self.version
+        spore_doc['expected_status'] = [200]
+        spore_doc['methods'] = OrderedDict()
+
+        for Service in self.apps:
+            service = Service()
+            service_base_path = '/%s' % service.ressource['ressource_name']
+
+            for url in service.urls:
+                endpoint = '%s%s' % (service_base_path, url[0])
+
+                service_path = URL_PLACEHOLDER.sub(':\g<1>', endpoint)
+                service_params = URL_PLACEHOLDER.findall(endpoint)
+
+                for method in url[2]:
+                    view_info = OrderedDict(path=service_path,
+                                            method=method,
+                                            formats=self.formats)
+                    if service_params:
+                        view_info['required_params'] = service_params
+
+                    if 'ressource_description' in service.ressource:
+                        view_info['description'] = service.ressource[
+                            'ressource_description']
+
+                    method_name = '{method}_{service}_{url_name}'.format(
+                        method=method.lower(),
+                        service=service.ressource['ressource_name'].lower(),
+                        url_name=url[1].lower())
+                    spore_doc['methods'][method_name] = view_info
+
+        return self.view(json.dumps(spore_doc), mimetype="application/json")
+
 
 class WSGIDispatcher(DispatcherMiddleware):
     """
@@ -109,16 +157,21 @@ class WSGIDispatcher(DispatcherMiddleware):
        app = WSGIDispatcher([FirstApp, SecondApp])
     """
 
-    def __init__(self, apps):
-        endpoints = {"/schema": self.make_schema(apps)}
+    def __init__(self, apps, name='PRAF', base_url='http://localhost:5000',
+                 version='devel', formats=None):
+        if formats is None:
+            formats = ['json']
+
+        endpoints = {"/schema": self.make_schema(apps, name, base_url,
+                                                 version, formats)}
         for elem in apps:
             endpoints["/{0}".format(elem.ressource["ressource_name"])] = elem()
         app = NotFound()
         mounts = endpoints
         super(WSGIDispatcher, self).__init__(app, mounts=mounts)
 
-    def make_schema(self, apps):
-        return AutoDocGenerator(apps)
+    def make_schema(self, apps, name, base_url, version, formats):
+        return AutoDocGenerator(apps, name, base_url, version, formats)
 
 
 class ApiController(WSGIWrapper):
@@ -355,7 +408,7 @@ class Controller(ApiController):
             ('/<int:identifier>/',
              'unique_uri',
              self.controller['unique_verbs']),
-            ]
+        ]
 
         self.url_map = self.load_urls()
 
@@ -363,7 +416,7 @@ class Controller(ApiController):
             self.ressource['ressource'],
             self.ressource['model'],
             **self.ressource.get('options', {})
-            )
+        )
 
         self.view = self.view['response_class'](
             self.datastore.model,
@@ -390,8 +443,8 @@ class Controller(ApiController):
             [
                 Rule(pattern[0], endpoint=pattern[1], methods=pattern[2])
                 for pattern in self.urls
-                ]
-            )
+            ]
+        )
 
     def make_options(self, options):
         """

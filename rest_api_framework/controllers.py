@@ -73,7 +73,7 @@ class AutoSporeGenerator(WSGIWrapper):
 
         spore_doc = OrderedDict()
         spore_doc['name'] = self.name
-        spore_doc['base_url'] = self.base_url
+        spore_doc['base_url'] = self.base_url or request.host_url
         spore_doc['version'] = self.version
         spore_doc['expected_status'] = [200]
         spore_doc['methods'] = OrderedDict()
@@ -166,8 +166,8 @@ class WSGIDispatcher(DispatcherMiddleware):
        app = WSGIDispatcher([FirstApp, SecondApp])
     """
 
-    def __init__(self, apps, name='PRAF', base_url='http://localhost:5000',
-                 version='devel', formats=None):
+    def __init__(self, apps, name='PRAF', version='devel', 
+                 base_url=None, formats=None):
         if formats is None:
             formats = ['json']
 

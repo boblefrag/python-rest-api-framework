@@ -45,7 +45,7 @@ class PartialApiApp(ApiApp):
 class PartialSQLApp(SQLiteApp):
     ressource = {
         "ressource_name": "address",
-        "ressource": {"name": "test.db", "table": "address"},
+        "ressource": {"name": ":memory:", "table": "address"},
         "model": SQLModel,
         "datastore": SQLiteDataStore,
         "options": {"partial": Partial()}
@@ -86,7 +86,7 @@ class TestPartialSQLResponse(TestCase):
         resp = client.get("/address/")
 
         self.assertEqual(resp.status_code, 200)
-        os.remove("test.db")
+
 
     def test_get_partial_sql_raise(self):
         client = Client(WSGIDispatcher([PartialSQLApp]),
@@ -99,4 +99,3 @@ class TestPartialSQLResponse(TestCase):
         response = client.get("/address/?fields=wrongkey")
 
         self.assertEqual(response.status_code, 400)
-        os.remove("test.db")

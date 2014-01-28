@@ -67,8 +67,10 @@ class SQLiteForeign(Validator):
         self.options = options
 
     def validate(self, field, datastore):
-        conn = sqlite3.connect(datastore.db)
-        cursor = conn.cursor()
+        cursor = datastore.conn.cursor()
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+        print(cursor.fetchall())
+        #cursor = datastore.conn.cursor()
         query = "SELECT {0} FROM {1} WHERE {2}={3}".format(
             self.options["foreign"]["column"],
             self.options["foreign"]["table"],

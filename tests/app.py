@@ -67,7 +67,7 @@ class ApiApp(Controller):
 class SQLiteApp(Controller):
     ressource = {
         "ressource_name": "address",
-        "ressource": {"name": "test.db", "table": "address"},
+        "ressource": {"name": ":memory:", "table": "address"},
         "model": ApiModel,
         "datastore": SQLiteDataStore
         }

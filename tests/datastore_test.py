@@ -68,7 +68,7 @@ class PythonListDataStoreTest(TestCase):
             {"age": 20})
 
         store = SQLiteDataStore(
-            {"name": "test.db", "table": "address"},
+            {"name": ":memory:", "table": "address"},
             ApiModel,
             validators=[UniqueTogether("age", "name")]
             )
@@ -80,7 +80,7 @@ class PythonListDataStoreTest(TestCase):
         self.assertRaises(BadRequest,
                           store.validate,
                           {"name": "bob", "age": 20})
-        os.remove("test.db")
+
 
     def test_validation(self):
         data_list = [
@@ -227,7 +227,7 @@ class PythonListDataStoreTest(TestCase):
 class SQLiteDataStoreTest(TestCase):
     def test_validation(self):
         store = SQLiteDataStore(
-            {"name": "test.db", "table": "address"},
+            {"name": ":memory:", "table": "address"},
             ApiModel)
 
         self.assertEqual(store.validate({"name": "bob", "age": 34}), None)
@@ -245,11 +245,9 @@ class SQLiteDataStoreTest(TestCase):
                           store.validate_fields,
                           "age")
 
-        os.remove("test.db")
-
     def test_pagination(self):
         store = SQLiteDataStore(
-            {"name": "test.db", "table": "address"},
+            {"name": ":memory:", "table": "address"},
             ApiModel)
 
         for i in range(100):
@@ -264,8 +262,6 @@ class SQLiteDataStoreTest(TestCase):
         self.assertEqual(len(req), 2)
         self.assertEqual(req[0]['id'], 15)
 
-        os.remove("test.db")
-
     def test_get(self):
         store = SQLiteDataStore(
             {"name": "test.db", "table": "address"}, ApiModel)
@@ -277,10 +273,9 @@ class SQLiteDataStoreTest(TestCase):
         self.assertRaises(NotFound,
                           store.get,
                           101)
-        os.remove("test.db")
 
     def test_create(self):
-        data = {"name": "test.db", "table": "address"}
+        data = {"name": ":memory:", "table": "address"}
         store = SQLiteDataStore(
             data,
             ApiModel)
@@ -292,8 +287,6 @@ class SQLiteDataStoreTest(TestCase):
         self.assertEqual(store.create({"name": "bob", "age": 35}), 2)
         self.assertEqual(store.create({"name": "bob", "age": 34}), 3)
         self.assertEqual(store.get(3)["id"], 3)
-
-        os.remove("test.db")
 
     def test_foreign_keys(self):
         data = {"name": "test.db", "table": "address"}
@@ -317,12 +310,10 @@ class SQLiteDataStoreTest(TestCase):
                            "address": 2}
                           )
         self.assertRaises(BadRequest, store.delete, 1)
-
         os.remove("test.db")
-
     def test_update(self):
         store = SQLiteDataStore(
-            {"name": "test.db", "table": "address"},
+            {"name": ":memory:", "table": "address"},
             ApiModel)
 
         for i in range(100):
@@ -353,11 +344,10 @@ class SQLiteDataStoreTest(TestCase):
                           {"name": "bob", "age": "100", "id": 400},
                           {"name": "boby mc gee"}
                           )
-        os.remove("test.db")
 
     def test_delete(self):
         store = SQLiteDataStore(
-            {"name": "test.db", "table": "address"}, ApiModel)
+            {"name": ":memory:", "table": "address"}, ApiModel)
 
         for i in range(100):
             store.create({"name": "bob", "age": 34})
@@ -372,5 +362,3 @@ class SQLiteDataStoreTest(TestCase):
         self.assertRaises(NotFound,
                           store.get,
                           10)
-
-        os.remove("test.db")

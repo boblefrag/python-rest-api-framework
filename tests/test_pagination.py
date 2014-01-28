@@ -57,7 +57,6 @@ class TestSQlitePagination(TestCase):
         resp = client.get("/address/")
 
         self.assertEqual(len(json.loads(resp.data)["object_list"]), 20)
-        os.remove("test.db")
 
     def test_base_pagination_offset(self):
         client = Client(WSGIDispatcher([SQLiteApp]),
@@ -70,7 +69,7 @@ class TestSQlitePagination(TestCase):
         resp = client.get("/address/?offset=2")
 
         self.assertEqual(json.loads(resp.data)["object_list"][0]['id'], 2)
-        os.remove("test.db")
+
 
     def test_base_pagination_count(self):
         client = Client(WSGIDispatcher([SQLiteApp]),
@@ -83,7 +82,7 @@ class TestSQlitePagination(TestCase):
         resp = client.get("/address/?count=2")
 
         self.assertEqual(len(json.loads(resp.data)), 2)
-        os.remove("test.db")
+
 
     def test_base_pagination_count_offset(self):
         client = Client(WSGIDispatcher([SQLiteApp]),
@@ -97,5 +96,3 @@ class TestSQlitePagination(TestCase):
 
         self.assertEqual(len(json.loads(resp.data)), 2)
         self.assertEqual(json.loads(resp.data)["object_list"][0]['id'], 4)
-
-        os.remove("test.db")

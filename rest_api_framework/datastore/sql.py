@@ -49,15 +49,15 @@ class SQLiteDataStore(DataStore):
     def __init__(self, ressource_config, model, **options):
 
         self.db = ressource_config["name"]
-        conn = sqlite3.connect(ressource_config["name"])
-        cursor = conn.cursor()
+        self.conn = sqlite3.connect(ressource_config["name"])
+        cursor = self.conn.cursor()
         table = ressource_config["table"]
-        super(SQLiteDataStore, self).__init__({"conn": conn, "table": table},
+        super(SQLiteDataStore, self).__init__({"conn": self.conn, "table": table},
                                               model,
                                               **options)
         self.create_database(cursor, table)
-        conn.commit()
-        conn.close()
+        self.conn.commit()
+        # conn.close()
         self.fields = self.model.get_fields()
 
     def create_database(self, cursor, table):
@@ -91,10 +91,9 @@ class SQLiteDataStore(DataStore):
         return a sqlite3 connection to communicate with the table
         define in self.db
         """
-        conn = sqlite3.connect(self.db)
-        conn.execute('pragma foreign_keys=on')
+        self.conn.execute('pragma foreign_keys=on')
 
-        return conn
+        return self.conn
 
     def filter(self, **kwargs):
         """
@@ -246,7 +245,7 @@ class SQLiteDataStore(DataStore):
                 fields.append(str(k))
                 values.append(unicode(v))
 
-        conn = self.get_connector()
+        conn = self.conn
         cursor = conn.cursor()
 
         query = "insert into {0} {1} values ({2})".format(
@@ -256,8 +255,7 @@ class SQLiteDataStore(DataStore):
             )
 
         cursor.execute(query, tuple(values))
-        conn.commit()
-        conn.close()
+        self.conn.commit()
 
         return cursor.lastrowid
 
@@ -280,7 +278,7 @@ class SQLiteDataStore(DataStore):
                 fields.append(k)
                 values.append(v)
 
-        conn = self.get_connector()
+        conn = self.conn
         cursor = conn.cursor()
         update = " ,".join(["{0}='{1}'".format(f, v) for f, v in zip(fields,
                            values)])
@@ -293,7 +291,6 @@ class SQLiteDataStore(DataStore):
 
         cursor.execute(query)
         conn.commit()
-        conn.close()
 
         return self.get(obj[self.model.pk_field.name])
 
@@ -309,7 +306,7 @@ class SQLiteDataStore(DataStore):
 
         """
         self.get(identifier)
-        conn = self.get_connector()
+        conn = self.conn
         cursor = conn.cursor()
 
         query = "delete from {0} where {2}={1}".format(
@@ -328,4 +325,6 @@ class SQLiteDataStore(DataStore):
             raise BadRequest(message)
 
         conn.commit()
-        conn.close()
+
+    def __del__(self):
+        self.conn.close()

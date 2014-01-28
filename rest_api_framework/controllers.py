@@ -107,7 +107,7 @@ class AutoDocGenerator(WSGIWrapper):
         return self.view(json.dumps(response), mimetype="application/json")
 
     def spore(self, request):
-        URL_PLACEHOLDER = re.compile(r'<([a-zA-Z0-9_-]*)>')
+        URL_PLACEHOLDER = re.compile(r'<[a-zA-Z]*:?([a-zA-Z0-9_-]*)>')
 
         spore_doc = OrderedDict()
         spore_doc['name'] = self.name

@@ -3,7 +3,7 @@
 from setuptools import setup
 
 setup(name='PRAF',
-      version='1.1',
+      version='1.2',
       description='Python framework for REST API',
       author='Yohann Gabory',
       author_email='yohann@gabory.fr',

@@ -81,7 +81,6 @@ class PythonListDataStoreTest(TestCase):
                           store.validate,
                           {"name": "bob", "age": 20})
 
-
     def test_validation(self):
         data_list = [
             {"name": "bob",
@@ -264,7 +263,7 @@ class SQLiteDataStoreTest(TestCase):
 
     def test_get(self):
         store = SQLiteDataStore(
-            {"name": "test.db", "table": "address"}, ApiModel)
+            {"name": ":memory:", "table": "address"}, ApiModel)
 
         for i in range(100):
             store.create({"name": "bob", "age": 34})
@@ -311,6 +310,7 @@ class SQLiteDataStoreTest(TestCase):
                           )
         self.assertRaises(BadRequest, store.delete, 1)
         os.remove("test.db")
+
     def test_update(self):
         store = SQLiteDataStore(
             {"name": ":memory:", "table": "address"},

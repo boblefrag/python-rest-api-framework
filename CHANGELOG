@@ -1,0 +1,21 @@
+CHANGELOG
+=========
+
+
+1.2 (unreleased)
+----------------
+
+- implementation of SPORE
+- schema and spore are optionals
+
+
+1.1 (2014-01-20)
+----------------
+
+- Added The PUT method on the ressource list endpoint
+
+
+1.0 (2014-01-20)
+----------------
+
+- Initial release

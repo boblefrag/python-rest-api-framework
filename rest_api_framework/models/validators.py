@@ -2,7 +2,6 @@
 Validators to check the values of Fields instances
 """
 from abc import ABCMeta, abstractmethod
-import sqlite3
 
 
 class Validator(object):

@@ -1,2 +1,2 @@
-include *.txt
+include *.txt CHANGELOG LICENCE VERSION README.md
 recursive-include docs *.rst

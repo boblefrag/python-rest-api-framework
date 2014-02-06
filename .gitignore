@@ -4,3 +4,5 @@
 /*.egg-info/
 /.coverage
 /report*.xml
+build
+dist

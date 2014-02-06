@@ -52,9 +52,10 @@ class SQLiteDataStore(DataStore):
         self.conn = sqlite3.connect(ressource_config["name"])
         cursor = self.conn.cursor()
         table = ressource_config["table"]
-        super(SQLiteDataStore, self).__init__({"conn": self.conn, "table": table},
-                                              model,
-                                              **options)
+        super(SQLiteDataStore, self).__init__(
+            {"conn": self.conn, "table": table},
+            model,
+            **options)
         self.create_database(cursor, table)
         self.conn.commit()
         # conn.close()

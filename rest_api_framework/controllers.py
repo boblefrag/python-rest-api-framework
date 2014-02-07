@@ -201,7 +201,7 @@ class WSGIDispatcher(DispatcherMiddleware):
             endpoints["/schema"] = self.make_schema(apps)
         if autospore:
             endpoints["/spore"] = self.make_spore(apps, name, base_url,
-                                                  version, formats)
+                                                  version)
         if hello:
             endpoints["/"] = self.make_hello(name, version)
 

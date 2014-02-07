@@ -126,7 +126,6 @@ class TestSayHello(TestCase):
         client = Client(WSGIDispatcher([FormatedApp]),
                         response_wrapper=BaseResponse)
         resp = client.get('/')
-        print dir(resp), resp.data
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(
             {"version": "devel", "name": "PRAF"},

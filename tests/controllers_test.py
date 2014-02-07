@@ -118,3 +118,17 @@ class TestControllerFormaters(TestCase):
                            data=json.dumps({'name': 'bob', 'age': "34"}))
 
         self.assertEqual(resp.status_code, 201)
+
+
+class TestSayHello(TestCase):
+
+    def test_say_hello(self):
+        client = Client(WSGIDispatcher([FormatedApp]),
+                        response_wrapper=BaseResponse)
+        resp = client.get('/')
+        print dir(resp), resp.data
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(
+            {"version": "devel", "name": "PRAF"},
+            json.loads(resp.data)
+            )

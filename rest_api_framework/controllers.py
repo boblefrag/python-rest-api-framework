@@ -113,6 +113,22 @@ class AutoSporeGenerator(WSGIWrapper):
         return self.view(json.dumps(spore_doc), mimetype="application/json")
 
 
+class HelloGenerator(WSGIWrapper):
+
+    def __init__(self, name, version):
+        self.name = name
+        self.version = version
+        from werkzeug.wrappers import Response
+        self.url_map = Map([Rule('/', endpoint='hello')
+                            ])
+        self.view = Response
+
+    def hello(self, request):
+        response = {"version": self.version,
+                    "name": self.name}
+        return self.view(json.dumps(response), mimetype="application/json")
+
+
 class AutoDocGenerator(WSGIWrapper):
     """
     Auto generate a documentation endpoint for each endpoints registered.
@@ -172,7 +188,8 @@ class WSGIDispatcher(DispatcherMiddleware):
     """
 
     def __init__(self, apps, name='PRAF', version='devel',
-                 base_url=None, formats=None, autodoc=True, autospore=True):
+                 base_url=None, formats=None, autodoc=True,
+                 autospore=True, hello=True):
         if formats is None:
             formats = []
         endpoints = {}
@@ -184,7 +201,10 @@ class WSGIDispatcher(DispatcherMiddleware):
             endpoints["/schema"] = self.make_schema(apps)
         if autospore:
             endpoints["/spore"] = self.make_spore(apps, name, base_url,
-                                                  version)
+                                                  version, formats)
+        if hello:
+            endpoints["/"] = self.make_hello(name, version)
+
         app = NotFound()
         mounts = endpoints
         super(WSGIDispatcher, self).__init__(app, mounts=mounts)
@@ -194,6 +214,9 @@ class WSGIDispatcher(DispatcherMiddleware):
 
     def make_spore(self, apps, name, base_url, version):
         return AutoSporeGenerator(apps, name, base_url, version)
+
+    def make_hello(self, name, version):
+        return HelloGenerator(name, version)
 
 
 class ApiController(WSGIWrapper):

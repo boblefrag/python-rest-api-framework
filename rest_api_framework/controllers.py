@@ -56,13 +56,12 @@ class WSGIWrapper(object):
 
 
 class AutoSporeGenerator(WSGIWrapper):
-    def __init__(self, apps, name, base_url, version, formats):
+    def __init__(self, apps, name, base_url, version):
         from werkzeug.wrappers import Response
         self.apps = apps
         self.name = name
         self.base_url = base_url
         self.version = version
-        self.formats = formats
 
         self.url_map = Map([
             Rule('/', endpoint='spore'),
@@ -96,9 +95,10 @@ class AutoSporeGenerator(WSGIWrapper):
                 service_params = URL_PLACEHOLDER.findall(endpoint)
 
                 for method in url[2]:
-                    view_info = OrderedDict(path=service_path,
-                                            method=method,
-                                            formats=self.formats)
+                    view_info = OrderedDict(
+                        path=service_path,
+                        method=method,
+                        formats=[service.view.render_format])
                     if service_params:
                         view_info['required_params'] = service_params
 
@@ -177,7 +177,6 @@ class WSGIDispatcher(DispatcherMiddleware):
             formats = []
         endpoints = {}
         for elem in apps:
-            formats.append(elem.view['response_class'].render_format)
             endpoints["/{0}".format(elem.ressource["ressource_name"])] = elem()
         if not formats:
             formats = ["json"]
@@ -185,7 +184,7 @@ class WSGIDispatcher(DispatcherMiddleware):
             endpoints["/schema"] = self.make_schema(apps)
         if autospore:
             endpoints["/spore"] = self.make_spore(apps, name, base_url,
-                                                  version, formats)
+                                                  version)
         app = NotFound()
         mounts = endpoints
         super(WSGIDispatcher, self).__init__(app, mounts=mounts)
@@ -193,8 +192,8 @@ class WSGIDispatcher(DispatcherMiddleware):
     def make_schema(self, apps):
         return AutoDocGenerator(apps)
 
-    def make_spore(self, apps, name, base_url, version, formats):
-        return AutoSporeGenerator(apps, name, base_url, version, formats)
+    def make_spore(self, apps, name, base_url, version):
+        return AutoSporeGenerator(apps, name, base_url, version)
 
 
 class ApiController(WSGIWrapper):

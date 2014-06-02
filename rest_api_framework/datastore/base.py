@@ -138,7 +138,8 @@ class DataStore(object):
 
         for field in self.model.fields:
             for validator in field.validators:
-                if not field.name in data:
+                if not field.name in data and field.options.get(
+                        "required", None) is True:
                     raise BadRequest(
                         "{0} is missing. Cannot create the ressource".format(
                             field.name)
@@ -149,9 +150,11 @@ class DataStore(object):
                         raise BadRequest("{0} does not validate".format(
                             field.name))
                 else:
-                    if not validator.validate(data[field.name]):
-                        raise BadRequest("{0} does not validate".format(
-                            field.name))
+                    if data.get(field.name):
+                        if not validator.validate(data[field.name]):
+                            raise BadRequest(
+                                "{0} does not validate".format(
+                                    field.name))
 
         if self.validators:
             for elem in self.validators:

@@ -49,7 +49,7 @@ class SQLiteDataStore(DataStore):
     def __init__(self, ressource_config, model, **options):
 
         self.db = ressource_config["name"]
-        self.conn = sqlite3.connect(ressource_config["name"])
+        self.conn = sqlite3.connect(ressource_config["name"], check_same_thread=False)
         cursor = self.conn.cursor()
         table = ressource_config["table"]
         super(SQLiteDataStore, self).__init__(

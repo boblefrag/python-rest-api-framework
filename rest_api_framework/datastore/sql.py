@@ -241,7 +241,6 @@ class SQLiteDataStore(DataStore):
         And, if data is valid, create the row in database and return it.
         """
         self.validate(data)
-
         fields = []
         values = []
 

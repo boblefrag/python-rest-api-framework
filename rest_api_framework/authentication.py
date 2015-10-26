@@ -40,9 +40,11 @@ class Authentication(object):
 class ApiKeyAuthentication(Authentication):
     """
     Authentication based on an apikey stored in a datastore.
+    internal_id is what will let you retreive user data. If not found
+    will return True to allow authentication.
     """
 
-    def __init__(self, datastore, identifier="apikey"):
+    def __init__(self, datastore, identifier="apikey", internal_id="id"):
         self.identifier = identifier
         self.datastore = datastore
 
@@ -54,8 +56,7 @@ class ApiKeyAuthentication(Authentication):
         data = request.values.to_dict()
         if self.identifier in data:
             try:
-                user = self.datastore.get(data[self.identifier])
-                return user
+                return self.datastore.get(data[self.identifier])
             except NotFound:
                 return None
         return None

@@ -144,10 +144,14 @@ class DataStore(object):
                         "{0} is missing. Cannot create the ressource".format(
                             field.name)
                         )
-
+                elif field.name not in data:
+                    continue # do not validate a missing key ;)
                 if hasattr(validator, "need_datastore"):
+                    try:
+                        validator.validate(data[field.name], self)
+                    except Exception, e:
+                        print e.__class__
                     if not validator.validate(data[field.name], self):
-                        print "OUPS"
                         raise BadRequest("{0} does not validate".format(
                             field.name))
                 else:

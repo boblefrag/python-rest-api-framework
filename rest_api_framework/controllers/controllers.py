@@ -39,6 +39,13 @@ class WSGIWrapper(object):
         response = self.dispatch_request(request)
         return response(environ, start_response)
 
+    def dispatch(self, matching_method, request, **values):
+        """
+        basicaly a hook to do something once the matching method is found
+        and before the method is actualy called
+        """
+        return matching_method(request, **values)
+
     def dispatch_request(self, request):
         """
         Using the :class:`werkzeug.routing.Map` constructed by
@@ -50,7 +57,9 @@ class WSGIWrapper(object):
             self.user = self.authentication.get_user(request)
         try:
             endpoint, values = adapter.match()
-            return getattr(self, endpoint)(request, **values)
+            matching_method = getattr(self, endpoint)
+            return self.dispatch(matching_method, request, **values)
+
         except HTTPException, error:
             return self.view(
                 {"error": error.description},
@@ -242,6 +251,7 @@ class ApiController(WSGIWrapper):
 
     def render_list(self, objs):
         return objs
+
 
     def index(self, request):
         """

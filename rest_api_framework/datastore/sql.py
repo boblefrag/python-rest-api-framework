@@ -49,7 +49,8 @@ class SQLiteDataStore(DataStore):
     def __init__(self, ressource_config, model, **options):
 
         self.db = ressource_config["name"]
-        self.conn = sqlite3.connect(ressource_config["name"], check_same_thread=False)
+        self.conn = sqlite3.connect(ressource_config["name"],
+                                    check_same_thread=False)
         cursor = self.conn.cursor()
         table = ressource_config["table"]
         super(SQLiteDataStore, self).__init__(
@@ -68,7 +69,9 @@ class SQLiteDataStore(DataStore):
             query = "{0} {1}".format(field.name, self.wrapper[field.base_type])
 
             if isinstance(field, PkField):
-                query += " primary key autoincrement"
+                query += " primary key"
+                if field.base_type == "integer":
+                    query += " autoincrement"
             statement.append(query)
 
             if "required" in field.options\
@@ -189,10 +192,10 @@ class SQLiteDataStore(DataStore):
                 fields = self.model.get_fields_name()
 
             for field in fields:
-                if not field in self.model.get_fields_name():
+                if field not in self.model.get_fields_name():
                     raise BadRequest()
 
-                if not self.model.pk_field.name in fields:
+                if self.model.pk_field.name not in fields:
                     fields.append(self.model.pk_field.name)
         else:
             fields = self.model.get_fields_name()
@@ -238,6 +241,7 @@ class SQLiteDataStore(DataStore):
         And, if data is valid, create the row in database and return it.
         """
         self.validate(data)
+
         fields = []
         values = []
 
@@ -254,7 +258,6 @@ class SQLiteDataStore(DataStore):
             tuple(fields),
             ",".join(["?" for step in range(len(fields))])
             )
-
         cursor.execute(query, tuple(values))
         self.conn.commit()
 

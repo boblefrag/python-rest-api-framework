@@ -51,14 +51,14 @@ class PkField(Field):
     example = 42
 
 
-class ForeignKeyField(Field):
+class ForeignKeyField(object):
 
     def __init__(self, name, **options):
-        self.validators = [IntegerValidator(), SQLiteForeign(**options)]
+        self.validators = [SQLiteForeign(**options), IntegerValidator()]
         super(ForeignKeyField, self).__init__(name, **options)
 
 
-class IntForeign(ForeignKeyField):
+class IntForeign(ForeignKeyField, Field):
     """
     A type of integer and a Foreign key to check
     """
@@ -66,12 +66,24 @@ class IntForeign(ForeignKeyField):
     example = 42
 
 
+class StringForeingKey(ForeignKeyField, Field):
+    """
+    A type of string and a Foreign key to check
+    """
+    base_type = "string"
+    example = "hackme"
+
+    def __init__(self, name, **options):
+        super(StringForeingKey, self).__init__(name, **options)
+        self.validators = [SQLiteForeign(**options), StringValidator()]
+
+
 class StringPkField(PkField):
     """
     A string based PkField
     """
     base_type = "string"
-    validators = []
+    validators = [StringValidator()]
     example = "i6HOCjvZMQ4"
 
 

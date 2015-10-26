@@ -51,7 +51,7 @@ class PythonListDataStore(DataStore):
         if self.partial:
             fields, kwargs = self.partial.get_partials(**kwargs)
 
-            if not self.model.pk_field.name in fields:
+            if self.model.pk_field.name not in fields:
                 fields.append(self.model.pk_field.name)
             try:
                 data = [dict((k, elem[k]) for k in fields) for elem in data]

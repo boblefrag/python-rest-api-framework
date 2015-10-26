@@ -46,6 +46,8 @@ class WSGIWrapper(object):
         object and return the response object.
         """
         adapter = self.url_map.bind_to_environ(request.environ)
+        if hasattr(self, "authentication"):
+            self.user = self.authentication.get_user(request)
         try:
             endpoint, values = adapter.match()
             return getattr(self, endpoint)(request, **values)
@@ -262,7 +264,6 @@ class ApiController(WSGIWrapper):
             return self.view(
                 headers={"Allow": ",".join(verbs)},
                 status=200)
-
         if self.authorization:
             self.authorization.check_auth(request)
         if self.ratelimit:

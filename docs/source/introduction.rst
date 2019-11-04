@@ -12,7 +12,7 @@ Instead it give you a good start with an extensible architecture to
 build your own API.
 
 Python REST API Framework has not been create for the usual
-case. Instead it give you some hook to your very special ressource
+case. Instead it give you some hook to your very special resource
 provider, your very special view management and your very special way
 of displaying data.
 
